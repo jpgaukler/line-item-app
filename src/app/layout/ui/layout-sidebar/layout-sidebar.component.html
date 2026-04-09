@@ -1,6 +1,6 @@
 <aside
   class="w-sidebar-width fixed top-0 left-0 h-full bg-gray-800 text-white transition-transform"
-  [ngClass]="isOpen() ? 'translate-x-0' : '-translate-x-full'"
+  [ngClass]="{ '-translate-x-full': !isOpen() }"
 >
   <div class="p-4 font-bold">Sidebar</div>
   <nav class="space-y-2 p-4">

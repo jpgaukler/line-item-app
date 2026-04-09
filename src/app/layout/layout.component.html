@@ -5,7 +5,8 @@
 ></app-layout-topbar>
 <main
   class="mt-topbar-height h-500 bg-gray-200 transition-[margin-left]"
-  [ngClass]="layoutService.sidebarOpen() ? 'ml-sidebar-width' : 'ml-0'"
+  [ngClass]="{ 'ml-sidebar-width': layoutService.sidebarOpen() }"
 >
+  <div class="p-4 font-bold">Content Area</div>
   <router-outlet />
 </main>
