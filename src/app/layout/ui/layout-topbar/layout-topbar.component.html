@@ -1,0 +1,9 @@
+<header
+  class="h-topbar-height fixed top-0 right-0 left-0 z-50 bg-gray-200 shadow-sm transition-[margin-left]"
+  [ngClass]="sidebarOpen() ? 'ml-sidebar-width' : 'ml-0'"
+>
+  <div class="flex h-full items-center justify-between p-4">
+    <button (click)="toggleSidebarClick.emit()">Toggle</button>
+    <div class="p-4 font-bold">Topbar</div>
+  </div>
+</header>

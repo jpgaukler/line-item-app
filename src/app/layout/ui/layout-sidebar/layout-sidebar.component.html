@@ -1,0 +1,10 @@
+<aside
+  class="w-sidebar-width fixed top-0 left-0 h-full bg-gray-800 text-white transition-transform"
+  [ngClass]="isOpen() ? 'translate-x-0' : '-translate-x-full'"
+>
+  <div class="p-4 font-bold">Sidebar</div>
+  <nav class="space-y-2 p-4">
+    <a href="#" class="block rounded p-2 hover:bg-gray-700">Item 1</a>
+    <a href="#" class="block rounded p-2 hover:bg-gray-700">Item 2</a>
+  </nav>
+</aside>

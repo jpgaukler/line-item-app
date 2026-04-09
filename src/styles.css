@@ -1,2 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
 @import 'tailwindcss';
+
+@theme {
+  --spacing-sidebar-width: calc(var(--spacing) * 64);
+  --spacing-topbar-height: calc(var(--spacing) * 16);
+}
+
+/* used to disable transitions on intial page load, see index.html body tag */
+.no-transition *,
+.no-transition *::before,
+.no-transition *::after {
+  transition: none !important;
+}
