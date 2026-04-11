@@ -106,31 +106,18 @@
     @apply bg-background text-foreground;
   }
 
+  /* dont know what these do */
   input[type='number']::-webkit-inner-spin-button,
   input[type='number']::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
 
+  /* dont know what these do */
   input[type='number'] {
     -moz-appearance: textfield;
     appearance: textfield; /* Added for general compatibility */
   }
-}
-
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--muted-foreground);
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-track {
-  border-radius: 5px;
-  background: var(--muted);
 }
 
 /* #endregion */
