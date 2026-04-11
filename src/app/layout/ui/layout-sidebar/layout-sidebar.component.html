@@ -1,10 +1,16 @@
 <aside
-  class="w-sidebar-width fixed top-0 bottom-0 left-0 bg-gray-800 text-white transition-transform"
+  class="w-sidebar-width bg-sidebar text-sidebar-foreground fixed top-0 bottom-0 left-0 z-10 transition-transform"
   [ngClass]="{ '-translate-x-full': !isOpen() }"
 >
-  <div class="p-4 font-bold">Sidebar</div>
-  <nav class="space-y-2 p-4">
-    <a routerLink="/products" class="block rounded p-2 hover:bg-gray-700">Products</a>
-    <a routerLink="/" class="block rounded p-2 hover:bg-gray-700">Item 2</a>
+  <div class="flex flex-col gap-2 border-b p-4">
+    <div class="text-lg font-bold">QuotePro</div>
+    <div class="text-sm">Material Handling Systems</div>
+  </div>
+  <nav class="flex flex-col gap-2 p-2">
+    @for (item of menuItems; track item.route) {
+      <a [routerLink]="item.route" class="hover:bg-muted rounded-md p-3 font-medium">
+        {{ item.label }}
+      </a>
+    }
   </nav>
 </aside>
