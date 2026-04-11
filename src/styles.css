@@ -5,6 +5,9 @@
   --spacing-topbar-height: calc(var(--spacing) * 16);
 }
 
+/* apply dark mode whenever the dark class is present: https://tailwindcss.com/docs/dark-mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* used to disable transitions on intial page load, see index.html body tag */
 .no-transition *,
 .no-transition *::before,

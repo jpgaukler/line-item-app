@@ -26,27 +26,12 @@
       <ol class="flex items-center gap-0">
         @for (breadcrumb of breadcrumbs(); track breadcrumb.url; let last = $last) {
           <li>
-            <a [routerLink]="breadcrumb.url" class="rounded p-2 hover:font-semibold">
+            <a [routerLink]="breadcrumb.url" class="rounded p-2 hover:underline">
               {{ breadcrumb.label }}
             </a>
           </li>
           @if (!last) {
-            <li>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-4"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                />
-              </svg>
-            </li>
+            <li>/</li>
           }
         }
       </ol>

@@ -14,12 +14,16 @@ const LOCAL_STORAGE = new InjectionToken<Storage>('window local storage object',
 export class LocalStorageService {
   private readonly storage = inject(LOCAL_STORAGE);
 
-  saveSidebarState(state: boolean): void {
-    this.storage.setItem('sidebar-state', String(state));
+  setItem(key: string, value: string): void {
+    this.storage.setItem(key, value);
   }
 
-  loadSidebarState(): Observable<boolean | null> {
-    const value = this.storage.getItem('sidebar-state');
-    return of(value === null ? null : value === 'true');
+  removeItem(key: string): void {
+    this.storage.removeItem(key);
+  }
+
+  loadItem(key: string): Observable<string | null> {
+    const value = this.storage.getItem(key);
+    return of(value === null ? null : value);
   }
 }

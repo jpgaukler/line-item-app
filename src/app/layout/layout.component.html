@@ -5,8 +5,11 @@
   (toggleSidebarClick)="layoutService.toggleSidebar$.next()"
 ></app-layout-topbar>
 <main
-  class="mt-topbar-height min-h-[calc(100vh-(var(--spacing-topbar-height)))] bg-gray-200 transition-[margin-left]"
+  class="mt-topbar-height min-h-[calc(100vh-(var(--spacing-topbar-height)))] bg-gray-200 transition-[margin-left] dark:bg-blue-800"
   [ngClass]="{ 'ml-sidebar-width': layoutService.sidebarOpen() }"
 >
+  <button (click)="this.layoutService.setLightTheme$.next()">Light</button>
+  <button (click)="this.layoutService.setDarkTheme$.next()">Dark</button>
+  <button (click)="this.layoutService.setSystemTheme$.next()">System</button>
   <router-outlet />
 </main>
