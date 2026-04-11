@@ -1,6 +1,5 @@
 import { Injectable, InjectionToken, PLATFORM_ID, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { LayoutState } from '../../layout/data-access/layout.service';
 
 const LOCAL_STORAGE = new InjectionToken<Storage>('window local storage object', {
   providedIn: 'root',
@@ -15,12 +14,12 @@ const LOCAL_STORAGE = new InjectionToken<Storage>('window local storage object',
 export class LocalStorageService {
   private readonly storage = inject(LOCAL_STORAGE);
 
-  loadLayoutState(): Observable<LayoutState | null> {
-    const theme = this.storage.getItem('layout-state');
-    return of(theme ? (JSON.parse(theme) as LayoutState) : null);
+  saveSidebarState(state: boolean): void {
+    this.storage.setItem('sidebar-state', String(state));
   }
 
-  saveLayoutState(state: LayoutState): void {
-    this.storage.setItem('layout-state', JSON.stringify(state));
+  loadSidebarState(): Observable<boolean | null> {
+    const value = this.storage.getItem('sidebar-state');
+    return of(value === null ? null : value === 'true');
   }
 }

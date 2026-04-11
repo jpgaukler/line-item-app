@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { LayoutComponent } from './layout/layout.component';
+import { ProductsComponent } from './products/products.component';
 
 export const routes: Routes = [
   {
@@ -7,15 +8,15 @@ export const routes: Routes = [
     component: LayoutComponent,
     children: [
       // {
-      //     path: 'home',
-      //     title: 'Home',
+      //     path: 'quotes',
+      //     title: 'Quotes',
       //     component: HomeComponent,
       // },
-      // {
-      //     path: 'product-groups',
-      //     title: 'Product Groups',
-      //     component: ProductGroupsComponent,
-      // },
+      {
+        path: 'products',
+        title: 'Products • Cadflair',
+        component: ProductsComponent,
+      },
       // {
       //     path: 'product-groups/:id',
       //     title: 'Product Groups',

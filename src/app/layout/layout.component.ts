@@ -14,8 +14,6 @@ import { LayoutTopbarComponent } from './ui/layout-topbar/layout-topbar.componen
 export class LayoutComponent implements AfterViewInit {
   public layoutService = inject(LayoutService);
 
-  constructor() {}
-
   ngAfterViewInit() {
     // Remove the 'no-transition' class after the layout has initialized to enable CSS transitions
     requestAnimationFrame(() => {
