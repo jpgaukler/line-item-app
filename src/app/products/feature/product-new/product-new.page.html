@@ -1,0 +1,24 @@
+<div class="text-2xl font-bold">Create a new product</div>
+<form [formGroup]="newProductForm" (ngSubmit)="submit()" class="mt-4 flex flex-col gap-4">
+  <input
+    id="product-name-input"
+    type="text"
+    placeholder="Product Name"
+    formControlName="name"
+    class="rounded-md border p-2"
+  />
+  <textarea
+    id="product-description-input"
+    placeholder="Description"
+    formControlName="description"
+    class="rounded-md border p-2"
+  ></textarea>
+  <button
+    type="submit"
+    [disabled]="newProductForm.invalid"
+    data-testid="submit-button"
+    class="bg-primary text-primary-foreground rounded-md p-2 font-medium"
+  >
+    Create product
+  </button>
+</form>

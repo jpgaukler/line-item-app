@@ -9,7 +9,7 @@ interface LayoutState {
   breadcrumbs: LayoutBreadcrumb[];
 }
 
-const DEFAULT_LAYOUT_STATE: Readonly<LayoutState> = {
+const DEFAULT_STATE: Readonly<LayoutState> = {
   sidebarOpen: false,
   breadcrumbs: [],
 };
@@ -24,14 +24,14 @@ export class LayoutService {
   private readonly localStorageService = inject(LocalStorageService);
 
   // state
-  private state = signal<LayoutState>(DEFAULT_LAYOUT_STATE);
+  private state = signal<LayoutState>(DEFAULT_STATE);
 
   // selectors
   sidebarOpen = computed(() => this.state().sidebarOpen);
   breadcrumbs = computed(() => this.state().breadcrumbs);
 
   // sources
-  private loadSidebarState$ = this.localStorageService.loadItem(SIDEBAR_STATE_KEY);
+  private loadSidebarState$ = this.localStorageService.loadItem<boolean>(SIDEBAR_STATE_KEY);
   toggleSidebar$ = new Subject<void>();
   setDarkTheme$ = new Subject<void>();
   setLightTheme$ = new Subject<void>();
@@ -67,7 +67,7 @@ export class LayoutService {
         if (isOpen !== null) {
           this.state.update((state) => ({
             ...state,
-            sidebarOpen: isOpen === 'true',
+            sidebarOpen: isOpen === true,
           }));
         }
       },

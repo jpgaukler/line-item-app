@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { LocalStorageService } from '../../shared/data-access/local-storage.service';
 import { Product } from '../interfaces/product.interface';
 
-export interface ProductListState {
+interface ProductListState {
   products: Product[];
   loaded: boolean;
   error: string | null;

@@ -3,6 +3,7 @@ import { LayoutComponent } from './layout/layout.component';
 import { PreferencesPage } from './preferences/preferences.page';
 import { ProductEditPage } from './products/feature/product-edit/product-edit.page';
 import { ProductListPage } from './products/feature/product-list/product-list.page';
+import { ProductNewPage } from './products/feature/product-new/product-new.page';
 
 export const routes: Routes = [
   {
@@ -13,6 +14,11 @@ export const routes: Routes = [
         path: 'products',
         title: 'Products • Cadflair',
         component: ProductListPage,
+      },
+      {
+        path: 'products/new',
+        title: 'New Product • Cadflair',
+        component: ProductNewPage,
       },
       {
         path: 'products/:productId',

@@ -22,8 +22,8 @@ export class LocalStorageService {
     this.storage.removeItem(key);
   }
 
-  loadItem(key: string): Observable<string | null> {
+  loadItem<T>(key: string): Observable<T | null> {
     const value = this.storage.getItem(key);
-    return of(value === null ? null : value);
+    return of(value === null ? null : (JSON.parse(value) as T));
   }
 }

@@ -15,8 +15,8 @@ interface MenuItem {
 export class LayoutSidebarComponent {
   isOpen = input.required<boolean>();
   menuItems: MenuItem[] = [
+    { label: 'Home', route: '/' },
     { label: 'Products', route: '/products' },
     { label: 'Preferences', route: '/preferences' },
-    { label: 'Item 2', route: '/' },
   ];
 }
