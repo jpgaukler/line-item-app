@@ -20,6 +20,6 @@ export class ProductEditPage implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.layoutService.updateBreadcrumbs$.next([]);
+    this.layoutService.clearBreadcrumbs$.next();
   }
 }

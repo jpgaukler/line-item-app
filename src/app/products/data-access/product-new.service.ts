@@ -10,12 +10,6 @@ interface ProductNewState {
   error: string | null;
 }
 
-const DEFAULT_STATE: Readonly<ProductNewState> = {
-  product: { id: '', name: '', description: '', productCodeDefinition: '', selections: [] },
-  loaded: false,
-  error: null,
-};
-
 @Injectable({
   providedIn: 'root',
 })
@@ -23,7 +17,11 @@ export class ProductNewService {
   private readonly localStorageService = inject(LocalStorageService);
 
   // state
-  private state = signal<ProductNewState>(DEFAULT_STATE);
+  private state = signal<ProductNewState>({
+    product: { id: '', name: '', description: '', productCodeDefinition: '', selections: [] },
+    loaded: false,
+    error: null,
+  });
 
   // selectors
   name = computed(() => this.state().product.name);

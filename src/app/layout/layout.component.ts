@@ -12,7 +12,7 @@ import { LayoutTopbarComponent } from './ui/layout-topbar/layout-topbar.componen
   templateUrl: './layout.component.html',
 })
 export class LayoutComponent implements AfterViewInit {
-  public layoutService = inject(LayoutService);
+  public readonly layoutService = inject(LayoutService);
 
   ngAfterViewInit() {
     // Remove the 'no-transition' class after the layout has initialized to enable CSS transitions

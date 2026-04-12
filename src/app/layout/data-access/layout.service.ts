@@ -9,11 +9,6 @@ interface LayoutState {
   breadcrumbs: LayoutBreadcrumb[];
 }
 
-const DEFAULT_STATE: Readonly<LayoutState> = {
-  sidebarOpen: false,
-  breadcrumbs: [],
-};
-
 const SIDEBAR_STATE_KEY = 'sidebar-open';
 const THEME_STATE_KEY = 'theme';
 
@@ -24,7 +19,10 @@ export class LayoutService {
   private readonly localStorageService = inject(LocalStorageService);
 
   // state
-  private state = signal<LayoutState>(DEFAULT_STATE);
+  private state = signal<LayoutState>({
+    sidebarOpen: false,
+    breadcrumbs: [],
+  });
 
   // selectors
   sidebarOpen = computed(() => this.state().sidebarOpen);
@@ -37,6 +35,7 @@ export class LayoutService {
   setLightTheme$ = new Subject<void>();
   setSystemTheme$ = new Subject<void>();
   updateBreadcrumbs$ = new Subject<LayoutBreadcrumb[]>();
+  clearBreadcrumbs$ = new Subject<void>();
 
   constructor() {
     // reducers
@@ -89,6 +88,15 @@ export class LayoutService {
         this.state.update((state) => ({
           ...state,
           breadcrumbs: value,
+        }));
+      },
+    });
+
+    this.clearBreadcrumbs$.pipe(takeUntilDestroyed()).subscribe({
+      next: () => {
+        this.state.update((state) => ({
+          ...state,
+          breadcrumbs: [],
         }));
       },
     });
