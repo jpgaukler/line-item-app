@@ -1,14 +1,15 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { LocalStorageService } from '../../shared/data-access/local-storage.service';
+import { Product } from '../interfaces/product.interface';
 
-export interface ProductsState {
-  sidebarOpen: boolean;
+export interface ProductListState {
+  products: Product[];
   loaded: boolean;
   error: string | null;
 }
 
-const DEFAULT_PRODUCTS_STATE: Readonly<ProductsState> = {
-  sidebarOpen: false,
+const DEFAULT_PRODUCTS_STATE: Readonly<ProductListState> = {
+  products: [],
   loaded: false,
   error: null,
 };
@@ -16,11 +17,11 @@ const DEFAULT_PRODUCTS_STATE: Readonly<ProductsState> = {
 @Injectable({
   providedIn: 'root',
 })
-export class ProductsService {
+export class ProductListService {
   private readonly localStorageService = inject(LocalStorageService);
 
   // state
-  private state = signal<ProductsState>(DEFAULT_PRODUCTS_STATE);
+  private state = signal<ProductListState>(DEFAULT_PRODUCTS_STATE);
 
   // selectors
   // sidebarOpen = computed(() => this.state().sidebarOpen);

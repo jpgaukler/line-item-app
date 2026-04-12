@@ -1,21 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { LayoutService } from '../layout/data-access/layout.service';
+import { LayoutService } from '../../../layout/data-access/layout.service';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './preferences.component.html',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './product-edit.page.html',
 })
-export class PreferencesComponent implements OnDestroy {
-  public layoutService = inject(LayoutService);
+export class ProductEditPage implements OnDestroy {
+  private readonly layoutService = inject(LayoutService);
 
   constructor() {
     this.layoutService.updateBreadcrumbs$.next([
       { label: 'Home', url: '/' },
-      { label: 'Preferences', url: '/preferences' },
+      { label: 'Products', url: '/products' },
+      { label: 'Edit Product', url: '/products/edit' },
     ]);
   }
 

@@ -12,14 +12,11 @@
 
 <div class="mt-4 flex flex-row flex-wrap gap-4">
   @for (product of products; track product.name) {
-    <div class="bg-card border-border rounded-md border p-2">
+    <a class="bg-card border-border rounded-md border p-2" [routerLink]="['/products', product.id]">
       <div class="mb-2 text-lg font-bold">{{ product.name }}</div>
       <div>{{ product.description }}</div>
       <hr class="my-2" />
       <div class="font-semibold">Configurations ({{ product.selections.length }})</div>
-      <button class="bg-primary text-primary-foreground w-full rounded-md p-2 font-medium">
-        Edit
-      </button>
-    </div>
+    </a>
   }
 </div>
