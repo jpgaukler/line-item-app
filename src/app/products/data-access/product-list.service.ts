@@ -24,7 +24,7 @@ export class ProductListService {
   });
 
   // selectors
-  products = computed(() => this.state().products);
+  products = computed(() => this.state().products.sort((a, b) => a.name.localeCompare(b.name)));
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
 

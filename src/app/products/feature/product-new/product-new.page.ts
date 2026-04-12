@@ -3,12 +3,13 @@ import { Component, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LayoutService } from '../../../layout/data-access/layout.service';
+import { ButtonPrimaryDirective } from '../../../shared/ui/button-primary.directive';
 import { ProductListService } from '../../data-access/product-list.service';
 import { AddProduct } from '../../interfaces/product.interface';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ButtonPrimaryDirective],
   templateUrl: './product-new.page.html',
 })
 export class ProductNewPage implements OnDestroy {

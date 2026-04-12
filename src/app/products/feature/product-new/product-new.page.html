@@ -37,12 +37,6 @@
       {{ descriptionControl.value ? descriptionControl.value.length : 0 }} /
       {{ MAX_DESCRIPTION_LENGTH }}
     </p>
-    <button
-      type="submit"
-      data-testid="submit-button"
-      class="bg-primary hover:bg-primary/80 text-primary-foreground disabled:bg-muted cursor-pointer rounded-md p-2 font-medium"
-    >
-      Create product
-    </button>
+    <button appButtonPrimary type="submit">Create product</button>
   </form>
 }

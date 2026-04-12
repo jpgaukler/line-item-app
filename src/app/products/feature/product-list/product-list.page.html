@@ -8,12 +8,7 @@
     <div>Select a product to edit</div>
   </div>
   <div>
-    <a
-      routerLink="/products/new"
-      class="bg-primary text-primary-foreground rounded-md p-2 font-medium"
-    >
-      + New
-    </a>
+    <a appButtonPrimary routerLink="/products/new"> + New </a>
   </div>
 </div>
 
@@ -30,6 +25,9 @@
         <div>{{ product.description }}</div>
         <hr class="my-2" />
         <div class="font-semibold">Configurations ({{ product.selections.length }})</div>
+        <!-- <button appButtonPrimary (click)="productListService.deleteProduct$.next(product)">
+          Delete
+        </button> -->
       </a>
     }
   </div>

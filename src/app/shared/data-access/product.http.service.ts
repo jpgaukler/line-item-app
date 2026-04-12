@@ -24,7 +24,14 @@ export class ProductHttpService {
   getProducts(): Observable<Product[]> {
     return this.localStorageService.loadItem<Product[]>('products').pipe(
       delay(1000),
-      map((products) => (products ?? []).sort((a, b) => a.name.localeCompare(b.name))),
+      map((products) => products ?? []),
+    );
+  }
+
+  getProductById(id: string): Observable<Product | null> {
+    return this.localStorageService.loadItem<Product[]>('products').pipe(
+      delay(1000),
+      map((products) => products?.find((p) => p.id === id) ?? null),
     );
   }
 
