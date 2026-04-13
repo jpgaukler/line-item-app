@@ -22,7 +22,12 @@ export class LocalStorageService {
     this.storage.removeItem(key);
   }
 
-  loadItem<T>(key: string): Observable<T | null> {
+  loadString(key: string): Observable<string | null> {
+    const value = this.storage.getItem(key);
+    return of(value === null ? null : value);
+  }
+
+  loadJson<T>(key: string): Observable<T | null> {
     const value = this.storage.getItem(key);
     return of(value === null ? null : (JSON.parse(value) as T));
   }

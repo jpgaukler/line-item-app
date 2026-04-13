@@ -22,14 +22,14 @@ export class ProductHttpService {
   }
 
   getProducts(): Observable<Product[]> {
-    return this.localStorageService.loadItem<Product[]>('products').pipe(
+    return this.localStorageService.loadJson<Product[]>('products').pipe(
       delay(500),
       map((products) => products ?? []),
     );
   }
 
   getProductById(id: string): Observable<Product> {
-    return this.localStorageService.loadItem<Product[]>('products').pipe(
+    return this.localStorageService.loadJson<Product[]>('products').pipe(
       delay(500),
       map((products) => {
         const product = products?.find((p) => p.id === id);
