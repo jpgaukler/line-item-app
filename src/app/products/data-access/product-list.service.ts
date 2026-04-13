@@ -10,9 +10,7 @@ interface ProductListState {
   error: string | null;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class ProductListService {
   private readonly productHttpService = inject(ProductHttpService);
 

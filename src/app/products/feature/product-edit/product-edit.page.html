@@ -1,1 +1,24 @@
 <div>edit product</div>
+
+@if (productEditService.error()) {
+  <p class="text-destructive">Error: {{ productEditService.error() }}</p>
+}
+
+<div class="mb-4 flex flex-row justify-between">
+  <div>
+    <div class="text-2xl font-bold">Products</div>
+    <div>Select a product to edit</div>
+  </div>
+  <div>
+    <a appButtonPrimary routerLink="/products/new"> + New </a>
+  </div>
+</div>
+
+@if (!productEditService.loaded()) {
+  <p>Loading...</p>
+} @else {
+  <div class="bg-card border-border rounded-md border p-4">
+    <div class="mb-2 text-lg font-bold">{{ productEditService.name() }}</div>
+    <div>{{ productEditService.description() }}</div>
+  </div>
+}

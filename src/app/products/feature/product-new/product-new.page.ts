@@ -11,6 +11,7 @@ import { AddProduct } from '../../interfaces/product.interface';
   selector: 'app-products',
   imports: [CommonModule, ReactiveFormsModule, ButtonPrimaryDirective],
   templateUrl: './product-new.page.html',
+  providers: [ProductListService],
 })
 export class ProductNewPage implements OnDestroy {
   private readonly router = inject(Router);
