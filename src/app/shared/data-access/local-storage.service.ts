@@ -18,6 +18,10 @@ export class LocalStorageService {
     this.storage.setItem(key, value);
   }
 
+  setJson<T>(key: string, value: T): void {
+    this.storage.setItem(key, JSON.stringify(value));
+  }
+
   removeItem(key: string): void {
     this.storage.removeItem(key);
   }

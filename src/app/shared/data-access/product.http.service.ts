@@ -18,7 +18,7 @@ export class ProductHttpService {
   // }
 
   saveProducts(products: Product[]): void {
-    this.localStorageService.setItem('products', JSON.stringify(products));
+    this.localStorageService.setJson('products', products);
   }
 
   getProducts(): Observable<Product[]> {
