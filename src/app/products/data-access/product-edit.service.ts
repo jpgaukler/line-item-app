@@ -1,9 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { Subject, switchMap } from 'rxjs';
+import { Subject, switchMap, tap } from 'rxjs';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
-import { AddProductSelectionOption } from '../interfaces/product-selection-option.interface';
 import { Product } from '../interfaces/product.interface';
 
 interface ProductEditState {
@@ -40,11 +39,33 @@ export class ProductEditService {
   private loadProduct$ = this.activatedRoute.paramMap.pipe(
     switchMap((params) => this.productHttpService.getProductById(params.get('productId')!)),
   );
-  updateName$ = new Subject<string>();
-  updateDescription$ = new Subject<string>();
-  addSelection$ = new Subject<void>();
-  addOption$ = new Subject<AddProductSelectionOption>();
+
+  updateProductName$ = new Subject<string>();
+  updateProductDescription$ = new Subject<string>();
   updateProductCodeDefinition$ = new Subject<string>();
+
+  addSelection$ = new Subject<void>();
+  removeSelection$ = new Subject<{ selectionId: string }>();
+  updateSelectionName$ = new Subject<{ selectionId: string; name: string }>();
+  updateSelectionAllowCustomValue$ = new Subject<{
+    selectionId: string;
+    allowCustomValue: boolean;
+  }>();
+  updateSelectionDefaultOptionId$ = new Subject<{ selectionId: string; defaultOptionId: string }>();
+
+  addOption$ = new Subject<{ selectionId: string }>();
+  removeOption$ = new Subject<{ selectionId: string; optionId: string }>();
+  updateOptionDisplayText$ = new Subject<{
+    selectionId: string;
+    optionId: string;
+    displayText: string;
+  }>();
+  updateOptionValue$ = new Subject<{
+    selectionId: string;
+    optionId: string;
+    value: string;
+  }>();
+
   saveChanges$ = new Subject<void>();
   discardChanges$ = new Subject<void>();
 
@@ -61,29 +82,31 @@ export class ProductEditService {
       error: (err) => this.state.update((state) => ({ ...state, error: err })),
     });
 
-    this.updateName$.pipe(takeUntilDestroyed()).subscribe((name: string) =>
+    this.updateProductName$.pipe(takeUntilDestroyed()).subscribe((next) =>
       this.state.update((state) => ({
         ...state,
         isDirty: true,
         product: {
           ...state.product,
-          name: name,
+          name: next,
         },
       })),
     );
 
-    this.updateDescription$.pipe(takeUntilDestroyed()).subscribe((description: string) =>
+    this.updateProductDescription$.pipe(takeUntilDestroyed()).subscribe((next) =>
       this.state.update((state) => ({
         ...state,
         isDirty: true,
         product: {
           ...state.product,
-          description: description,
+          description: next,
         },
       })),
     );
 
-    this.addSelection$.pipe(takeUntilDestroyed()).subscribe(() =>
+    this.addSelection$.pipe(takeUntilDestroyed()).subscribe(() => {
+      const defaultOptionId = crypto.randomUUID();
+
       this.state.update((state) => ({
         ...state,
         isDirty: true,
@@ -92,59 +115,191 @@ export class ProductEditService {
           selections: [
             ...state.product.selections,
             {
+              id: crypto.randomUUID(),
               name: `Selection (${state.product.selections.length + 1})`,
-              options: [{ displayText: 'Option (1)', value: '1' }],
-              defaultValue: 'Option (1)',
+              options: [{ id: defaultOptionId, displayText: 'Option (1)', value: '1' }],
+              defaultOptionId: defaultOptionId,
               allowCustomValue: false,
             },
           ],
         },
+      }));
+    });
+
+    this.removeSelection$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => ({
+        ...state,
+        isDirty: true,
+        product: {
+          ...state.product,
+          selections: state.product.selections.filter(
+            (selection) => selection.id !== next.selectionId,
+          ),
+        },
       })),
     );
 
-    this.addOption$
-      .pipe(takeUntilDestroyed())
-      .subscribe((selectionName: AddProductSelectionOption) =>
-        this.state.update((state) => ({
-          ...state,
-          isDirty: true,
-          product: {
-            ...state.product,
-            selections: state.product.selections.map((selection) =>
-              selection.name === selectionName
-                ? {
-                    ...selection,
-                    options: [
-                      ...selection.options,
-                      {
-                        displayText: `Option (${selection.options.length + 1})`,
-                        value: `${selection.options.length + 1}`,
-                      },
-                    ],
-                  }
-                : selection,
-            ),
-          },
-        })),
-      );
+    this.updateSelectionName$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => ({
+        ...state,
+        isDirty: true,
+        product: {
+          ...state.product,
+          selections: state.product.selections.map((selection) =>
+            selection.id === next.selectionId
+              ? {
+                  ...selection,
+                  name: next.name,
+                }
+              : selection,
+          ),
+        },
+      })),
+    );
 
-    this.updateProductCodeDefinition$
-      .pipe(takeUntilDestroyed())
-      .subscribe((productCodeDefinition: string) =>
-        this.state.update((state) => ({
-          ...state,
-          isDirty: true,
-          product: {
-            ...state.product,
-            productCodeDefinition: productCodeDefinition,
-          },
-        })),
-      );
+    this.updateSelectionDefaultOptionId$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => ({
+        ...state,
+        isDirty: true,
+        product: {
+          ...state.product,
+          selections: state.product.selections.map((selection) =>
+            selection.id === next.selectionId
+              ? {
+                  ...selection,
+                  defaultOptionId: next.defaultOptionId,
+                }
+              : selection,
+          ),
+        },
+      })),
+    );
+
+    this.updateSelectionAllowCustomValue$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => ({
+        ...state,
+        isDirty: true,
+        product: {
+          ...state.product,
+          selections: state.product.selections.map((selection) =>
+            selection.id === next.selectionId
+              ? {
+                  ...selection,
+                  allowCustomValue: next.allowCustomValue,
+                }
+              : selection,
+          ),
+        },
+      })),
+    );
+
+    this.addOption$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => ({
+        ...state,
+        isDirty: true,
+        product: {
+          ...state.product,
+          selections: state.product.selections.map((selection) =>
+            selection.id === next.selectionId
+              ? {
+                  ...selection,
+                  options: [
+                    ...selection.options,
+                    {
+                      id: crypto.randomUUID(),
+                      displayText: `Option (${selection.options.length + 1})`,
+                      value: `${selection.options.length + 1}`,
+                    },
+                  ],
+                }
+              : selection,
+          ),
+        },
+      })),
+    );
+
+    this.removeOption$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => ({
+        ...state,
+        isDirty: true,
+        product: {
+          ...state.product,
+          selections: state.product.selections.map((selection) =>
+            selection.id === next.selectionId
+              ? {
+                  ...selection,
+                  options: selection.options.filter((option) => option.id !== next.optionId),
+                }
+              : selection,
+          ),
+        },
+      })),
+    );
+
+    this.updateOptionDisplayText$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => ({
+        ...state,
+        isDirty: true,
+        product: {
+          ...state.product,
+          selections: state.product.selections.map((selection) =>
+            selection.id === next.selectionId
+              ? {
+                  ...selection,
+                  options: [
+                    ...selection.options.map((option) =>
+                      option.id === next.optionId
+                        ? { ...option, displayText: next.displayText }
+                        : option,
+                    ),
+                  ],
+                }
+              : selection,
+          ),
+        },
+      })),
+    );
+
+    this.updateOptionValue$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => ({
+        ...state,
+        isDirty: true,
+        product: {
+          ...state.product,
+          selections: state.product.selections.map((selection) =>
+            selection.id === next.selectionId
+              ? {
+                  ...selection,
+                  options: [
+                    ...selection.options.map((option) =>
+                      option.id === next.optionId ? { ...option, value: next.value } : option,
+                    ),
+                  ],
+                }
+              : selection,
+          ),
+        },
+      })),
+    );
+
+    this.updateProductCodeDefinition$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => ({
+        ...state,
+        isDirty: true,
+        product: {
+          ...state.product,
+          productCodeDefinition: next,
+        },
+      })),
+    );
 
     this.saveChanges$
       .pipe(
         takeUntilDestroyed(),
         switchMap(() => this.productHttpService.saveProduct(this.product())),
+        tap(() => {
+          console.log('Product saved successfully', this.product());
+        }),
       )
       .subscribe(() =>
         this.state.update((state) => ({

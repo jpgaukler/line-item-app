@@ -18,13 +18,13 @@
         type="text"
         class="hover:bg-input focus:bg-input rounded-md p-2 text-2xl font-bold"
         [ngModel]="productEditService.name()"
-        (ngModelChange)="productEditService.updateName$.next($event)"
+        (ngModelChange)="productEditService.updateProductName$.next($event)"
       />
       <textarea
         class="hover:bg-input focus:bg-input resize-none rounded-md p-2 hover:resize-y"
         rows="3"
         [ngModel]="productEditService.description()"
-        (ngModelChange)="productEditService.updateDescription$.next($event)"
+        (ngModelChange)="productEditService.updateProductDescription$.next($event)"
       ></textarea>
       <input
         class="hover:bg-input focus:bg-input rounded-md p-2"
@@ -38,26 +38,82 @@
         <div class="text-2xl font-bold">Selections</div>
         <button appButtonPrimary (click)="productEditService.addSelection$.next()">+ New</button>
       </div>
-      @for (selection of productEditService.selections(); track selection.name) {
+      @for (selection of productEditService.selections(); track selection.id) {
         <div class="flex flex-col gap-2 rounded-md border p-2">
-          <input
-            type="text"
-            class="hover:bg-input focus:bg-input rounded-md p-2 text-lg font-bold"
-            [ngModel]="selection.name"
-          />
+          <div class="flex flex-row justify-between gap-4">
+            <input
+              type="text"
+              class="hover:bg-input focus:bg-input rounded-md p-2 text-lg font-bold"
+              [ngModel]="selection.name"
+              (ngModelChange)="
+                productEditService.updateSelectionName$.next({
+                  selectionId: selection.id,
+                  name: $event,
+                })
+              "
+            />
+            <button
+              appButtonPrimary
+              (click)="productEditService.removeSelection$.next({ selectionId: selection.id })"
+            >
+              Delete
+            </button>
+          </div>
           <div class="flex flex-row items-center justify-between">
             <div class="text-md p-2 font-bold">Options</div>
-            <button appButtonPrimary (click)="productEditService.addOption$.next(selection.name)">
+            <button
+              appButtonPrimary
+              (click)="productEditService.addOption$.next({ selectionId: selection.id })"
+            >
               + New
             </button>
           </div>
           <div class="flex flex-col gap-4">
-            @for (option of selection.options; track option.value) {
-              <input
-                class="hover:bg-input focus:bg-input ml-4 rounded-md p-2"
-                placeholder="Option"
-                [ngModel]="option.displayText"
-              />
+            @for (option of selection.options; track option.id; let optionIndex = $index) {
+              <div class="flex flex-row gap-4">
+                <div class="group relative flex justify-center">
+                  <input
+                    type="radio"
+                    [name]="`selection-${selection.id}`"
+                    [value]="option.id"
+                    [ngModel]="selection.defaultOptionId"
+                    (ngModelChange)="
+                      productEditService.updateSelectionDefaultOptionId$.next({
+                        selectionId: selection.id,
+                        defaultOptionId: $event,
+                      })
+                    "
+                  />
+                  <span
+                    class="bg-accent text-accent-foreground absolute bottom-full z-50 mb-2 w-max rounded p-2 text-xs opacity-0 transition-all group-hover:opacity-100"
+                  >
+                    Set default option
+                  </span>
+                </div>
+                <input
+                  class="hover:bg-input focus:bg-input ml-4 flex-1 rounded-md p-2"
+                  placeholder="Option"
+                  [ngModel]="option.displayText"
+                  (ngModelChange)="
+                    productEditService.updateOptionDisplayText$.next({
+                      selectionId: selection.id,
+                      optionId: option.id,
+                      displayText: $event,
+                    })
+                  "
+                />
+                <button
+                  appButtonPrimary
+                  (click)="
+                    productEditService.removeOption$.next({
+                      selectionId: selection.id,
+                      optionId: option.id,
+                    })
+                  "
+                >
+                  Delete
+                </button>
+              </div>
             }
           </div>
         </div>

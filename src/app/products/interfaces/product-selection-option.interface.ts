@@ -1,8 +1,5 @@
-import { ProductSelection } from './product-selection.interface';
-
 export interface ProductSelectionOption {
-  value: string;
+  id: string;
   displayText: string;
+  value: string;
 }
-
-export type AddProductSelectionOption = ProductSelection['name'];
