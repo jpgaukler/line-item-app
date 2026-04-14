@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { delay, map, Observable } from 'rxjs';
+import { delay, map, Observable, of } from 'rxjs';
 import { Product } from '../../products/interfaces/product.interface';
 import { LocalStorageService } from './local-storage.service';
 
@@ -19,6 +19,13 @@ export class ProductHttpService {
 
   saveProducts(products: Product[]): void {
     this.localStorageService.setJson('products', products);
+  }
+
+  saveProduct(product: Product): Observable<void> {
+    const products = this.localStorageService.getJson<Product[]>('products') || [];
+    const updatedProducts = products.map((p) => (p.id === product.id ? product : p));
+    this.localStorageService.setJson('products', updatedProducts);
+    return of(undefined);
   }
 
   getProducts(): Observable<Product[]> {

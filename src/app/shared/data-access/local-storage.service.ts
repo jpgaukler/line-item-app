@@ -22,6 +22,11 @@ export class LocalStorageService {
     this.storage.setItem(key, JSON.stringify(value));
   }
 
+  getJson<T>(key: string): T | null {
+    const value = this.storage.getItem(key);
+    return value === null ? null : (JSON.parse(value) as T);
+  }
+
   removeItem(key: string): void {
     this.storage.removeItem(key);
   }

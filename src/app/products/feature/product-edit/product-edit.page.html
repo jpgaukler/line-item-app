@@ -1,24 +1,67 @@
-<div>edit product</div>
-
 @if (productEditService.error()) {
   <p class="text-destructive">Error: {{ productEditService.error() }}</p>
 }
 
-<div class="mb-4 flex flex-row justify-between">
-  <div>
-    <div class="text-2xl font-bold">Products</div>
-    <div>Select a product to edit</div>
-  </div>
-  <div>
-    <a appButtonPrimary routerLink="/products/new"> + New </a>
-  </div>
-</div>
-
 @if (!productEditService.loaded()) {
   <p>Loading...</p>
 } @else {
-  <div class="bg-card border-border rounded-md border p-4">
-    <div class="mb-2 text-lg font-bold">{{ productEditService.name() }}</div>
-    <div>{{ productEditService.description() }}</div>
+  <div class="flex flex-row justify-start gap-4">
+    <div>IsDirty: {{ productEditService.isDirty() }}</div>
+    <button appButtonPrimary (click)="productEditService.saveChanges$.next()">Save Changes</button>
+    <button appButtonPrimary (click)="productEditService.discardChanges$.next()">
+      Discard Changes
+    </button>
+  </div>
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2 rounded-md border p-4">
+      <input
+        type="text"
+        class="hover:bg-input focus:bg-input rounded-md p-2 text-2xl font-bold"
+        [ngModel]="productEditService.name()"
+        (ngModelChange)="productEditService.updateName$.next($event)"
+      />
+      <textarea
+        class="hover:bg-input focus:bg-input resize-none rounded-md p-2 hover:resize-y"
+        rows="3"
+        [ngModel]="productEditService.description()"
+        (ngModelChange)="productEditService.updateDescription$.next($event)"
+      ></textarea>
+      <input
+        class="hover:bg-input focus:bg-input rounded-md p-2"
+        placeholder="Product Code"
+        [ngModel]="productEditService.productCodeDefinition()"
+        (ngModelChange)="productEditService.updateProductCodeDefinition$.next($event)"
+      />
+    </div>
+    <div class="flex flex-col gap-2 rounded-md p-4">
+      <div class="flex flex-row items-center justify-between">
+        <div class="text-2xl font-bold">Selections</div>
+        <button appButtonPrimary (click)="productEditService.addSelection$.next()">+ New</button>
+      </div>
+      @for (selection of productEditService.selections(); track selection.name) {
+        <div class="flex flex-col gap-2 rounded-md border p-2">
+          <input
+            type="text"
+            class="hover:bg-input focus:bg-input rounded-md p-2 text-lg font-bold"
+            [ngModel]="selection.name"
+          />
+          <div class="flex flex-row items-center justify-between">
+            <div class="text-md p-2 font-bold">Options</div>
+            <button appButtonPrimary (click)="productEditService.addOption$.next(selection.name)">
+              + New
+            </button>
+          </div>
+          <div class="flex flex-col gap-4">
+            @for (option of selection.options; track option.value) {
+              <input
+                class="hover:bg-input focus:bg-input ml-4 rounded-md p-2"
+                placeholder="Option"
+                [ngModel]="option.displayText"
+              />
+            }
+          </div>
+        </div>
+      }
+    </div>
   </div>
 }
