@@ -5,45 +5,68 @@
 @if (!productEditService.loaded()) {
   <p>Loading...</p>
 } @else {
-  <div class="flex flex-row justify-start gap-4">
-    <div>IsDirty: {{ productEditService.isDirty() }}</div>
-    <button appButtonPrimary (click)="productEditService.saveChanges$.next()">Save Changes</button>
-    <button appButtonPrimary (click)="productEditService.discardChanges$.next()">
-      Discard Changes
-    </button>
-  </div>
   <div class="flex flex-col gap-4">
+    <div class="flex flex-row justify-between gap-4">
+      <div [ngClass]="{ 'text-destructive': productEditService.isDirty() }">
+        IsDirty: {{ productEditService.isDirty() }}
+      </div>
+      <div class="flex flex-row gap-2">
+        <button
+          appButtonPrimary
+          (click)="productEditService.saveChanges$.next()"
+          [disabled]="!productEditService.isDirty()"
+        >
+          Save Changes
+        </button>
+        <button
+          appButtonPrimary
+          (click)="productEditService.discardChanges$.next()"
+          [disabled]="!productEditService.isDirty()"
+        >
+          Discard Changes
+        </button>
+      </div>
+    </div>
+
     <div class="flex flex-col gap-2 rounded-md border p-4">
       <input
+        id="product-name-input"
         type="text"
         class="hover:bg-input focus:bg-input rounded-md p-2 text-2xl font-bold"
         [ngModel]="productEditService.name()"
         (ngModelChange)="productEditService.updateProductName$.next($event)"
       />
+
+      <label for="product-description-input" class="text-sm">Description</label>
       <textarea
-        class="hover:bg-input focus:bg-input resize-none rounded-md p-2 hover:resize-y"
+        id="product-description-input"
+        class="hover:bg-input focus:bg-input resize-none rounded-md border p-2 hover:resize-y"
         rows="3"
         [ngModel]="productEditService.description()"
         (ngModelChange)="productEditService.updateProductDescription$.next($event)"
       ></textarea>
+
+      <label for="product-code-input" class="text-sm">Product Code</label>
       <input
-        class="hover:bg-input focus:bg-input rounded-md p-2"
+        id="product-code-input"
+        class="hover:bg-input focus:bg-input rounded-md border p-2"
         placeholder="Product Code"
         [ngModel]="productEditService.productCodeDefinition()"
         (ngModelChange)="productEditService.updateProductCodeDefinition$.next($event)"
       />
     </div>
-    <div class="flex flex-col gap-2 rounded-md p-4">
+
+    <div class="flex flex-col gap-6 rounded-md p-4">
       <div class="flex flex-row items-center justify-between">
         <div class="text-2xl font-bold">Selections</div>
-        <button appButtonPrimary (click)="productEditService.addSelection$.next()">+ New</button>
       </div>
+
       @for (selection of productEditService.selections(); track selection.id) {
-        <div class="flex flex-col gap-2 rounded-md border p-2">
+        <div class="flex flex-col gap-2 rounded-md border p-4">
           <div class="flex flex-row justify-between gap-4">
             <input
               type="text"
-              class="hover:bg-input focus:bg-input rounded-md p-2 text-lg font-bold"
+              class="hover:bg-input focus:bg-input rounded-md text-lg font-bold"
               [ngModel]="selection.name"
               (ngModelChange)="
                 productEditService.updateSelectionName$.next({
@@ -53,27 +76,33 @@
               "
             />
             <button
-              appButtonPrimary
+              class="hover:bg-muted rounded-md p-2"
               (click)="productEditService.removeSelection$.next({ selectionId: selection.id })"
             >
-              Delete
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
-          <div class="flex flex-row items-center justify-between">
-            <div class="text-md p-2 font-bold">Options</div>
-            <button
-              appButtonPrimary
-              (click)="productEditService.addOption$.next({ selectionId: selection.id })"
-            >
-              + New
-            </button>
-          </div>
+
+          <!-- <div class="flex flex-row items-center justify-between">
+            <div class="text-md font-bold">Options</div>
+          </div> -->
+
           <div class="flex flex-col gap-4">
             @for (option of selection.options; track option.id; let optionIndex = $index) {
-              <div class="flex flex-row gap-4">
+              <div class="ml-2 flex flex-row gap-2">
                 <div class="group relative flex justify-center">
                   <input
                     type="radio"
+                    class="mx-2"
                     [name]="`selection-${selection.id}`"
                     [value]="option.id"
                     [ngModel]="selection.defaultOptionId"
@@ -85,13 +114,14 @@
                     "
                   />
                   <span
-                    class="bg-accent text-accent-foreground absolute bottom-full z-50 mb-2 w-max rounded p-2 text-xs opacity-0 transition-all group-hover:opacity-100"
+                    class="bg-accent text-accent-foreground absolute bottom-full mb-2 w-max rounded p-2 text-xs opacity-0 transition-all group-hover:opacity-100"
                   >
                     Set default option
                   </span>
                 </div>
+
                 <input
-                  class="hover:bg-input focus:bg-input ml-4 flex-1 rounded-md p-2"
+                  class="border-border hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
                   placeholder="Option"
                   [ngModel]="option.displayText"
                   (ngModelChange)="
@@ -102,8 +132,22 @@
                     })
                   "
                 />
+
+                <input
+                  class="border-border hover:bg-input focus:bg-input rounded-md border p-2"
+                  placeholder="Option"
+                  [ngModel]="option.value"
+                  (ngModelChange)="
+                    productEditService.updateOptionValue$.next({
+                      selectionId: selection.id,
+                      optionId: option.id,
+                      value: $event,
+                    })
+                  "
+                />
+
                 <button
-                  appButtonPrimary
+                  class="hover:bg-muted rounded-md p-2"
                   (click)="
                     productEditService.removeOption$.next({
                       selectionId: selection.id,
@@ -111,13 +155,42 @@
                     })
                   "
                 >
-                  Delete
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="size-5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                    />
+                  </svg>
                 </button>
               </div>
             }
           </div>
+
+          <div class="mx-2 mt-2">
+            <button
+              class="text-primary hover:text-primary/80 cursor-pointer font-medium"
+              (click)="productEditService.addOption$.next({ selectionId: selection.id })"
+            >
+              Add Option
+            </button>
+          </div>
         </div>
       }
+
+      <button
+        class="hover:bg-muted cursor-pointer rounded-md border border-dotted p-4 text-left font-medium"
+        (click)="productEditService.addSelection$.next()"
+      >
+        + Add Selection
+      </button>
     </div>
   </div>
 }
