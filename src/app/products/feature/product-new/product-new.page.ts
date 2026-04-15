@@ -5,6 +5,10 @@ import { Router } from '@angular/router';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ButtonPrimaryDirective } from '../../../shared/ui/button-primary.directive';
 import { ProductListService } from '../../data-access/product-list.service';
+import {
+  MAX_PRODUCT_DESCRIPTION_LENGTH,
+  MAX_PRODUCT_NAME_LENGTH,
+} from '../../interfaces/product.interface';
 
 @Component({
   selector: 'app-products',
@@ -18,12 +22,12 @@ export class ProductNewPage implements OnDestroy {
   private readonly layoutService = inject(LayoutService);
   public readonly productListService = inject(ProductListService);
 
-  MAX_NAME_LENGTH = 30;
-  MAX_DESCRIPTION_LENGTH = 200;
+  maxNameLength = MAX_PRODUCT_NAME_LENGTH;
+  maxDescriptionLength = MAX_PRODUCT_DESCRIPTION_LENGTH;
 
   newProductForm = this.formBuilder.group({
-    name: ['', [Validators.required, Validators.maxLength(this.MAX_NAME_LENGTH)]],
-    description: ['', [Validators.required, Validators.maxLength(this.MAX_DESCRIPTION_LENGTH)]],
+    name: ['', [Validators.required, Validators.maxLength(MAX_PRODUCT_NAME_LENGTH)]],
+    description: ['', [Validators.required, Validators.maxLength(MAX_PRODUCT_DESCRIPTION_LENGTH)]],
   });
 
   nameControl = this.newProductForm.controls.name;

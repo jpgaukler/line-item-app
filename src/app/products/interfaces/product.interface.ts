@@ -7,3 +7,6 @@ export interface Product {
   productCodeDefinition: string;
   selections: ProductSelection[];
 }
+
+export const MAX_PRODUCT_NAME_LENGTH = 30;
+export const MAX_PRODUCT_DESCRIPTION_LENGTH = 200;

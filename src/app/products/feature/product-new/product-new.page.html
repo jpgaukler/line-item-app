@@ -11,7 +11,7 @@
       type="text"
       placeholder="Product Name"
       formControlName="name"
-      [maxlength]="MAX_NAME_LENGTH"
+      [maxlength]="maxNameLength"
       class="rounded-md border p-2"
       [ngClass]="{
         'border-destructive': nameControl.invalid && nameControl.touched,
@@ -24,7 +24,7 @@
       id="product-description-input"
       placeholder="Description"
       formControlName="description"
-      [maxlength]="MAX_DESCRIPTION_LENGTH"
+      [maxlength]="maxDescriptionLength"
       class="rounded-md border p-2"
       [ngClass]="{
         'border-destructive': descriptionControl.invalid && descriptionControl.touched,
@@ -35,7 +35,7 @@
     }
     <p class="text-sm">
       {{ descriptionControl.value ? descriptionControl.value.length : 0 }} /
-      {{ MAX_DESCRIPTION_LENGTH }}
+      {{ maxDescriptionLength }}
     </p>
     <button appButtonPrimary type="submit">Create product</button>
   </form>
