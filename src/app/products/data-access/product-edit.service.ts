@@ -40,9 +40,9 @@ export class ProductEditService {
     switchMap((params) => this.productHttpService.getProductById(params.get('productId')!)),
   );
 
-  updateProductName$ = new Subject<string>();
-  updateProductDescription$ = new Subject<string>();
-  updateProductCodeDefinition$ = new Subject<string>();
+  updateProductName$ = new Subject<{ name: string }>();
+  updateProductDescription$ = new Subject<{ description: string }>();
+  updateProductCodeDefinition$ = new Subject<{ productCodeDefinition: string }>();
 
   addSelection$ = new Subject<void>();
   removeSelection$ = new Subject<{ selectionId: string }>();
@@ -88,7 +88,7 @@ export class ProductEditService {
         isDirty: true,
         product: {
           ...state.product,
-          name: next,
+          name: next.name,
         },
       })),
     );
@@ -99,7 +99,18 @@ export class ProductEditService {
         isDirty: true,
         product: {
           ...state.product,
-          description: next,
+          description: next.description,
+        },
+      })),
+    );
+
+    this.updateProductCodeDefinition$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => ({
+        ...state,
+        isDirty: true,
+        product: {
+          ...state.product,
+          productCodeDefinition: next.productCodeDefinition,
         },
       })),
     );
@@ -278,17 +289,6 @@ export class ProductEditService {
                 }
               : selection,
           ),
-        },
-      })),
-    );
-
-    this.updateProductCodeDefinition$.pipe(takeUntilDestroyed()).subscribe((next) =>
-      this.state.update((state) => ({
-        ...state,
-        isDirty: true,
-        product: {
-          ...state.product,
-          productCodeDefinition: next,
         },
       })),
     );

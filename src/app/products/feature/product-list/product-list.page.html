@@ -25,9 +25,12 @@
         <div>{{ product.description }}</div>
         <hr class="my-2" />
         <div class="font-semibold">Configurations ({{ product.selections.length }})</div>
-        <!-- <button appButtonPrimary (click)="productListService.deleteProduct$.next(product)">
+        <button
+          appButtonPrimary
+          (click)="productListService.deleteProduct$.next({ productId: product.id })"
+        >
           Delete
-        </button> -->
+        </button>
       </a>
     }
   </div>

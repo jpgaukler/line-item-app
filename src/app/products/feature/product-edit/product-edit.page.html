@@ -34,7 +34,7 @@
         type="text"
         class="hover:bg-input focus:bg-input rounded-md p-2 text-2xl font-bold"
         [ngModel]="productEditService.name()"
-        (ngModelChange)="productEditService.updateProductName$.next($event)"
+        (ngModelChange)="productEditService.updateProductName$.next({ name: $event })"
       />
 
       <label for="product-description-input" class="text-sm">Description</label>
@@ -43,7 +43,7 @@
         class="hover:bg-input focus:bg-input resize-none rounded-md border p-2 hover:resize-y"
         rows="3"
         [ngModel]="productEditService.description()"
-        (ngModelChange)="productEditService.updateProductDescription$.next($event)"
+        (ngModelChange)="productEditService.updateProductDescription$.next({ description: $event })"
       ></textarea>
 
       <label for="product-code-input" class="text-sm">Product Code</label>
@@ -52,7 +52,9 @@
         class="hover:bg-input focus:bg-input rounded-md border p-2"
         placeholder="Product Code"
         [ngModel]="productEditService.productCodeDefinition()"
-        (ngModelChange)="productEditService.updateProductCodeDefinition$.next($event)"
+        (ngModelChange)="
+          productEditService.updateProductCodeDefinition$.next({ productCodeDefinition: $event })
+        "
       />
     </div>
 

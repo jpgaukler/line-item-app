@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ButtonPrimaryDirective } from '../../../shared/ui/button-primary.directive';
 import { ProductListService } from '../../data-access/product-list.service';
-import { AddProduct } from '../../interfaces/product.interface';
 
 @Component({
   selector: 'app-products',
@@ -48,12 +47,10 @@ export class ProductNewPage implements OnDestroy {
       return;
     }
 
-    const newProduct: AddProduct = {
+    this.productListService.addProduct$.next({
       name: this.nameControl.value!,
       description: this.descriptionControl.value!,
-    };
-
-    this.productListService.addProduct$.next(newProduct);
+    });
 
     this.router.navigate(['/products']);
   }

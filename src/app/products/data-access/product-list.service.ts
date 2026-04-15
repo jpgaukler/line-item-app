@@ -2,7 +2,7 @@ import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject } from 'rxjs';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
-import { AddProduct, Product } from '../interfaces/product.interface';
+import { Product } from '../interfaces/product.interface';
 
 interface ProductListState {
   products: Product[];
@@ -26,8 +26,8 @@ export class ProductListService {
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
 
-  addProduct$ = new Subject<AddProduct>();
-  deleteProduct$ = new Subject<Product>();
+  addProduct$ = new Subject<{ name: string; description: string }>();
+  deleteProduct$ = new Subject<{ productId: string }>();
 
   // sources
   private productsLoaded$ = this.productHttpService.getProducts();
@@ -44,20 +44,26 @@ export class ProductListService {
       error: (err) => this.state.update((state) => ({ ...state, error: err })),
     });
 
-    this.addProduct$.pipe(takeUntilDestroyed()).subscribe((added: AddProduct) =>
+    this.addProduct$.pipe(takeUntilDestroyed()).subscribe((next) =>
       this.state.update((state) => ({
         ...state,
         products: [
           ...state.products,
-          { ...added, id: crypto.randomUUID(), productCodeDefinition: '', selections: [] },
+          {
+            id: crypto.randomUUID(),
+            name: next.name,
+            description: next.description,
+            productCodeDefinition: '',
+            selections: [],
+          },
         ],
       })),
     );
 
-    this.deleteProduct$.pipe(takeUntilDestroyed()).subscribe((deleted: Product) =>
+    this.deleteProduct$.pipe(takeUntilDestroyed()).subscribe((next) =>
       this.state.update((state) => ({
         ...state,
-        products: state.products.filter((product) => product.id !== deleted.id),
+        products: state.products.filter((product) => product.id !== next.productId),
       })),
     );
 

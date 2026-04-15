@@ -7,5 +7,3 @@ export interface Product {
   productCodeDefinition: string;
   selections: ProductSelection[];
 }
-
-export type AddProduct = Omit<Product, 'id' | 'productCodeDefinition' | 'selections'>;
