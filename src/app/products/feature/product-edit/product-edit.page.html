@@ -5,24 +5,14 @@
 @if (!productEditService.loaded()) {
   <p>Loading...</p>
 } @else {
-  <div class="flex flex-col gap-4">
+  <form [formGroup]="productForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
     <div class="flex flex-row justify-between gap-4">
-      <div [ngClass]="{ 'text-destructive': productEditService.isDirty() }">
-        IsDirty: {{ productEditService.isDirty() }}
+      <div [ngClass]="{ 'text-destructive': productForm.dirty }">
+        IsDirty: {{ productForm.dirty }}
       </div>
       <div class="flex flex-row gap-2">
-        <button
-          appButtonPrimary
-          (click)="productEditService.saveChanges$.next()"
-          [disabled]="!productEditService.isDirty()"
-        >
-          Save Changes
-        </button>
-        <button
-          appButtonPrimary
-          (click)="productEditService.discardChanges$.next()"
-          [disabled]="!productEditService.isDirty()"
-        >
+        <button appButtonPrimary type="submit" [disabled]="!productForm.dirty">Save Changes</button>
+        <button appButtonPrimary type="button" (click)="reset()" [disabled]="!productForm.dirty">
           Discard Changes
         </button>
       </div>
@@ -33,8 +23,7 @@
         id="product-name-input"
         type="text"
         class="hover:bg-input focus:bg-input rounded-md p-2 text-2xl font-bold"
-        [ngModel]="productEditService.name()"
-        (ngModelChange)="productEditService.updateProductName$.next({ name: $event })"
+        formControlName="name"
       />
 
       <label for="product-description-input" class="text-sm">Description</label>
@@ -42,8 +31,7 @@
         id="product-description-input"
         class="hover:bg-input focus:bg-input resize-none rounded-md border p-2 hover:resize-y"
         rows="3"
-        [ngModel]="productEditService.description()"
-        (ngModelChange)="productEditService.updateProductDescription$.next({ description: $event })"
+        formControlName="description"
       ></textarea>
 
       <label for="product-code-input" class="text-sm">Product Code</label>
@@ -51,35 +39,32 @@
         id="product-code-input"
         class="hover:bg-input focus:bg-input rounded-md border p-2"
         placeholder="Product Code"
-        [ngModel]="productEditService.productCodeDefinition()"
-        (ngModelChange)="
-          productEditService.updateProductCodeDefinition$.next({ productCodeDefinition: $event })
-        "
+        formControlName="productCodeDefinition"
       />
     </div>
 
-    <div class="flex flex-col gap-6 rounded-md p-4">
+    <div formArrayName="selections" class="flex flex-col gap-6 rounded-md p-4">
       <div class="flex flex-row items-center justify-between">
         <div class="text-2xl font-bold">Selections</div>
       </div>
 
-      @for (selection of productEditService.selections(); track selection.id) {
-        <div class="flex flex-col gap-2 rounded-md border p-4">
+      @for (
+        selection of selectionsArray.controls;
+        track selection.controls.id.value;
+        let selectionIndex = $index
+      ) {
+        <div [formGroupName]="selectionIndex" class="flex flex-col gap-2 rounded-md border p-4">
           <div class="flex flex-row justify-between gap-4">
             <input
+              [id]="`selection-name-${selectionIndex}`"
               type="text"
               class="hover:bg-input focus:bg-input rounded-md text-lg font-bold"
-              [ngModel]="selection.name"
-              (ngModelChange)="
-                productEditService.updateSelectionName$.next({
-                  selectionId: selection.id,
-                  name: $event,
-                })
-              "
+              formControlName="name"
             />
             <button
+              type="button"
               class="hover:bg-muted rounded-md p-2"
-              (click)="productEditService.removeSelection$.next({ selectionId: selection.id })"
+              (click)="removeSelection(selectionIndex)"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -98,64 +83,37 @@
             <div class="text-md font-bold">Options</div>
           </div> -->
 
-          <div class="flex flex-col gap-4">
-            @for (option of selection.options; track option.id; let optionIndex = $index) {
-              <div class="ml-2 flex flex-row gap-2">
-                <div class="group relative flex justify-center">
-                  <input
-                    type="radio"
-                    class="mx-2"
-                    [name]="`selection-${selection.id}`"
-                    [value]="option.id"
-                    [ngModel]="selection.defaultOptionId"
-                    (ngModelChange)="
-                      productEditService.updateSelectionDefaultOptionId$.next({
-                        selectionId: selection.id,
-                        defaultOptionId: $event,
-                      })
-                    "
-                  />
-                  <span
-                    class="bg-accent text-accent-foreground absolute bottom-full mb-2 w-max rounded p-2 text-xs opacity-0 transition-all group-hover:opacity-100"
-                  >
-                    Set default option
-                  </span>
-                </div>
+          <div formArrayName="options" class="flex flex-col gap-4">
+            @for (
+              option of optionsAt(selectionIndex).controls;
+              track option.controls.id.value;
+              let optionIndex = $index
+            ) {
+              <div [formGroupName]="optionIndex" class="ml-2 flex flex-row gap-2">
+                <input
+                  type="radio"
+                  class="mx-2"
+                  [name]="`selection-${selectionIndex}`"
+                  [value]="option.controls.id.value"
+                  [formControl]="selection.controls.defaultOptionId"
+                />
 
                 <input
                   class="border-border hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
                   placeholder="Option"
-                  [ngModel]="option.displayText"
-                  (ngModelChange)="
-                    productEditService.updateOptionDisplayText$.next({
-                      selectionId: selection.id,
-                      optionId: option.id,
-                      displayText: $event,
-                    })
-                  "
+                  formControlName="displayText"
                 />
 
                 <input
                   class="border-border hover:bg-input focus:bg-input rounded-md border p-2"
                   placeholder="Option"
-                  [ngModel]="option.value"
-                  (ngModelChange)="
-                    productEditService.updateOptionValue$.next({
-                      selectionId: selection.id,
-                      optionId: option.id,
-                      value: $event,
-                    })
-                  "
+                  formControlName="value"
                 />
 
                 <button
+                  type="button"
                   class="hover:bg-muted rounded-md p-2"
-                  (click)="
-                    productEditService.removeOption$.next({
-                      selectionId: selection.id,
-                      optionId: option.id,
-                    })
-                  "
+                  (click)="removeOption(selectionIndex, optionIndex)"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -178,8 +136,9 @@
 
           <div class="mx-2 mt-2">
             <button
+              type="button"
               class="text-primary hover:text-primary/80 cursor-pointer font-medium"
-              (click)="productEditService.addOption$.next({ selectionId: selection.id })"
+              (click)="addOption(selectionIndex)"
             >
               Add Option
             </button>
@@ -188,11 +147,12 @@
       }
 
       <button
+        type="button"
         class="hover:bg-muted cursor-pointer rounded-md border border-dotted p-4 text-left font-medium"
-        (click)="productEditService.addSelection$.next()"
+        (click)="addSelection()"
       >
         + Add Selection
       </button>
     </div>
-  </div>
+  </form>
 }

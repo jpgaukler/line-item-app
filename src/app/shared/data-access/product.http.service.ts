@@ -22,6 +22,14 @@ export class ProductHttpService {
   }
 
   saveProduct(product: Product): Observable<void> {
+    // this.http.get(`/api/v1/products`, { observe: 'response' }).subscribe((result) => {
+    //   if (result.status === 200) {
+    //     console.log('Product saved successfully', product);
+    //   } else {
+    //     console.error('Failed to save product', result);
+    //   }
+    // });
+
     const products = this.localStorageService.getJson<Product[]>('products') || [];
     const updatedProducts = products.map((p) => (p.id === product.id ? product : p));
     this.localStorageService.setJson('products', updatedProducts);
