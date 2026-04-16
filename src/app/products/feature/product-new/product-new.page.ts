@@ -56,6 +56,9 @@ export class ProductNewPage implements OnDestroy {
       description: this.descriptionControl.value!,
     });
 
-    this.router.navigate(['/products']);
+    // this is navigating away too fast, so the product isnt saving because the
+    // service is getting destroyed before the effect runs.
+    // need to find a better way to handle this
+    // this.router.navigate(['/products']);
   }
 }
