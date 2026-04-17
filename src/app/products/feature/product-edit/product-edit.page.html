@@ -57,11 +57,15 @@
               formControlName="name"
               [ngClass]="{
                 'border-destructive border':
-                  selection.controls.name.hasError('duplicateSelectionName') && selection.touched,
+                  selection.controls.name.hasError('duplicateSelectionName') &&
+                  selection.controls.name.touched,
               }"
             />
 
-            @if (selection.controls.name.hasError('duplicateSelectionName') && selection.touched) {
+            @if (
+              selection.controls.name.hasError('duplicateSelectionName') &&
+              selection.controls.name.touched
+            ) {
               <div class="text-destructive">Selection names must be unique</div>
             }
 
@@ -106,23 +110,36 @@
                   class="hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
                   placeholder="Option"
                   formControlName="displayText"
+                  [ngClass]="{
+                    'border-destructive':
+                      option.controls.displayText.hasError('duplicateOptionDisplayText') &&
+                      option.controls.displayText.touched,
+                  }"
                 />
+
+                @if (
+                  option.controls.displayText.hasError('duplicateOptionDisplayText') &&
+                  option.controls.displayText.touched
+                ) {
+                  <div class="text-destructive">Display text must be unique</div>
+                }
 
                 <input
                   class="hover:bg-input focus:bg-input rounded-md border p-2"
-                  placeholder="Option"
+                  placeholder="Value"
                   formControlName="value"
                   [ngClass]="{
                     'border-destructive':
-                      option.controls.value.hasError('duplicateOptionValue') && option.touched,
+                      option.controls.value.hasError('duplicateOptionValue') &&
+                      option.controls.value.touched,
                   }"
                 />
 
                 @if (
                   option.controls.value.hasError('duplicateOptionValue') &&
-                  (option.touched || option.dirty)
+                  option.controls.value.touched
                 ) {
-                  <div class="text-destructive">Option values must be unique</div>
+                  <div class="text-destructive">Value must be unique</div>
                 }
 
                 <button

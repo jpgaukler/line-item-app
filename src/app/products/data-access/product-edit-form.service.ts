@@ -1,10 +1,15 @@
 import { inject, Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { duplicateSelectionNameValidator, ProductForm } from '../interfaces/product-form.interface';
 import {
-  duplicateOptionValueValidator,
-  ProductSelectionForm,
-} from '../interfaces/product-selection-form.interface';
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { ProductForm } from '../interfaces/product-form.interface';
+import { ProductSelectionForm } from '../interfaces/product-selection-form.interface';
 import { ProductSelectionOptionForm } from '../interfaces/product-selection-option-form.interface';
 import { ProductSelectionOption } from '../interfaces/product-selection-option.interface';
 import { ProductSelection } from '../interfaces/product-selection.interface';
@@ -35,7 +40,10 @@ export class ProductEditFormService {
 
   toProductSelectionForm(selection: ProductSelection): FormGroup<ProductSelectionForm> {
     return this.formBuilder.nonNullable.group({
-      name: [selection.name, [Validators.required, duplicateSelectionNameValidator]],
+      name: [
+        selection.name,
+        [Validators.required, ProductEditFormService.duplicateSelectionNameValidator],
+      ],
       defaultValue: selection.defaultValue,
       allowCustomValue: selection.allowCustomValue,
       options: this.formBuilder.array(
@@ -48,8 +56,65 @@ export class ProductEditFormService {
     option: ProductSelectionOption,
   ): FormGroup<ProductSelectionOptionForm> {
     return this.formBuilder.nonNullable.group({
-      displayText: [option.displayText, [Validators.required]],
-      value: [option.value, [Validators.required, duplicateOptionValueValidator]],
+      displayText: [
+        option.displayText,
+        [Validators.required, ProductEditFormService.duplicateOptionDisplayTextValidator],
+      ],
+      value: [
+        option.value,
+        [Validators.required, ProductEditFormService.duplicateOptionValueValidator],
+      ],
     });
   }
+
+  private static duplicateSelectionNameValidator: ValidatorFn = (
+    control: AbstractControl,
+  ): ValidationErrors | null => {
+    const name = control.value;
+    const currentGroup = control?.parent as FormGroup<ProductSelectionForm>;
+    const selectionsArray = currentGroup?.parent as FormArray<FormGroup<ProductSelectionForm>>;
+
+    if (!name || !selectionsArray) return null;
+
+    // Find duplicates: check if any OTHER selection has the same name
+    const isDuplicate = selectionsArray.controls.some(
+      (group) => group !== currentGroup && group.controls.name.value === name,
+    );
+
+    return isDuplicate ? { duplicateSelectionName: true } : null;
+  };
+
+  private static duplicateOptionValueValidator: ValidatorFn = (
+    control: AbstractControl,
+  ): ValidationErrors | null => {
+    const value = control.value;
+    const currentGroup = control?.parent as FormGroup<ProductSelectionOptionForm>;
+    const optionsArray = currentGroup?.parent as FormArray<FormGroup<ProductSelectionOptionForm>>;
+
+    if (!value || !optionsArray) return null;
+
+    // Find duplicates: check if any OTHER option has the same name
+    const isDuplicate = optionsArray.controls.some(
+      (group) => group !== currentGroup && group.controls.value.value === value,
+    );
+
+    return isDuplicate ? { duplicateOptionValue: true } : null;
+  };
+
+  private static duplicateOptionDisplayTextValidator: ValidatorFn = (
+    control: AbstractControl,
+  ): ValidationErrors | null => {
+    const displayText = control.value;
+    const currentGroup = control?.parent as FormGroup<ProductSelectionOptionForm>;
+    const optionsArray = currentGroup?.parent as FormArray<FormGroup<ProductSelectionOptionForm>>;
+
+    if (!displayText || !optionsArray) return null;
+
+    // Find duplicates: check if any OTHER option has the same name
+    const isDuplicate = optionsArray.controls.some(
+      (group) => group !== currentGroup && group.controls.displayText.value === displayText,
+    );
+
+    return isDuplicate ? { duplicateOptionDisplayText: true } : null;
+  };
 }
