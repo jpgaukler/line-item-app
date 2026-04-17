@@ -4,6 +4,6 @@ import { ProductSelectionOptionForm } from './product-selection-option-form.inte
 export interface ProductSelectionForm {
   name: FormControl<string>;
   allowCustomValue: FormControl<boolean>;
-  defaultValue: FormControl<string>;
+  defaultOptionIndex: FormControl<number>;
   options: FormArray<FormGroup<ProductSelectionOptionForm>>;
 }

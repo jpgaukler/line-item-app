@@ -44,7 +44,7 @@ export class ProductEditFormService {
         selection.name,
         [Validators.required, ProductEditFormService.duplicateSelectionNameValidator],
       ],
-      defaultValue: selection.defaultValue,
+      defaultOptionIndex: selection.defaultOptionIndex,
       allowCustomValue: selection.allowCustomValue,
       options: this.formBuilder.array(
         selection.options.map((option) => this.toProductSelectionOptionForm(option)),
