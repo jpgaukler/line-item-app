@@ -64,14 +64,14 @@ export class ProductEditPage implements OnDestroy {
   }
 
   addSelection(): void {
-    const defaultValue = '1';
+    const defaultOptionId = crypto.randomUUID();
 
     this.selectionsArray.push(
       this.productEditFormService.toProductSelectionForm({
         name: `Selection (${this.selectionsArray.length + 1})`,
-        defaultValue: defaultValue,
+        defaultOptionId: defaultOptionId,
         allowCustomValue: false,
-        options: [{ displayText: 'Option (1)', value: defaultValue }],
+        options: [{ id: defaultOptionId, displayText: 'Option (1)', value: '1' }],
       }),
     );
 
@@ -88,6 +88,7 @@ export class ProductEditPage implements OnDestroy {
 
     optionsArray.push(
       this.productEditFormService.toProductSelectionOptionForm({
+        id: crypto.randomUUID(),
         displayText: `Option (${optionsArray.length + 1})`,
         value: `${optionsArray.length + 1}`,
       }),

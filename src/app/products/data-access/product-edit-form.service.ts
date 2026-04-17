@@ -32,7 +32,7 @@ export class ProductEditFormService {
   toProductSelectionForm(selection: ProductSelection): FormGroup {
     return this.formBuilder.group({
       name: [selection.name, [Validators.required, duplicateSelectionNameValidator]],
-      defaultOptionId: selection.defaultValue,
+      defaultOptionId: selection.defaultOptionId,
       allowCustomValue: selection.allowCustomValue,
       options: this.formBuilder.array(
         selection.options.map((option) => this.toProductSelectionOptionForm(option)),
@@ -42,6 +42,7 @@ export class ProductEditFormService {
 
   toProductSelectionOptionForm(option: ProductSelectionOption): FormGroup {
     return this.formBuilder.group({
+      id: option.id,
       displayText: [option.displayText, [Validators.required]],
       value: [option.value, [Validators.required, duplicateOptionValueValidator]],
     });
