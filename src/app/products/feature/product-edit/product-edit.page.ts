@@ -1,62 +1,32 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy } from '@angular/core';
-import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ButtonPrimaryDirective } from '../../../shared/ui/button-primary.directive';
+import { ProductEditFormService } from '../../data-access/product-edit-form.service';
 import { ProductEditService } from '../../data-access/product-edit.service';
-import { ProductSelectionOption } from '../../interfaces/product-selection-option.interface';
-import { ProductSelection } from '../../interfaces/product-selection.interface';
+import { ProductForm } from '../../interfaces/product-form.interface';
 import {
   MAX_PRODUCT_DESCRIPTION_LENGTH,
   MAX_PRODUCT_NAME_LENGTH,
-  Product,
 } from '../../interfaces/product.interface';
-
-interface ProductForm {
-  id: FormControl<string>;
-  name: FormControl<string>;
-  description: FormControl<string>;
-  productCodeDefinition: FormControl<string>;
-  selections: FormArray<FormGroup<ProductSelectionForm>>;
-}
-
-interface ProductSelectionForm {
-  id: FormControl<string>;
-  name: FormControl<string>;
-  allowCustomValue: FormControl<boolean>;
-  defaultOptionId: FormControl<string>;
-  options: FormArray<FormGroup<ProductSelectionOptionForm>>;
-}
-
-interface ProductSelectionOptionForm {
-  id: FormControl<string>;
-  displayText: FormControl<string>;
-  value: FormControl<string>;
-}
 
 @Component({
   selector: 'app-products',
   imports: [CommonModule, FormsModule, ButtonPrimaryDirective, ReactiveFormsModule],
   templateUrl: './product-edit.page.html',
-  providers: [ProductEditService],
+  providers: [ProductEditService, ProductEditFormService],
 })
 export class ProductEditPage implements OnDestroy {
   private readonly layoutService = inject(LayoutService);
   public readonly formBuilder = inject(FormBuilder);
+  public readonly productEditFormService = inject(ProductEditFormService);
   public readonly productEditService = inject(ProductEditService);
 
   maxNameLength = MAX_PRODUCT_NAME_LENGTH;
   maxDescriptionLength = MAX_PRODUCT_DESCRIPTION_LENGTH;
 
-  productForm: FormGroup<ProductForm> = this.buildProductForm({
+  productForm: FormGroup<ProductForm> = this.productEditFormService.toProductForm({
     id: '',
     name: '',
     description: '',
@@ -82,7 +52,9 @@ export class ProductEditPage implements OnDestroy {
     effect(() => {
       if (this.productEditService.loaded()) {
         console.log('running effect');
-        this.productForm = this.buildProductForm(this.productEditService.product());
+        this.productForm = this.productEditFormService.toProductForm(
+          this.productEditService.product(),
+        );
       }
     });
   }
@@ -91,52 +63,15 @@ export class ProductEditPage implements OnDestroy {
     this.layoutService.clearBreadcrumbs$.next();
   }
 
-  buildProductForm(product: Product): FormGroup {
-    return this.formBuilder.group({
-      id: product.id,
-      name: [product.name, [Validators.required, Validators.maxLength(MAX_PRODUCT_NAME_LENGTH)]],
-      description: [
-        product.description,
-        [Validators.required, Validators.maxLength(MAX_PRODUCT_DESCRIPTION_LENGTH)],
-      ],
-      productCodeDefinition: [product.productCodeDefinition],
-      selections: this.formBuilder.array(
-        product.selections.map((selection) => this.buildProductSelectionForm(selection)),
-      ),
-    });
-  }
-
-  buildProductSelectionForm(selection: ProductSelection): FormGroup {
-    return this.formBuilder.group({
-      id: selection.id,
-      name: [selection.name, [Validators.required]],
-      defaultOptionId: selection.defaultOptionId,
-      allowCustomValue: selection.allowCustomValue,
-      options: this.formBuilder.array(
-        selection.options.map((option) => this.buildProductSelectionOptionForm(option)),
-      ),
-    });
-  }
-
-  buildProductSelectionOptionForm(option: ProductSelectionOption): FormGroup {
-    return this.formBuilder.group({
-      id: option.id,
-      displayText: [option.displayText, [Validators.required]],
-      value: [option.value, [Validators.required]],
-    });
-  }
-
   addSelection(): void {
-    const newSelectionId = crypto.randomUUID();
-    const defaultOptionId = crypto.randomUUID();
+    const defaultValue = '1';
 
     this.selectionsArray.push(
-      this.buildProductSelectionForm({
-        id: newSelectionId,
+      this.productEditFormService.toProductSelectionForm({
         name: `Selection (${this.selectionsArray.length + 1})`,
-        defaultOptionId: defaultOptionId,
+        defaultValue: defaultValue,
         allowCustomValue: false,
-        options: [{ id: defaultOptionId, displayText: 'Option (1)', value: '1' }],
+        options: [{ displayText: 'Option (1)', value: defaultValue }],
       }),
     );
 
@@ -152,8 +87,7 @@ export class ProductEditPage implements OnDestroy {
     const optionsArray = this.optionsAt(selectionIndex);
 
     optionsArray.push(
-      this.buildProductSelectionOptionForm({
-        id: crypto.randomUUID(),
+      this.productEditFormService.toProductSelectionOptionForm({
         displayText: `Option (${optionsArray.length + 1})`,
         value: `${optionsArray.length + 1}`,
       }),
@@ -178,6 +112,6 @@ export class ProductEditPage implements OnDestroy {
   }
 
   reset(): void {
-    this.productForm = this.buildProductForm(this.productEditService.product());
+    this.productForm = this.productEditFormService.toProductForm(this.productEditService.product());
   }
 }
