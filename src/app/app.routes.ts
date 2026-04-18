@@ -4,12 +4,14 @@ import { PreferencesPage } from './preferences/preferences.page';
 import { ProductEditPage } from './products/feature/product-edit/product-edit.page';
 import { ProductListPage } from './products/feature/product-list/product-list.page';
 import { ProductNewPage } from './products/feature/product-new/product-new.page';
+import { QuoteNewPage } from './quotes/feature/quote-new/quote-new.page';
 
 export const routes: Routes = [
   {
     path: '',
     component: LayoutComponent,
     children: [
+      // products
       {
         path: 'products',
         title: 'Products • Cadflair',
@@ -25,11 +27,21 @@ export const routes: Routes = [
         title: 'Edit Product • Cadflair',
         component: ProductEditPage,
       },
+
+      // quotes
+      {
+        path: 'quotes/new',
+        title: 'New Quote • Cadflair',
+        component: QuoteNewPage,
+      },
+
+      // preferences
       {
         path: 'preferences',
         title: 'Preferences • Cadflair',
         component: PreferencesPage,
       },
+
       // { path: '**', redirectTo: 'home' }, // catch-all for unknown routes, redirect to home
       // { path: '', redirectTo: 'home' }, // redirect to home when the path is empty
     ],
