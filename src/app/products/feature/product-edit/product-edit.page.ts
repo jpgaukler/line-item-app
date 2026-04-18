@@ -148,26 +148,26 @@ export class ProductEditPage implements OnDestroy {
 
     // Move the options FormGroup
     moveItemInArray(optionsArray.controls, previousIndex, currentIndex);
+    optionsArray.updateValueAndValidity(); // required because Angular doesn't detect this mutation automatically
 
     // Fix the default option index
     const currentDefaultIndex = defaultOptionControl.value;
 
     if (currentDefaultIndex === previousIndex) {
-      // The default item itself was moved
+      // The default itself was moved
       defaultOptionControl.setValue(currentIndex);
     } else if (previousIndex < currentIndex) {
-      // non-default item moved down - items between shift up
+      // non-default moved down - items between shift up
       if (currentDefaultIndex > previousIndex && currentDefaultIndex <= currentIndex) {
         defaultOptionControl.setValue(currentDefaultIndex - 1);
       }
     } else if (previousIndex > currentIndex) {
-      // non-default item moved up - items between shift down
+      // non-default moved up - items between shift down
       if (currentDefaultIndex >= currentIndex && currentDefaultIndex < previousIndex) {
         defaultOptionControl.setValue(currentDefaultIndex + 1);
       }
     }
 
-    optionsArray.updateValueAndValidity(); // required because Angular doesn't detect this mutation automatically
     this.productForm.markAsDirty();
   }
 
