@@ -17,6 +17,7 @@ export class LayoutSidebarComponent {
   menuItems: MenuItem[] = [
     { label: 'Home', route: '/' },
     { label: 'Products', route: '/products' },
+    { label: 'New Quote', route: '/quotes/new' },
     { label: 'Preferences', route: '/preferences' },
   ];
 }
