@@ -40,6 +40,7 @@ export class ProductEditFormService {
 
   toProductSelectionForm(selection: ProductSelection): FormGroup<ProductSelectionForm> {
     return this.formBuilder.nonNullable.group({
+      controlId: crypto.randomUUID() as string,
       name: [
         selection.name,
         [Validators.required, ProductEditFormService.duplicateSelectionNameValidator],
@@ -56,6 +57,7 @@ export class ProductEditFormService {
     option: ProductSelectionOption,
   ): FormGroup<ProductSelectionOptionForm> {
     return this.formBuilder.nonNullable.group({
+      controlId: crypto.randomUUID() as string,
       displayText: [
         option.displayText,
         [Validators.required, ProductEditFormService.duplicateOptionDisplayTextValidator],

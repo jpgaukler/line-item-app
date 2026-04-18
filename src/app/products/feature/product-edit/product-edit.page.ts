@@ -1,3 +1,4 @@
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -6,6 +7,7 @@ import { ButtonPrimaryDirective } from '../../../shared/ui/button-primary.direct
 import { ProductEditFormService } from '../../data-access/product-edit-form.service';
 import { ProductEditService } from '../../data-access/product-edit.service';
 import { ProductForm } from '../../interfaces/product-form.interface';
+import { ProductSelectionOptionForm } from '../../interfaces/product-selection-option-form.interface';
 import {
   MAX_PRODUCT_DESCRIPTION_LENGTH,
   MAX_PRODUCT_NAME_LENGTH,
@@ -13,7 +15,14 @@ import {
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, FormsModule, ButtonPrimaryDirective, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ButtonPrimaryDirective,
+    ReactiveFormsModule,
+    CdkDropList,
+    CdkDrag,
+  ],
   templateUrl: './product-edit.page.html',
   providers: [ProductEditService, ProductEditFormService],
 })
@@ -40,6 +49,10 @@ export class ProductEditPage implements OnDestroy {
 
   optionsAt(selectionIndex: number) {
     return this.productForm.controls.selections.at(selectionIndex).controls.options;
+  }
+
+  defaultOptionAt(selectionIndex: number) {
+    return this.productForm.controls.selections.at(selectionIndex).controls.defaultOptionIndex;
   }
 
   constructor() {
@@ -96,7 +109,65 @@ export class ProductEditPage implements OnDestroy {
 
   removeOption(selectionIndex: number, optionIndex: number): void {
     const optionsArray = this.optionsAt(selectionIndex);
+
+    if (optionsArray.length <= 1) {
+      return;
+    }
+
     optionsArray.removeAt(optionIndex);
+
+    const defaultOptionControl = this.defaultOptionAt(selectionIndex);
+    const currentDefaultIndex = defaultOptionControl.value;
+
+    if (currentDefaultIndex === optionIndex) {
+      defaultOptionControl.setValue(currentDefaultIndex - 1);
+    }
+
+    this.productForm.markAsDirty();
+  }
+
+  setDefaultOption(selectionIndex: number, optionIndex: number): void {
+    const defaultOptionControl = this.defaultOptionAt(selectionIndex);
+    defaultOptionControl.setValue(optionIndex);
+    this.productForm.markAsDirty();
+  }
+
+  reorderOption(
+    selectionIndex: number,
+    event: CdkDragDrop<FormGroup<ProductSelectionOptionForm>>,
+  ): void {
+    const previousIndex = event.previousIndex;
+    const currentIndex = event.currentIndex;
+
+    if (previousIndex === currentIndex) {
+      return;
+    }
+
+    const optionsArray = this.optionsAt(selectionIndex);
+    const defaultOptionControl = this.defaultOptionAt(selectionIndex);
+
+    // Move the options FormGroup
+    moveItemInArray(optionsArray.controls, previousIndex, currentIndex);
+
+    // Fix the default option index
+    const currentDefaultIndex = defaultOptionControl.value;
+
+    if (currentDefaultIndex === previousIndex) {
+      // The default item itself was moved
+      defaultOptionControl.setValue(currentIndex);
+    } else if (previousIndex < currentIndex) {
+      // non-default item moved down - items between shift up
+      if (currentDefaultIndex > previousIndex && currentDefaultIndex <= currentIndex) {
+        defaultOptionControl.setValue(currentDefaultIndex - 1);
+      }
+    } else if (previousIndex > currentIndex) {
+      // non-default item moved up - items between shift down
+      if (currentDefaultIndex >= currentIndex && currentDefaultIndex < previousIndex) {
+        defaultOptionControl.setValue(currentDefaultIndex + 1);
+      }
+    }
+
+    optionsArray.updateValueAndValidity(); // required because Angular doesn't detect this mutation automatically
     this.productForm.markAsDirty();
   }
 

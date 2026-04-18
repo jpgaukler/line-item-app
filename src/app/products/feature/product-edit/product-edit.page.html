@@ -5,186 +5,213 @@
 @if (!productEditService.loaded()) {
   <p>Loading...</p>
 } @else {
-  <form [formGroup]="productForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
-    <div class="flex flex-row justify-between gap-4">
-      <div [ngClass]="{ 'text-destructive': productForm.dirty }">
-        IsDirty: {{ productForm.dirty }}
+  <div class="flex flex-row gap-4">
+    <div class="mt-8 border bg-gray-100 p-4">
+      <h3 class="font-bold">Debug Form Value:</h3>
+      <pre>{{ productForm.value | json }}</pre>
+      <p>Status: {{ productForm.status }}</p>
+    </div>
+    <form [formGroup]="productForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
+      <div class="flex flex-row justify-between gap-4">
+        <div [ngClass]="{ 'text-destructive': productForm.dirty }">
+          IsDirty: {{ productForm.dirty }}
+        </div>
+        <div class="flex flex-row gap-2">
+          <button appButtonPrimary type="submit" [disabled]="!productForm.dirty">
+            Save Changes
+          </button>
+          <button appButtonPrimary type="button" (click)="reset()" [disabled]="!productForm.dirty">
+            Discard Changes
+          </button>
+        </div>
       </div>
-      <div class="flex flex-row gap-2">
-        <button appButtonPrimary type="submit" [disabled]="!productForm.dirty">Save Changes</button>
-        <button appButtonPrimary type="button" (click)="reset()" [disabled]="!productForm.dirty">
-          Discard Changes
+
+      <div class="flex flex-col gap-2 rounded-md p-4">
+        <input
+          id="product-name-input"
+          type="text"
+          class="hover:bg-input focus:bg-input rounded-md p-2 text-2xl font-bold"
+          formControlName="name"
+        />
+
+        <label for="product-description-input" class="text-sm">Description</label>
+        <textarea
+          id="product-description-input"
+          class="hover:bg-input focus:bg-input resize-none rounded-md border p-2 hover:resize-y"
+          rows="3"
+          formControlName="description"
+        ></textarea>
+
+        <label for="product-code-input" class="text-sm">Product Code</label>
+        <input
+          id="product-code-input"
+          class="hover:bg-input focus:bg-input rounded-md border p-2"
+          placeholder="Product Code"
+          formControlName="productCodeDefinition"
+        />
+      </div>
+
+      <div formArrayName="selections" class="flex flex-col gap-6 rounded-md p-4">
+        <div class="flex flex-row items-center justify-between">
+          <div class="text-2xl font-bold">Selections</div>
+        </div>
+
+        @for (
+          selection of selectionsArray.controls;
+          track selection.value.controlId;
+          let selectionIndex = $index
+        ) {
+          <div [formGroupName]="selectionIndex" class="flex flex-col gap-2 rounded-md border p-4">
+            <div class="flex flex-row justify-between gap-4">
+              <input
+                type="text"
+                class="hover:bg-input focus:bg-input rounded-md text-lg font-bold"
+                formControlName="name"
+                [ngClass]="{
+                  'border-destructive border':
+                    selection.controls.name.hasError('duplicateSelectionName') &&
+                    selection.controls.name.touched,
+                }"
+              />
+
+              @if (
+                selection.controls.name.hasError('duplicateSelectionName') &&
+                selection.controls.name.touched
+              ) {
+                <div class="text-destructive">Selection names must be unique</div>
+              }
+
+              <button
+                type="button"
+                class="hover:bg-muted rounded-md p-2"
+                (click)="removeSelection(selectionIndex)"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div
+              class="flex flex-col gap-4"
+              formArrayName="options"
+              cdkDropList
+              (cdkDropListDropped)="reorderOption(selectionIndex, $event)"
+            >
+              @for (
+                option of optionsAt(selectionIndex).controls;
+                track option.value.controlId;
+                let optionIndex = $index
+              ) {
+                <div
+                  cdkDrag
+                  [formGroupName]="optionIndex"
+                  class="ml-2 flex flex-row items-center gap-2"
+                >
+                  <button
+                    type="button"
+                    class="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full"
+                    (click)="setDefaultOption(selectionIndex, optionIndex)"
+                  >
+                    <div
+                      class="bg-input h-3 w-3 rounded-full"
+                      [ngClass]="{
+                        'bg-primary': selection.controls.defaultOptionIndex.value === optionIndex,
+                        'group-hover:bg-primary':
+                          selection.controls.defaultOptionIndex.value !== optionIndex,
+                      }"
+                    ></div>
+                  </button>
+
+                  <div class="flex flex-col">
+                    <input
+                      class="hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
+                      placeholder="Option"
+                      formControlName="displayText"
+                      [ngClass]="{
+                        'border-destructive':
+                          option.controls.displayText.hasError('duplicateOptionDisplayText') &&
+                          option.controls.displayText.touched,
+                      }"
+                    />
+                    @if (
+                      option.controls.displayText.hasError('duplicateOptionDisplayText') &&
+                      option.controls.displayText.touched
+                    ) {
+                      <div class="text-destructive text-sm">Display text must be unique</div>
+                    }
+                  </div>
+
+                  <div class="flex flex-col">
+                    <input
+                      class="hover:bg-input focus:bg-input rounded-md border p-2"
+                      placeholder="Value"
+                      formControlName="value"
+                      [ngClass]="{
+                        'border-destructive':
+                          option.controls.value.hasError('duplicateOptionValue') &&
+                          option.controls.value.touched,
+                      }"
+                    />
+                    @if (
+                      option.controls.value.hasError('duplicateOptionValue') &&
+                      option.controls.value.touched
+                    ) {
+                      <div class="text-destructive text-sm">Value must be unique</div>
+                    }
+                  </div>
+
+                  <button
+                    type="button"
+                    class="hover:bg-muted rounded-md p-2"
+                    (click)="removeOption(selectionIndex, optionIndex)"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="size-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              }
+            </div>
+
+            <div class="mx-2 mt-2">
+              <button
+                type="button"
+                class="text-primary hover:text-primary/80 cursor-pointer font-medium"
+                (click)="addOption(selectionIndex)"
+              >
+                Add Option
+              </button>
+            </div>
+          </div>
+        }
+
+        <button
+          type="button"
+          class="hover:bg-muted cursor-pointer rounded-md border border-dotted p-4 text-left font-medium"
+          (click)="addSelection()"
+        >
+          + Add Selection
         </button>
       </div>
-    </div>
-
-    <div class="flex flex-col gap-2 rounded-md border p-4">
-      <input
-        id="product-name-input"
-        type="text"
-        class="hover:bg-input focus:bg-input rounded-md p-2 text-2xl font-bold"
-        formControlName="name"
-      />
-
-      <label for="product-description-input" class="text-sm">Description</label>
-      <textarea
-        id="product-description-input"
-        class="hover:bg-input focus:bg-input resize-none rounded-md border p-2 hover:resize-y"
-        rows="3"
-        formControlName="description"
-      ></textarea>
-
-      <label for="product-code-input" class="text-sm">Product Code</label>
-      <input
-        id="product-code-input"
-        class="hover:bg-input focus:bg-input rounded-md border p-2"
-        placeholder="Product Code"
-        formControlName="productCodeDefinition"
-      />
-    </div>
-
-    <div formArrayName="selections" class="flex flex-col gap-6 rounded-md p-4">
-      <div class="flex flex-row items-center justify-between">
-        <div class="text-2xl font-bold">Selections</div>
-      </div>
-
-      @for (selection of selectionsArray.controls; track $index; let selectionIndex = $index) {
-        <div [formGroupName]="selectionIndex" class="flex flex-col gap-2 rounded-md border p-4">
-          <div class="flex flex-row justify-between gap-4">
-            <input
-              type="text"
-              class="hover:bg-input focus:bg-input rounded-md text-lg font-bold"
-              formControlName="name"
-              [ngClass]="{
-                'border-destructive border':
-                  selection.controls.name.hasError('duplicateSelectionName') &&
-                  selection.controls.name.touched,
-              }"
-            />
-
-            @if (
-              selection.controls.name.hasError('duplicateSelectionName') &&
-              selection.controls.name.touched
-            ) {
-              <div class="text-destructive">Selection names must be unique</div>
-            }
-
-            <button
-              type="button"
-              class="hover:bg-muted rounded-md p-2"
-              (click)="removeSelection(selectionIndex)"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-6"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          <!-- <div class="flex flex-row items-center justify-between">
-            <div class="text-md font-bold">Options</div>
-          </div> -->
-
-          <div formArrayName="options" class="flex flex-col gap-4">
-            @for (
-              option of optionsAt(selectionIndex).controls;
-              track $index;
-              let optionIndex = $index
-            ) {
-              <div [formGroupName]="optionIndex" class="ml-2 flex flex-row gap-2">
-                <input
-                  type="radio"
-                  [name]="`selection-${selectionIndex}`"
-                  [value]="optionIndex"
-                  [formControl]="selection.controls.defaultOptionIndex"
-                  class="mx-2"
-                />
-
-                <input
-                  class="hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
-                  placeholder="Option"
-                  formControlName="displayText"
-                  [ngClass]="{
-                    'border-destructive':
-                      option.controls.displayText.hasError('duplicateOptionDisplayText') &&
-                      option.controls.displayText.touched,
-                  }"
-                />
-
-                @if (
-                  option.controls.displayText.hasError('duplicateOptionDisplayText') &&
-                  option.controls.displayText.touched
-                ) {
-                  <div class="text-destructive">Display text must be unique</div>
-                }
-
-                <input
-                  class="hover:bg-input focus:bg-input rounded-md border p-2"
-                  placeholder="Value"
-                  formControlName="value"
-                  [ngClass]="{
-                    'border-destructive':
-                      option.controls.value.hasError('duplicateOptionValue') &&
-                      option.controls.value.touched,
-                  }"
-                />
-
-                @if (
-                  option.controls.value.hasError('duplicateOptionValue') &&
-                  option.controls.value.touched
-                ) {
-                  <div class="text-destructive">Value must be unique</div>
-                }
-
-                <button
-                  type="button"
-                  class="hover:bg-muted rounded-md p-2"
-                  (click)="removeOption(selectionIndex, optionIndex)"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                    />
-                  </svg>
-                </button>
-              </div>
-            }
-          </div>
-
-          <div class="mx-2 mt-2">
-            <button
-              type="button"
-              class="text-primary hover:text-primary/80 cursor-pointer font-medium"
-              (click)="addOption(selectionIndex)"
-            >
-              Add Option
-            </button>
-          </div>
-        </div>
-      }
-
-      <button
-        type="button"
-        class="hover:bg-muted cursor-pointer rounded-md border border-dotted p-4 text-left font-medium"
-        (click)="addSelection()"
-      >
-        + Add Selection
-      </button>
-    </div>
-  </form>
+    </form>
+  </div>
 }
