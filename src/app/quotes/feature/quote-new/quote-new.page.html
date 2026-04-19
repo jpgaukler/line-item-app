@@ -1,5 +1,5 @@
 <div class="mb-6">
-  <p class="text-foreground/80 text-sm font-semibold tracking-widest uppercase">New Quote</p>
+  <p class="text-foreground/70 text-sm font-semibold tracking-widest uppercase">New Quote</p>
   <h1 class="mt-3 text-3xl font-semibold tracking-tight">Create a new quote</h1>
 </div>
 
@@ -8,71 +8,66 @@
     <section class="bg-card rounded-xl border p-6 shadow-sm">
       <div class="mb-6 flex items-center justify-between">
         <div>
-          <p class="text-lg font-semibold text-slate-900">Quote Information</p>
-          <p class="mt-1 text-sm text-slate-500">Start with the details for this quote.</p>
+          <p class="text-lg font-semibold">Quote Information</p>
+          <p class="mt-1 text-sm">Start with the details for this quote.</p>
         </div>
       </div>
 
-      <div class="space-y-5">
-        <label class="block">
-          <span class="text-sm font-medium text-slate-700">Quote Name *</span>
+      <div class="flex flex-col gap-4">
+        <label>
+          <span class="text-sm font-medium">Quote Name</span>
           <input
             type="text"
             placeholder="e.g., Warehouse Conveyor System"
-            class="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 transition outline-none focus:border-slate-400 focus:bg-white"
+            class="hover:bg-input focus:bg-input mt-2 w-full rounded-md border p-2"
           />
         </label>
 
-        <label class="block">
-          <span class="text-sm font-medium text-slate-700">Client Name *</span>
+        <label>
+          <span class="text-sm font-medium">Client Name</span>
           <input
             type="text"
             placeholder="Client or company name"
-            class="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 transition outline-none focus:border-slate-400 focus:bg-white"
+            class="hover:bg-input focus:bg-input mt-2 w-full rounded-md border p-2"
           />
         </label>
 
-        <label class="block">
-          <span class="text-sm font-medium text-slate-700">Client Email *</span>
+        <label>
+          <span class="text-sm font-medium">Client Email</span>
           <input
             type="email"
             placeholder="client@example.com"
-            class="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 transition outline-none focus:border-slate-400 focus:bg-white"
+            class="hover:bg-input focus:bg-input mt-2 w-full rounded-md border p-2"
           />
         </label>
       </div>
     </section>
 
-    <section class="bg-card rounded-xl border p-6 shadow-sm">
-      <div class="mb-5 flex items-center justify-between">
+    <section class="bg-card flex flex-col gap-4 rounded-xl border p-6 shadow-sm">
+      <div class="flex items-center justify-between">
         <div>
-          <p class="text-lg font-semibold text-slate-900">System 1</p>
-          <p class="mt-1 text-sm text-slate-500">No products added yet</p>
+          <p class="text-lg font-semibold">System 1</p>
+          <p class="text-foreground/80 mt-1 text-sm">No products added yet</p>
         </div>
-        <button
-          type="button"
-          class="inline-flex items-center rounded-2xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
-        >
-          + Add Product
+      </div>
+
+      <div class="text-foreground/70 rounded-md border border-dotted py-10 text-center">
+        <p class="text-sm">Click <span class="font-semibold">Add Product</span> to get started</p>
+      </div>
+
+      <div>
+        <button type="button" class="text-primary hover:text-primary/70 cursor-pointer font-medium">
+          Add Product
         </button>
       </div>
-
-      <div
-        class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-6 py-16 text-center text-slate-500"
-      >
-        <p class="text-sm font-medium">No products added yet</p>
-        <p class="mt-2 text-sm">Click "Add Product" to get started</p>
-      </div>
     </section>
 
-    <section class="bg-card rounded-xl border p-6 shadow-sm">
-      <button
-        type="button"
-        class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
-      >
-        + Add Another System
-      </button>
-    </section>
+    <button
+      type="button"
+      class="hover:bg-muted cursor-pointer rounded-md border border-dotted p-4 text-left font-medium"
+    >
+      + Add System
+    </button>
 
     <div class="h-500"></div>
   </div>
