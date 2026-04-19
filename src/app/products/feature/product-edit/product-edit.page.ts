@@ -11,6 +11,7 @@ import { ProductSelectionOptionForm } from '../../interfaces/product-selection-o
 import {
   MAX_PRODUCT_DESCRIPTION_LENGTH,
   MAX_PRODUCT_NAME_LENGTH,
+  Product,
 } from '../../interfaces/product.interface';
 
 @Component({
@@ -64,16 +65,17 @@ export class ProductEditPage implements OnDestroy {
 
     effect(() => {
       if (this.productEditService.loaded()) {
-        console.log('running effect');
-        this.productForm = this.productEditFormService.toProductForm(
-          this.productEditService.product(),
-        );
+        this.initializeProductForm(this.productEditService.product());
       }
     });
   }
 
   ngOnDestroy(): void {
     this.layoutService.clearBreadcrumbs$.next();
+  }
+
+  initializeProductForm(product: Product): void {
+    this.productForm = this.productEditFormService.toProductForm(product);
   }
 
   addSelection(): void {
@@ -181,6 +183,6 @@ export class ProductEditPage implements OnDestroy {
   }
 
   reset(): void {
-    this.productForm = this.productEditFormService.toProductForm(this.productEditService.product());
+    this.initializeProductForm(this.productEditService.product());
   }
 }
