@@ -14,28 +14,18 @@ export class ButtonDirective {
   private readonly baseClasses = [
     'text-sm',
     'font-medium',
-    'cursor-pointer',
-    'rounded-xl',
+    'rounded-lg',
     'p-3',
+    'cursor-pointer',
     'transition',
+    'disabled:bg-muted',
+    'disabled:text-muted-foreground',
   ];
 
   private readonly variantClassMap: Record<ButtonVariant, string[]> = {
-    default: ['border', 'hover:bg-input', 'disabled:bg-muted', 'disabled:text-muted-foreground'],
-    primary: [
-      'bg-primary',
-      'text-primary-foreground',
-      'hover:bg-primary/80',
-      'disabled:bg-muted',
-      'disabled:text-muted-foreground',
-    ],
-    secondary: [
-      'bg-secondary',
-      'text-secondary-foreground',
-      'hover:bg-secondary/80',
-      'disabled:bg-muted',
-      'disabled:text-muted-foreground',
-    ],
+    default: ['border', 'hover:bg-input'],
+    primary: ['bg-primary', 'text-primary-foreground', 'hover:bg-primary/80'],
+    secondary: ['bg-secondary', 'text-secondary-foreground', 'hover:bg-secondary/80'],
   };
 
   readonly classes = computed(() =>
