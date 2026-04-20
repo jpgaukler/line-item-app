@@ -3,12 +3,12 @@ import { Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LayoutService } from '../../../layout/data-access/layout.service';
-import { ButtonPrimaryDirective } from '../../../shared/ui/button-primary.directive';
+import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { ProductListService } from '../../data-access/product-list.service';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, FormsModule, RouterLink, ButtonPrimaryDirective],
+  imports: [CommonModule, FormsModule, RouterLink, ButtonDirective],
   templateUrl: './product-list.page.html',
   providers: [ProductListService],
 })

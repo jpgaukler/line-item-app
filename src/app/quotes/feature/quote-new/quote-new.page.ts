@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy } from '@angular/core';
 import { LayoutService } from '../../../layout/data-access/layout.service';
+import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonDirective],
   templateUrl: './quote-new.page.html',
   providers: [],
 })

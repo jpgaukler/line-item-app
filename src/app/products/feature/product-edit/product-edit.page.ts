@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutService } from '../../../layout/data-access/layout.service';
-import { ButtonPrimaryDirective } from '../../../shared/ui/button-primary.directive';
+import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { ProductEditFormService } from '../../data-access/product-edit-form.service';
 import { ProductEditService } from '../../data-access/product-edit.service';
 import { ProductForm } from '../../interfaces/product-form.interface';
@@ -16,14 +16,7 @@ import {
 
 @Component({
   selector: 'app-products',
-  imports: [
-    CommonModule,
-    FormsModule,
-    ButtonPrimaryDirective,
-    ReactiveFormsModule,
-    CdkDropList,
-    CdkDrag,
-  ],
+  imports: [CommonModule, FormsModule, ButtonDirective, ReactiveFormsModule, CdkDropList, CdkDrag],
   templateUrl: './product-edit.page.html',
   providers: [ProductEditService, ProductEditFormService],
 })

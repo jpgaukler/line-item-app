@@ -17,10 +17,10 @@
           IsDirty: {{ productForm.dirty }}
         </div>
         <div class="flex flex-row gap-2">
-          <button appButtonPrimary type="submit" [disabled]="!productForm.dirty">
+          <button appButton variant="primary" type="submit" [disabled]="!productForm.dirty">
             Save Changes
           </button>
-          <button appButtonPrimary type="button" (click)="reset()" [disabled]="!productForm.dirty">
+          <button appButton type="button" (click)="reset()" [disabled]="!productForm.dirty">
             Discard Changes
           </button>
         </div>
