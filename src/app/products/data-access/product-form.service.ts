@@ -25,7 +25,7 @@ export class ProductFormService {
 
   toProductForm(product: Product): FormGroup<ProductForm> {
     return this.formBuilder.nonNullable.group({
-      id: product.id,
+      id: [product.id],
       name: [product.name, [Validators.required, Validators.maxLength(MAX_PRODUCT_NAME_LENGTH)]],
       description: [
         product.description,
@@ -40,13 +40,13 @@ export class ProductFormService {
 
   toProductSelectionForm(selection: ProductSelection): FormGroup<ProductSelectionForm> {
     return this.formBuilder.nonNullable.group({
-      controlId: crypto.randomUUID() as string,
+      controlId: [crypto.randomUUID() as string],
       name: [
         selection.name,
         [Validators.required, ProductFormService.duplicateSelectionNameValidator],
       ],
-      defaultOptionIndex: selection.defaultOptionIndex,
-      allowCustomValue: selection.allowCustomValue,
+      defaultOptionIndex: [selection.defaultOptionIndex],
+      allowCustomValue: [selection.allowCustomValue],
       options: this.formBuilder.array(
         selection.options.map((option) => this.toProductSelectionOptionForm(option)),
       ),
@@ -57,7 +57,7 @@ export class ProductFormService {
     option: ProductSelectionOption,
   ): FormGroup<ProductSelectionOptionForm> {
     return this.formBuilder.nonNullable.group({
-      controlId: crypto.randomUUID() as string,
+      controlId: [crypto.randomUUID() as string],
       displayText: [
         option.displayText,
         [Validators.required, ProductFormService.duplicateOptionDisplayTextValidator],
@@ -72,7 +72,7 @@ export class ProductFormService {
   private static duplicateSelectionNameValidator: ValidatorFn = (
     control: AbstractControl,
   ): ValidationErrors | null => {
-    const name = control.value;
+    const name: string = control.value;
     const currentGroup = control?.parent as FormGroup<ProductSelectionForm>;
     const selectionsArray = currentGroup?.parent as FormArray<FormGroup<ProductSelectionForm>>;
 
@@ -80,7 +80,9 @@ export class ProductFormService {
 
     // Find duplicates: check if any OTHER selection has the same name
     const isDuplicate = selectionsArray.controls.some(
-      (group) => group !== currentGroup && group.controls.name.value === name,
+      (group) =>
+        group !== currentGroup &&
+        group.controls.name.value.toLocaleLowerCase() === name.toLocaleLowerCase(),
     );
 
     return isDuplicate ? { duplicateSelectionName: true } : null;
@@ -89,15 +91,17 @@ export class ProductFormService {
   private static duplicateOptionValueValidator: ValidatorFn = (
     control: AbstractControl,
   ): ValidationErrors | null => {
-    const value = control.value;
+    const value: string = control.value;
     const currentGroup = control?.parent as FormGroup<ProductSelectionOptionForm>;
     const optionsArray = currentGroup?.parent as FormArray<FormGroup<ProductSelectionOptionForm>>;
 
     if (!value || !optionsArray) return null;
 
-    // Find duplicates: check if any OTHER option has the same name
+    // Find duplicates: check if any OTHER option has the same value
     const isDuplicate = optionsArray.controls.some(
-      (group) => group !== currentGroup && group.controls.value.value === value,
+      (group) =>
+        group !== currentGroup &&
+        group.controls.value.value.toLocaleLowerCase() === value.toLocaleLowerCase(),
     );
 
     return isDuplicate ? { duplicateOptionValue: true } : null;
@@ -106,15 +110,17 @@ export class ProductFormService {
   private static duplicateOptionDisplayTextValidator: ValidatorFn = (
     control: AbstractControl,
   ): ValidationErrors | null => {
-    const displayText = control.value;
+    const displayText: string = control.value;
     const currentGroup = control?.parent as FormGroup<ProductSelectionOptionForm>;
     const optionsArray = currentGroup?.parent as FormArray<FormGroup<ProductSelectionOptionForm>>;
 
     if (!displayText || !optionsArray) return null;
 
-    // Find duplicates: check if any OTHER option has the same name
+    // Find duplicates: check if any OTHER option has the same display text
     const isDuplicate = optionsArray.controls.some(
-      (group) => group !== currentGroup && group.controls.displayText.value === displayText,
+      (group) =>
+        group !== currentGroup &&
+        group.controls.displayText.value.toLocaleLowerCase() === displayText.toLocaleLowerCase(),
     );
 
     return isDuplicate ? { duplicateOptionDisplayText: true } : null;
