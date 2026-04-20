@@ -1,11 +1,11 @@
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
-import { ProductEditFormService } from '../../data-access/product-edit-form.service';
 import { ProductEditService } from '../../data-access/product-edit.service';
+import { ProductFormService } from '../../data-access/product-form.service';
 import { ProductForm } from '../../interfaces/product-form.interface';
 import { ProductSelectionOptionForm } from '../../interfaces/product-selection-option-form.interface';
 import {
@@ -18,18 +18,17 @@ import {
   selector: 'app-products',
   imports: [CommonModule, FormsModule, ButtonDirective, ReactiveFormsModule, CdkDropList, CdkDrag],
   templateUrl: './product-edit.page.html',
-  providers: [ProductEditService, ProductEditFormService],
+  providers: [ProductEditService, ProductFormService],
 })
 export class ProductEditPage implements OnDestroy {
   private readonly layoutService = inject(LayoutService);
-  public readonly formBuilder = inject(FormBuilder);
-  public readonly productEditFormService = inject(ProductEditFormService);
+  private readonly productFormService = inject(ProductFormService);
   public readonly productEditService = inject(ProductEditService);
 
   maxNameLength = MAX_PRODUCT_NAME_LENGTH;
   maxDescriptionLength = MAX_PRODUCT_DESCRIPTION_LENGTH;
 
-  productForm: FormGroup<ProductForm> = this.productEditFormService.toProductForm({
+  productForm: FormGroup<ProductForm> = this.productFormService.toProductForm({
     id: '',
     name: '',
     description: '',
@@ -68,12 +67,12 @@ export class ProductEditPage implements OnDestroy {
   }
 
   initializeProductForm(product: Product): void {
-    this.productForm = this.productEditFormService.toProductForm(product);
+    this.productForm = this.productFormService.toProductForm(product);
   }
 
   addSelection(): void {
     this.selectionsArray.push(
-      this.productEditFormService.toProductSelectionForm({
+      this.productFormService.toProductSelectionForm({
         name: `Selection (${this.selectionsArray.length + 1})`,
         defaultOptionIndex: 0,
         allowCustomValue: false,
@@ -93,7 +92,7 @@ export class ProductEditPage implements OnDestroy {
     const optionsArray = this.optionsAt(selectionIndex);
 
     optionsArray.push(
-      this.productEditFormService.toProductSelectionOptionForm({
+      this.productFormService.toProductSelectionOptionForm({
         displayText: `Option (${optionsArray.length + 1})`,
         value: `Value (${optionsArray.length + 1})`,
       }),

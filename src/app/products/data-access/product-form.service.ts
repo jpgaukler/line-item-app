@@ -20,8 +20,8 @@ import {
 } from '../interfaces/product.interface';
 
 @Injectable()
-export class ProductEditFormService {
-  public readonly formBuilder = inject(FormBuilder);
+export class ProductFormService {
+  private readonly formBuilder = inject(FormBuilder);
 
   toProductForm(product: Product): FormGroup<ProductForm> {
     return this.formBuilder.nonNullable.group({
@@ -43,7 +43,7 @@ export class ProductEditFormService {
       controlId: crypto.randomUUID() as string,
       name: [
         selection.name,
-        [Validators.required, ProductEditFormService.duplicateSelectionNameValidator],
+        [Validators.required, ProductFormService.duplicateSelectionNameValidator],
       ],
       defaultOptionIndex: selection.defaultOptionIndex,
       allowCustomValue: selection.allowCustomValue,
@@ -60,11 +60,11 @@ export class ProductEditFormService {
       controlId: crypto.randomUUID() as string,
       displayText: [
         option.displayText,
-        [Validators.required, ProductEditFormService.duplicateOptionDisplayTextValidator],
+        [Validators.required, ProductFormService.duplicateOptionDisplayTextValidator],
       ],
       value: [
         option.value,
-        [Validators.required, ProductEditFormService.duplicateOptionValueValidator],
+        [Validators.required, ProductFormService.duplicateOptionValueValidator],
       ],
     });
   }
