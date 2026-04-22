@@ -1,11 +1,3 @@
-// export interface Quote {
-//   quoteName: string;
-//   customerName: string;
-//   customerEmail: string;
-//   systems: QuoteSystem[];
-//   price: number;
-// }
-
 export interface QuoteModel {
   name: string;
   customerName: string;
