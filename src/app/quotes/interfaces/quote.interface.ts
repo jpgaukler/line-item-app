@@ -1,9 +1,33 @@
-import { QuoteSystem } from './quote-system.interface';
+// export interface Quote {
+//   quoteName: string;
+//   customerName: string;
+//   customerEmail: string;
+//   systems: QuoteSystem[];
+//   price: number;
+// }
 
 export interface Quote {
   name: string;
   customerName: string;
   customerEmail: string;
-  systems: QuoteSystem[];
+  systems: {
+    price: number;
+    name: string;
+    items: {
+      productId: string;
+      // productVersion: number;
+      itemNumber: string;
+      name: string;
+      description: string;
+      productCode: string;
+      price: number;
+      selections: {
+        name: string;
+        value: string;
+        displayText: string;
+        isCustomValue: boolean;
+      }[];
+    }[];
+  }[];
   price: number;
 }

@@ -8,6 +8,7 @@ import { ProductHttpService } from '../../shared/data-access/product.http.servic
 import { QuoteItemSelection } from '../interfaces/quote-item-selection.interface';
 import { QuoteItem } from '../interfaces/quote-item.interface';
 import { QuoteSystem } from '../interfaces/quote-system.interface';
+import { Quote } from '../interfaces/quote.interface';
 
 // type ProductKey = `${string}::${number}`;
 
@@ -67,23 +68,48 @@ export class QuoteNewService {
   showAddItem = computed(() => this.state().showAddItem);
   systemItemIdMap = computed(() => this.state().systemItemIdMap);
   itemMap = computed(() => this.state().itemMap);
-  // quote = computed(() => {
-  //   const quote: Quote = {
-  //     name: this.state().quoteName,
-  //     customerName: this.state().customerName,
-  //     customerEmail: this.state().customerEmail,
+  quote = computed(() => {
+    const quote: Quote = {
+      name: this.state().quoteName,
+      customerName: this.state().customerName,
+      customerEmail: this.state().customerEmail,
+      // systems: Array.from(this.state().systemMap.entries(), ([systemKey, system], systemIndex) => ({
+      //   systemPrice: system.price,
+      //   name: `System ${systemIndex + 1}`,
+      //   items:
+      // })),
+      systems: Array.from(this.state().systemMap.entries(), ([systemKey, system], systemIndex) => {
+        const itemIds = this.state().systemItemIdMap.get(systemKey)!;
+        const items = itemIds.map((itemId, itemIndex) => {
+          const item = this.state().itemMap.get(itemId)!;
 
-  //     systems: Array.from(this.state().systemMap.entries(), ([systemKey, system], systemIndex) => {
-  //       const itemIds = this.state().systemItemIdMap.get(systemKey)!;
+          return {
+            productId: item.productId,
+            itemNumber: `${systemIndex + 1}.${itemIndex + 1}`,
+            name: item.name,
+            description: item.description,
+            productCode: item.productCode,
+            price: 0,
+            selections: item.selections.map((selection) => ({
+              name: selection.name,
+              value: selection.value,
+              displayText: selection.displayText,
+              isCustomValue: selection.isCustomValue,
+            })),
+          };
+        });
 
-  //       return {
-  //         systemPrice: system.price,
-  //         name: `System ${systemIndex + 1}`,
-  //       };
-  //     }),
-  //   };
-  //   return quote;
-  // });
+        return {
+          price: system.price,
+          name: `System ${systemIndex + 1}`,
+          items: items,
+        };
+      }),
+      price: 0,
+    };
+
+    return quote;
+  });
 
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
