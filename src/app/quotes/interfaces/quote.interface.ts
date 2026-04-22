@@ -6,7 +6,7 @@
 //   price: number;
 // }
 
-export interface Quote {
+export interface QuoteModel {
   name: string;
   customerName: string;
   customerEmail: string;

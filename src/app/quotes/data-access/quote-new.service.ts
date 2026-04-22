@@ -8,7 +8,7 @@ import { ProductHttpService } from '../../shared/data-access/product.http.servic
 import { QuoteItemSelection } from '../interfaces/quote-item-selection.interface';
 import { QuoteItem } from '../interfaces/quote-item.interface';
 import { QuoteSystem } from '../interfaces/quote-system.interface';
-import { Quote } from '../interfaces/quote.interface';
+import { QuoteModel } from '../interfaces/quote.interface';
 
 // type ProductKey = `${string}::${number}`;
 
@@ -69,7 +69,7 @@ export class QuoteNewService {
   systemItemIdMap = computed(() => this.state().systemItemIdMap);
   itemMap = computed(() => this.state().itemMap);
   quote = computed(() => {
-    const quote: Quote = {
+    const quote: QuoteModel = {
       name: this.state().name,
       customerName: this.state().customerName,
       customerEmail: this.state().customerEmail,
