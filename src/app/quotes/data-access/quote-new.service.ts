@@ -73,17 +73,13 @@ export class QuoteNewService {
       name: this.state().quoteName,
       customerName: this.state().customerName,
       customerEmail: this.state().customerEmail,
-      // systems: Array.from(this.state().systemMap.entries(), ([systemKey, system], systemIndex) => ({
-      //   systemPrice: system.price,
-      //   name: `System ${systemIndex + 1}`,
-      //   items:
-      // })),
-      systems: Array.from(this.state().systemMap.entries(), ([systemKey, system], systemIndex) => {
-        const itemIds = this.state().systemItemIdMap.get(systemKey)!;
-        const items = itemIds.map((itemId, itemIndex) => {
-          const item = this.state().itemMap.get(itemId)!;
-
-          return {
+      systems: Array.from(this.state().systemMap.entries(), ([systemKey, system], systemIndex) => ({
+        price: system.price,
+        name: `System ${systemIndex + 1}`,
+        items: this.state()
+          .systemItemIdMap.get(systemKey)!
+          .map((itemKey) => this.state().itemMap.get(itemKey)!)
+          .map((item, itemIndex) => ({
             productId: item.productId,
             itemNumber: `${systemIndex + 1}.${itemIndex + 1}`,
             name: item.name,
@@ -96,18 +92,10 @@ export class QuoteNewService {
               displayText: selection.displayText,
               isCustomValue: selection.isCustomValue,
             })),
-          };
-        });
-
-        return {
-          price: system.price,
-          name: `System ${systemIndex + 1}`,
-          items: items,
-        };
-      }),
+          })),
+      })),
       price: 0,
     };
-
     return quote;
   });
 
