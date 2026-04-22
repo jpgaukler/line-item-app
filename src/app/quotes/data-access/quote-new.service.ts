@@ -1,3 +1,4 @@
+import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
@@ -88,6 +89,7 @@ export class QuoteNewService {
     itemId: string;
     updatedSelection: QuoteItemSelection;
   }>();
+  reorderItem$ = new Subject<{ systemId: string; previousIndex: number; currentIndex: number }>();
   addSystem$ = new Subject<void>();
 
   constructor() {
@@ -183,6 +185,20 @@ export class QuoteNewService {
         //     },
         //   },
         // }));
+      });
+
+    this.reorderItem$
+      .pipe(takeUntilDestroyed())
+      .subscribe((next: { systemId: string; previousIndex: number; currentIndex: number }) => {
+        this.state.update((state) => {
+          const itemIds = [...state.systemItemIdMap.get(next.systemId)!];
+          moveItemInArray(itemIds, next.previousIndex, next.currentIndex);
+
+          return {
+            ...state,
+            systemItemIdMap: new Map([...state.systemItemIdMap, [next.systemId, itemIds]]),
+          };
+        });
       });
   }
 }

@@ -1,3 +1,4 @@
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -8,7 +9,7 @@ import { QuoteNewService } from '../../data-access/quote-new.service';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, ButtonDirective, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ButtonDirective, ReactiveFormsModule, FormsModule, CdkDropList, CdkDrag],
   templateUrl: './quote-new.page.html',
   providers: [ProductListService, QuoteNewService],
 })
@@ -31,6 +32,17 @@ export class QuoteNewPage implements OnDestroy {
 
   onSelectionChange(event: any) {
     console.log('onSelectionCHange', event);
+  }
+
+  reorderItem(systemId: string, event: CdkDragDrop<any>): void {
+    const previousIndex = event.previousIndex;
+    const currentIndex = event.currentIndex;
+
+    if (previousIndex === currentIndex) {
+      return;
+    }
+
+    this.quoteNewService.reorderItem$.next({ systemId, previousIndex, currentIndex });
   }
 
   toJSON(map: Map<any, any>) {

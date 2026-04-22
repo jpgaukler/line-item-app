@@ -72,7 +72,7 @@
             </div>
           </div>
 
-          <div>
+          <div cdkDropList (cdkDropListDropped)="reorderItem(systemId, $event)">
             @for (
               itemId of quoteNewService.systemItemIdMap().get(systemId)!;
               track itemId;
@@ -81,7 +81,7 @@
               @let item = quoteNewService.itemMap().get(itemId)!;
               @let product = quoteNewService.productMap().get(item.productId)!;
 
-              <div class="flex flex-col gap-3">
+              <div cdkDrag class="flex flex-col gap-3">
                 <div class="flex flex-row items-baseline gap-3">
                   <span class="bg-accent rounded-md px-3 font-semibold">
                     {{ systemIndex + 1 }}.{{ itemIndex + 1 }}
@@ -112,8 +112,9 @@
                   </div>
                 }
               </div>
+
               @if (!$last) {
-                <hr />
+                <hr class="my-3" />
               }
             }
           </div>
