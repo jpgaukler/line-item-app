@@ -60,14 +60,15 @@ export class QuoteNewPage implements OnDestroy {
     this.quoteNewService.updateItemSelection$.next({ itemId, updatedSelection });
   }
 
+  reorderSystem(event: CdkDragDrop<any>): void {
+    const previousIndex = event.previousIndex;
+    const currentIndex = event.currentIndex;
+    this.quoteNewService.reorderSystem$.next({ previousIndex, currentIndex });
+  }
+
   reorderItem(systemId: string, event: CdkDragDrop<any>): void {
     const previousIndex = event.previousIndex;
     const currentIndex = event.currentIndex;
-
-    if (previousIndex === currentIndex) {
-      return;
-    }
-
     this.quoteNewService.reorderItem$.next({ systemId, previousIndex, currentIndex });
   }
 

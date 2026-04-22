@@ -10,8 +10,11 @@
     <!-- <h3 class="font-bold">Debug SystemMap:</h3>
     <pre>{{ toJSON(quoteNewService.systemMap()) | json }}</pre> -->
 
-    <h3 class="font-bold">Debug ItemMap:</h3>
-    <pre>{{ toJSON(quoteNewService.itemMap()) | json }}</pre>
+    <!-- <h3 class="font-bold">Debug ItemMap:</h3>
+    <pre>{{ toJSON(quoteNewService.itemMap()) | json }}</pre> -->
+
+    <!-- <h3 class="font-bold">Debug Quote:</h3>
+    <pre>{{ quoteNewService.quote() | json }}</pre> -->
   </div>
 
   <div class="grid gap-6 xl:grid-cols-[1fr_24rem]">
@@ -57,72 +60,73 @@
         </div>
       </div>
 
-      @for (
-        keyValuePair of quoteNewService.systemMap();
-        track keyValuePair[0];
-        let systemIndex = $index
-      ) {
-        @let systemId = keyValuePair[0];
-        @let itemIds = quoteNewService.systemItemIdMap().get(systemId)!;
+      <div cdkDropList (cdkDropListDropped)="reorderSystem($event)">
+        @for (
+          keyValuePair of quoteNewService.systemMap();
+          track keyValuePair[0];
+          let systemIndex = $index
+        ) {
+          @let systemId = keyValuePair[0];
+          @let itemIds = quoteNewService.systemItemIdMap().get(systemId)!;
 
-        <div class="bg-card flex flex-col gap-4 rounded-xl border p-6 shadow-sm">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-lg font-semibold">System {{ systemIndex + 1 }}</p>
-              @if (itemIds.length < 1) {
-                <p class="text-foreground/80 mt-1 text-sm">No products added yet</p>
-              } @else {
-                <p class="text-foreground/80 mt-1 text-sm">{{ itemIds.length }} items</p>
-              }
+          <div cdkDrag class="bg-card flex flex-col gap-4 rounded-xl border p-6 shadow-sm">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-lg font-semibold">System {{ systemIndex + 1 }}</p>
+                @if (itemIds.length < 1) {
+                  <p class="text-foreground/80 mt-1 text-sm">No products added yet</p>
+                } @else {
+                  <p class="text-foreground/80 mt-1 text-sm">{{ itemIds.length }} items</p>
+                }
+              </div>
             </div>
-          </div>
 
-          @if (itemIds.length < 1 && quoteNewService.showAddItem() === null) {
-            <div class="text-foreground/70 rounded-md border border-dotted py-10 text-center">
-              <p class="text-sm">
-                Click <span class="font-semibold">Add Product</span> to get started
-              </p>
-            </div>
-          }
+            @if (itemIds.length < 1 && quoteNewService.showAddItem() === null) {
+              <div class="text-foreground/70 rounded-md border border-dotted py-10 text-center">
+                <p class="text-sm">
+                  Click <span class="font-semibold">Add Item</span> to get started
+                </p>
+              </div>
+            }
 
-          <div cdkDropList (cdkDropListDropped)="reorderItem(systemId, $event)">
-            @for (itemId of itemIds; track itemId; let itemIndex = $index) {
-              @let item = quoteNewService.itemMap().get(itemId)!;
-              @let product = quoteNewService.productMap().get(item.productId)!;
+            <div cdkDropList (cdkDropListDropped)="reorderItem(systemId, $event)">
+              @for (itemId of itemIds; track itemId; let itemIndex = $index) {
+                @let item = quoteNewService.itemMap().get(itemId)!;
+                @let product = quoteNewService.productMap().get(item.productId)!;
 
-              <div cdkDrag class="flex flex-col gap-3">
-                <div class="flex flex-row items-baseline gap-3">
-                  <span class="bg-accent rounded-md px-3 font-semibold">
-                    {{ systemIndex + 1 }}.{{ itemIndex + 1 }}
-                  </span>
-                  <p class="text-lg font-bold">{{ item.name }}</p>
-                </div>
-                <p>{{ item.description }}</p>
-
-                @for (
-                  productSelection of product.selections;
-                  track productSelection.name;
-                  let selectionIndex = $index
-                ) {
-                  @let itemSelection = item.selections[selectionIndex];
-
-                  <div class="flex flex-col gap-3">
-                    <select
-                      [ngModel]="itemSelection.value"
-                      (ngModelChange)="
-                        onSelectionChange(itemId, itemSelection, productSelection, $event)
-                      "
-                      class="hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
-                    >
-                      @for (option of productSelection.options; track option.value) {
-                        <option [value]="option.value">
-                          {{ option.displayText }}
-                        </option>
-                      }
-                    </select>
+                <div cdkDrag class="flex flex-col gap-3">
+                  <div class="flex flex-row items-baseline gap-3">
+                    <span class="bg-accent rounded-md px-3 font-semibold">
+                      {{ systemIndex + 1 }}.{{ itemIndex + 1 }}
+                    </span>
+                    <p class="text-lg font-bold">{{ item.name }}</p>
                   </div>
+                  <p>{{ item.description }}</p>
 
-                  <!-- <div class="relative">
+                  @for (
+                    productSelection of product.selections;
+                    track productSelection.name;
+                    let selectionIndex = $index
+                  ) {
+                    @let itemSelection = item.selections[selectionIndex];
+
+                    <div class="flex flex-col gap-3">
+                      <select
+                        [ngModel]="itemSelection.value"
+                        (ngModelChange)="
+                          onSelectionChange(itemId, itemSelection, productSelection, $event)
+                        "
+                        class="hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
+                      >
+                        @for (option of productSelection.options; track option.value) {
+                          <option [value]="option.value">
+                            {{ option.displayText }}
+                          </option>
+                        }
+                      </select>
+                    </div>
+
+                    <!-- <div class="relative">
                     <button
                       type="button"
                       (click)="open = !open"
@@ -144,43 +148,44 @@
                       }
                     </div>
                   </div> -->
-                }
-              </div>
+                  }
 
-              @if (!$last) {
-                <hr class="my-3" />
+                  @if (!$last) {
+                    <hr class="my-3" />
+                  }
+                </div>
               }
-            }
-          </div>
+            </div>
 
-          @if (quoteNewService.showAddItem() === systemId) {
-            <div class="flex flex-col gap-4 rounded-md border border-dotted p-6">
-              <!-- <input
+            @if (quoteNewService.showAddItem() === systemId) {
+              <div class="flex flex-col gap-4 rounded-md border border-dotted p-6">
+                <!-- <input
                 type="text"
                 placeholder="Search"
                 class="hover:bg-input focus:bg-input mt-2 w-full rounded-md border p-2"
               /> -->
-              <div class="flex gap-4">
-                @for (product of productListService.products(); track product.id) {
-                  <div appButton (click)="quoteNewService.addItem$.next({ systemId, product })">
-                    {{ product.name }}
-                  </div>
-                }
+                <div class="flex gap-4">
+                  @for (product of productListService.products(); track product.id) {
+                    <div appButton (click)="quoteNewService.addItem$.next({ systemId, product })">
+                      {{ product.name }}
+                    </div>
+                  }
+                </div>
               </div>
-            </div>
-          }
+            }
 
-          <div>
-            <button
-              type="button"
-              class="text-primary hover:text-primary/70 cursor-pointer font-medium"
-              (click)="quoteNewService.showAddItem$.next({ systemId })"
-            >
-              Add Item
-            </button>
+            <div>
+              <button
+                type="button"
+                class="text-primary hover:text-primary/70 cursor-pointer font-medium"
+                (click)="quoteNewService.showAddItem$.next({ systemId })"
+              >
+                Add Item
+              </button>
+            </div>
           </div>
-        </div>
-      }
+        }
+      </div>
 
       <button
         type="button"

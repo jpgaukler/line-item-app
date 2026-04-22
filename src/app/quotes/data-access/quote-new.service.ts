@@ -2,7 +2,7 @@ import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, Subject } from 'rxjs';
 import { Product } from '../../products/interfaces/product.interface';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
 import { QuoteItemSelection } from '../interfaces/quote-item-selection.interface';
@@ -60,7 +60,6 @@ export class QuoteNewService {
   );
 
   // selectors
-  // quote = computed(() => this.state().quote);
   products = computed(() => this.state().products.sort((a, b) => a.name.localeCompare(b.name)));
   productMap = computed(() => this.state().productMap);
 
@@ -68,6 +67,23 @@ export class QuoteNewService {
   showAddItem = computed(() => this.state().showAddItem);
   systemItemIdMap = computed(() => this.state().systemItemIdMap);
   itemMap = computed(() => this.state().itemMap);
+  // quote = computed(() => {
+  //   const quote: Quote = {
+  //     name: this.state().quoteName,
+  //     customerName: this.state().customerName,
+  //     customerEmail: this.state().customerEmail,
+
+  //     systems: Array.from(this.state().systemMap.entries(), ([systemKey, system], systemIndex) => {
+  //       const itemIds = this.state().systemItemIdMap.get(systemKey)!;
+
+  //       return {
+  //         systemPrice: system.price,
+  //         name: `System ${systemIndex + 1}`,
+  //       };
+  //     }),
+  //   };
+  //   return quote;
+  // });
 
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
@@ -91,6 +107,7 @@ export class QuoteNewService {
   showAddItem$ = new Subject<{ systemId: string }>();
   addItem$ = new Subject<{ systemId: string; product: Product }>();
   updateItemSelection$ = new Subject<{ itemId: string; updatedSelection: QuoteItemSelection }>();
+  reorderSystem$ = new Subject<{ previousIndex: number; currentIndex: number }>();
   reorderItem$ = new Subject<{ systemId: string; previousIndex: number; currentIndex: number }>();
 
   constructor() {
@@ -140,6 +157,23 @@ export class QuoteNewService {
         };
       }),
     );
+
+    this.reorderSystem$
+      .pipe(
+        takeUntilDestroyed(),
+        filter((next) => next.previousIndex !== next.currentIndex),
+      )
+      .subscribe((next: { previousIndex: number; currentIndex: number }) => {
+        this.state.update((state) => {
+          const entries = Array.from(state.systemMap.entries());
+          moveItemInArray(entries, next.previousIndex, next.currentIndex);
+
+          return {
+            ...state,
+            systemMap: new Map(entries),
+          };
+        });
+      });
 
     this.showAddItem$.pipe(takeUntilDestroyed()).subscribe((next: { systemId: string }) => {
       this.state.update((state) => ({
@@ -200,15 +234,19 @@ export class QuoteNewService {
       });
 
     this.reorderItem$
-      .pipe(takeUntilDestroyed())
+      .pipe(
+        takeUntilDestroyed(),
+        filter((next) => next.previousIndex !== next.currentIndex),
+      )
       .subscribe((next: { systemId: string; previousIndex: number; currentIndex: number }) => {
         this.state.update((state) => {
-          const itemIds = [...state.systemItemIdMap.get(next.systemId)!];
-          moveItemInArray(itemIds, next.previousIndex, next.currentIndex);
+          const itemIds = state.systemItemIdMap.get(next.systemId)!;
+          const updatedItemIds = [...itemIds];
+          moveItemInArray(updatedItemIds, next.previousIndex, next.currentIndex);
 
           return {
             ...state,
-            systemItemIdMap: new Map([...state.systemItemIdMap, [next.systemId, itemIds]]),
+            systemItemIdMap: new Map([...state.systemItemIdMap, [next.systemId, updatedItemIds]]),
           };
         });
       });
