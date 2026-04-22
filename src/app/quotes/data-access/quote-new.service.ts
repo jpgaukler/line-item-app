@@ -21,6 +21,7 @@ interface QuoteNewState {
   customerEmail: string;
 
   systemMap: Map<string, QuoteSystem>;
+  systemItemIdMap: Map<string, string[]>;
   itemMap: Map<string, QuoteItem>;
 
   loaded: boolean;
@@ -36,25 +37,24 @@ export class QuoteNewService {
   customerEmailControl = new FormControl<string>('', { nonNullable: true });
 
   // state
-  private state = signal<QuoteNewState>({
-    products: [],
-    productMap: new Map<string, Product>(),
-    quoteName: '',
-    customerName: '',
-    customerEmail: '',
-    systemMap: new Map<string, QuoteSystem>([
-      [
-        crypto.randomUUID(),
-        {
-          price: 0,
-          itemIds: [],
-        },
-      ],
-    ]),
-    itemMap: new Map<string, QuoteItem>(),
-    loaded: false,
-    error: null,
-  });
+  private state = signal<QuoteNewState>(
+    (() => {
+      const systemId = crypto.randomUUID();
+
+      return {
+        products: [],
+        productMap: new Map<string, Product>(),
+        quoteName: '',
+        customerName: '',
+        customerEmail: '',
+        systemMap: new Map<string, QuoteSystem>([[systemId, { price: 0 }]]),
+        systemItemIdMap: new Map<string, string[]>([[systemId, []]]),
+        itemMap: new Map<string, QuoteItem>(),
+        loaded: false,
+        error: null,
+      };
+    })(),
+  );
 
   // selectors
   // quote = computed(() => this.state().quote);
@@ -62,6 +62,7 @@ export class QuoteNewService {
   productMap = computed(() => this.state().productMap);
 
   systemMap = computed(() => this.state().systemMap);
+  systemItemIdMap = computed(() => this.state().systemItemIdMap);
   itemMap = computed(() => this.state().itemMap);
 
   loaded = computed(() => this.state().loaded);
@@ -127,7 +128,6 @@ export class QuoteNewService {
         const newSystemId: string = crypto.randomUUID();
         const newSystem: QuoteSystem = {
           price: 0,
-          itemIds: [],
         };
 
         return {
@@ -155,16 +155,14 @@ export class QuoteNewService {
               isCustomValue: false,
             })),
           };
-          const system: QuoteSystem = state.systemMap.get(next.systemId)!;
-          const updateSystem: QuoteSystem = {
-            ...system,
-            itemIds: [...system.itemIds, newItemId],
-          };
+
+          const itemIds: string[] = state.systemItemIdMap.get(next.systemId)!;
+          const updatedItemIds: string[] = [...itemIds, newItemId];
 
           return {
             ...state,
             productMap: new Map([...state.productMap, [next.product.id, next.product]]),
-            systemMap: new Map([...state.systemMap, [next.systemId, updateSystem]]),
+            systemItemIdMap: new Map([...state.systemItemIdMap, [next.systemId, updatedItemIds]]),
             itemMap: new Map([...state.itemMap, [newItemId, newItem]]),
           };
         });
