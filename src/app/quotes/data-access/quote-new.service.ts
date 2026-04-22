@@ -135,6 +135,7 @@ export class QuoteNewService {
         return {
           ...state,
           systemMap: new Map([...state.systemMap, [newSystemId, newSystem]]),
+          systemItemIdMap: new Map([[newSystemId, []]]),
         };
       }),
     );
@@ -173,18 +174,20 @@ export class QuoteNewService {
     this.updateItemSelection$
       .pipe(takeUntilDestroyed())
       .subscribe((next: { itemId: string; updatedSelection: QuoteItemSelection }) => {
-        // this.state.update((state) => ({
-        //   ...state,
-        //   itemMap: {
-        //     ...state.itemMap,
-        //     [next.itemId]: {
-        //       ...state.itemMap[next.itemId],
-        //       selections: state.itemMap[next.itemId].selections.map((selection) =>
-        //         next.updatedSelection.name === selection.name ? next.updatedSelection : selection,
-        //       ),
-        //     },
-        //   },
-        // }));
+        this.state.update((state) => {
+          const item: QuoteItem = state.itemMap.get(next.itemId)!;
+          const updatedItem: QuoteItem = {
+            ...item,
+            selections: item.selections.map((selection) =>
+              selection.name === next.updatedSelection.name ? next.updatedSelection : selection,
+            ),
+          };
+
+          return {
+            ...state,
+            itemMap: new Map([...state.itemMap, [next.itemId, updatedItem]]),
+          };
+        });
       });
 
     this.reorderItem$

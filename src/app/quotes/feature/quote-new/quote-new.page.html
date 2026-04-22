@@ -4,11 +4,11 @@
 </div>
 <div class="flex flex-row gap-4">
   <div class="mt-8 border bg-gray-100 p-4">
-    <h3 class="font-bold">Debug ProductMap:</h3>
-    <pre>{{ toJSON(quoteNewService.productMap()) | json }}</pre>
+    <!-- <h3 class="font-bold">Debug ProductMap:</h3>
+    <pre>{{ toJSON(quoteNewService.productMap()) | json }}</pre> -->
 
-    <h3 class="font-bold">Debug SystemMap:</h3>
-    <pre>{{ toJSON(quoteNewService.systemMap()) | json }}</pre>
+    <!-- <h3 class="font-bold">Debug SystemMap:</h3>
+    <pre>{{ toJSON(quoteNewService.systemMap()) | json }}</pre> -->
 
     <h3 class="font-bold">Debug ItemMap:</h3>
     <pre>{{ toJSON(quoteNewService.itemMap()) | json }}</pre>
@@ -100,7 +100,9 @@
                   <div class="flex flex-col gap-3">
                     <select
                       [ngModel]="itemSelection.value"
-                      (ngModelChange)="onSelectionChange($event)"
+                      (ngModelChange)="
+                        onSelectionChange(itemId, itemSelection, productSelection, $event)
+                      "
                       class="hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
                     >
                       @for (option of productSelection.options; track option.value) {
@@ -110,6 +112,29 @@
                       }
                     </select>
                   </div>
+
+                  <!-- <div class="relative">
+                    <button
+                      type="button"
+                      (click)="open = !open"
+                      class="w-full rounded-md border p-2 text-left"
+                    >
+                      {{ selected?.displayText || 'Select an option' }}
+                    </button>
+                    <div
+                      class="bg-card absolute z-10 mt-1 w-full origin-top rounded-md border shadow-sm transition-all"
+                      [ngClass]="
+                        open ? 'scale-y-100 opacity-100' : 'pointer-events-none scale-y-0 opacity-0'
+                      "
+                    >
+                      @for (option of productSelection.options; track option.value) {
+                        <div (click)="select(option)" class="hover:bg-input cursor-pointer p-2">
+                          <div class="font-medium">{{ option.displayText }}</div>
+                          <div class="text-sm text-gray-500">{{ option.value }}</div>
+                        </div>
+                      }
+                    </div>
+                  </div> -->
                 }
               </div>
 

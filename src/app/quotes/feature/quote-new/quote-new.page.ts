@@ -4,8 +4,11 @@ import { Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ProductListService } from '../../../products/data-access/product-list.service';
+import { ProductSelectionOption } from '../../../products/interfaces/product-selection-option.interface';
+import { ProductSelection } from '../../../products/interfaces/product-selection.interface';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { QuoteNewService } from '../../data-access/quote-new.service';
+import { QuoteItemSelection } from '../../interfaces/quote-item-selection.interface';
 
 @Component({
   selector: 'app-products',
@@ -17,6 +20,14 @@ export class QuoteNewPage implements OnDestroy {
   private readonly layoutService = inject(LayoutService);
   public readonly productListService = inject(ProductListService);
   public readonly quoteNewService = inject(QuoteNewService);
+  // open = false;
+  // selected: ProductSelectionOption | null = null;
+
+  // select(option: ProductSelectionOption) {
+  //   this.selected = option;
+  //   this.open = false;
+  //   this.onSelectionChange(option.value);
+  // }
 
   constructor() {
     this.layoutService.updateBreadcrumbs$.next([
@@ -30,8 +41,23 @@ export class QuoteNewPage implements OnDestroy {
     this.layoutService.clearBreadcrumbs$.next();
   }
 
-  onSelectionChange(event: any) {
-    console.log('onSelectionCHange', event);
+  onSelectionChange(
+    itemId: string,
+    itemSelection: QuoteItemSelection,
+    productSelection: ProductSelection,
+    newValue: string,
+  ) {
+    const optionSelected: ProductSelectionOption = productSelection.options.find(
+      (o) => o.value === newValue,
+    )!;
+
+    const updatedSelection: QuoteItemSelection = {
+      ...itemSelection,
+      displayText: optionSelected.displayText,
+      value: optionSelected.value,
+    };
+
+    this.quoteNewService.updateItemSelection$.next({ itemId, updatedSelection });
   }
 
   reorderItem(systemId: string, event: CdkDragDrop<any>): void {
