@@ -18,7 +18,7 @@ interface QuoteNewState {
   products: Product[];
   productMap: Map<string, Product>;
 
-  quoteName: string;
+  name: string;
   customerName: string;
   customerEmail: string;
 
@@ -47,7 +47,7 @@ export class QuoteNewService {
       return {
         products: [],
         productMap: new Map<string, Product>(),
-        quoteName: '',
+        name: '',
         customerName: '',
         customerEmail: '',
         systemMap: new Map<string, QuoteSystem>([[systemId, { price: 0 }]]),
@@ -70,7 +70,7 @@ export class QuoteNewService {
   itemMap = computed(() => this.state().itemMap);
   quote = computed(() => {
     const quote: Quote = {
-      name: this.state().quoteName,
+      name: this.state().name,
       customerName: this.state().customerName,
       customerEmail: this.state().customerEmail,
       systems: Array.from(this.state().systemMap.entries(), ([systemKey, system], systemIndex) => ({
@@ -139,7 +139,7 @@ export class QuoteNewService {
     this.nameControlChanges$.pipe(takeUntilDestroyed()).subscribe((next: string) =>
       this.state.update((state) => ({
         ...state,
-        quoteName: next,
+        name: next,
       })),
     );
 
