@@ -16,7 +16,7 @@
 
   <div class="grid gap-6 xl:grid-cols-[1fr_24rem]">
     <div class="flex flex-col gap-6">
-      <section class="bg-card rounded-xl border p-6 shadow-sm">
+      <div class="bg-card rounded-xl border p-6 shadow-sm">
         <div class="mb-6 flex items-center justify-between">
           <div>
             <p class="text-lg font-semibold">Quote Information</p>
@@ -55,7 +55,7 @@
             />
           </label>
         </div>
-      </section>
+      </div>
 
       @for (
         keyValuePair of quoteNewService.systemMap();
@@ -63,21 +63,30 @@
         let systemIndex = $index
       ) {
         @let systemId = keyValuePair[0];
+        @let itemIds = quoteNewService.systemItemIdMap().get(systemId)!;
 
-        <section class="bg-card flex flex-col gap-4 rounded-xl border p-6 shadow-sm">
+        <div class="bg-card flex flex-col gap-4 rounded-xl border p-6 shadow-sm">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-lg font-semibold">System {{ systemIndex + 1 }}</p>
-              <p class="text-foreground/80 mt-1 text-sm">No products added yet</p>
+              @if (itemIds.length < 1) {
+                <p class="text-foreground/80 mt-1 text-sm">No products added yet</p>
+              } @else {
+                <p class="text-foreground/80 mt-1 text-sm">{{ itemIds.length }} items</p>
+              }
             </div>
           </div>
 
+          @if (itemIds.length < 1 && quoteNewService.showAddItem() === null) {
+            <div class="text-foreground/70 rounded-md border border-dotted py-10 text-center">
+              <p class="text-sm">
+                Click <span class="font-semibold">Add Product</span> to get started
+              </p>
+            </div>
+          }
+
           <div cdkDropList (cdkDropListDropped)="reorderItem(systemId, $event)">
-            @for (
-              itemId of quoteNewService.systemItemIdMap().get(systemId)!;
-              track itemId;
-              let itemIndex = $index
-            ) {
+            @for (itemId of itemIds; track itemId; let itemIndex = $index) {
               @let item = quoteNewService.itemMap().get(itemId)!;
               @let product = quoteNewService.productMap().get(item.productId)!;
 
@@ -144,20 +153,7 @@
             }
           </div>
 
-          <div class="text-foreground/70 rounded-md border border-dotted py-10 text-center">
-            <p class="text-sm">
-              Click <span class="font-semibold">Add Product</span> to get started
-            </p>
-          </div>
-
-          <div>
-            <button
-              type="button"
-              class="text-primary hover:text-primary/70 cursor-pointer font-medium"
-            >
-              Add Product
-            </button>
-
+          @if (quoteNewService.showAddItem() === systemId) {
             <div class="flex flex-col gap-4 rounded-md border border-dotted p-6">
               <!-- <input
                 type="text"
@@ -172,8 +168,18 @@
                 }
               </div>
             </div>
+          }
+
+          <div>
+            <button
+              type="button"
+              class="text-primary hover:text-primary/70 cursor-pointer font-medium"
+              (click)="quoteNewService.showAddItem$.next({ systemId })"
+            >
+              Add Item
+            </button>
           </div>
-        </section>
+        </div>
       }
 
       <button
@@ -190,7 +196,7 @@
     <div
       class="sticky top-[calc(var(--spacing-topbar-height)+1.5rem)] flex flex-col gap-6 self-start"
     >
-      <section class="bg-card flex flex-col gap-6 rounded-xl border p-6 shadow-sm">
+      <div class="bg-card flex flex-col gap-6 rounded-xl border p-6 shadow-sm">
         <div class="flex flex-col gap-4 text-sm">
           <p class="text-lg font-semibold">Quote Summary</p>
           <div class="flex items-center justify-between">
@@ -225,7 +231,7 @@
           <p class="mt-1 text-sm">No products yet</p>
           <p class="mt-4 text-lg font-semibold">$0</p>
         </div>
-      </section>
+      </div>
     </div>
   </div>
 </div>

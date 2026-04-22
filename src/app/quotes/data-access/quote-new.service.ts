@@ -22,6 +22,7 @@ interface QuoteNewState {
   customerEmail: string;
 
   systemMap: Map<string, QuoteSystem>;
+  showAddItem: string | null;
   systemItemIdMap: Map<string, string[]>;
   itemMap: Map<string, QuoteItem>;
 
@@ -49,6 +50,7 @@ export class QuoteNewService {
         customerName: '',
         customerEmail: '',
         systemMap: new Map<string, QuoteSystem>([[systemId, { price: 0 }]]),
+        showAddItem: null,
         systemItemIdMap: new Map<string, string[]>([[systemId, []]]),
         itemMap: new Map<string, QuoteItem>(),
         loaded: false,
@@ -63,6 +65,7 @@ export class QuoteNewService {
   productMap = computed(() => this.state().productMap);
 
   systemMap = computed(() => this.state().systemMap);
+  showAddItem = computed(() => this.state().showAddItem);
   systemItemIdMap = computed(() => this.state().systemItemIdMap);
   itemMap = computed(() => this.state().itemMap);
 
@@ -84,13 +87,11 @@ export class QuoteNewService {
     distinctUntilChanged(),
   );
 
-  addItem$ = new Subject<{ systemId: string; product: Product }>();
-  updateItemSelection$ = new Subject<{
-    itemId: string;
-    updatedSelection: QuoteItemSelection;
-  }>();
-  reorderItem$ = new Subject<{ systemId: string; previousIndex: number; currentIndex: number }>();
   addSystem$ = new Subject<void>();
+  showAddItem$ = new Subject<{ systemId: string }>();
+  addItem$ = new Subject<{ systemId: string; product: Product }>();
+  updateItemSelection$ = new Subject<{ itemId: string; updatedSelection: QuoteItemSelection }>();
+  reorderItem$ = new Subject<{ systemId: string; previousIndex: number; currentIndex: number }>();
 
   constructor() {
     // reducers
@@ -135,10 +136,17 @@ export class QuoteNewService {
         return {
           ...state,
           systemMap: new Map([...state.systemMap, [newSystemId, newSystem]]),
-          systemItemIdMap: new Map([[newSystemId, []]]),
+          systemItemIdMap: new Map([...state.systemItemIdMap, [newSystemId, []]]),
         };
       }),
     );
+
+    this.showAddItem$.pipe(takeUntilDestroyed()).subscribe((next: { systemId: string }) => {
+      this.state.update((state) => ({
+        ...state,
+        showAddItem: next.systemId,
+      }));
+    });
 
     this.addItem$
       .pipe(takeUntilDestroyed())
@@ -164,6 +172,7 @@ export class QuoteNewService {
 
           return {
             ...state,
+            showAddItem: null,
             productMap: new Map([...state.productMap, [next.product.id, next.product]]),
             systemItemIdMap: new Map([...state.systemItemIdMap, [next.systemId, updatedItemIds]]),
             itemMap: new Map([...state.itemMap, [newItemId, newItem]]),
