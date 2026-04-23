@@ -6,8 +6,8 @@ import { debounceTime, distinctUntilChanged, filter, Subject } from 'rxjs';
 import { Product } from '../../products/interfaces/product.interface';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
 import { QuoteItemSelection } from '../interfaces/quote-item-selection.interface';
-import { ItemKey, QuoteItem } from '../interfaces/quote-item.interface';
-import { QuoteSystem, SystemKey } from '../interfaces/quote-system.interface';
+import { QuoteItem, QuoteItemKey } from '../interfaces/quote-item.interface';
+import { QuoteSystem, QuoteSystemKey } from '../interfaces/quote-system.interface';
 import { QuoteModel } from '../interfaces/quote.interface';
 
 // type ProductKey = `${string}::${number}`;
@@ -25,16 +25,16 @@ interface QuoteNewState {
   customerEmail: string;
 
   /** A Map of random string keys to QuoteSystems */
-  systemMap: Map<SystemKey, QuoteSystem>;
+  systemMap: Map<QuoteSystemKey, QuoteSystem>;
 
   /** The system key where an item is being added, otherwise null */
-  showAddItem: SystemKey | null;
+  showAddItem: QuoteSystemKey | null;
 
   /** A Map of system keys to array of item keys for the quote items in each system. */
-  systemItemKeyMap: Map<SystemKey, ItemKey[]>;
+  systemItemKeyMap: Map<QuoteSystemKey, QuoteItemKey[]>;
 
   /** A Map of random string keys to QuoteItems for easy lookups. */
-  itemMap: Map<ItemKey, QuoteItem>;
+  itemMap: Map<QuoteItemKey, QuoteItem>;
 
   /** List of product definitions for use when adding a new quote item. */
   products: Product[];
@@ -65,10 +65,10 @@ export class QuoteNewService {
         name: '',
         customerName: '',
         customerEmail: '',
-        systemMap: new Map<SystemKey, QuoteSystem>([[systemKey, { price: 0 }]]),
+        systemMap: new Map<QuoteSystemKey, QuoteSystem>([[systemKey, { price: 0 }]]),
         showAddItem: null,
-        systemItemKeyMap: new Map<SystemKey, ItemKey[]>([[systemKey, []]]),
-        itemMap: new Map<ItemKey, QuoteItem>(),
+        systemItemKeyMap: new Map<QuoteSystemKey, QuoteItemKey[]>([[systemKey, []]]),
+        itemMap: new Map<QuoteItemKey, QuoteItem>(),
         loaded: false,
         error: null,
       };
@@ -133,12 +133,15 @@ export class QuoteNewService {
   );
 
   addSystem$ = new Subject<void>();
-  showAddItem$ = new Subject<SystemKey>();
-  addItem$ = new Subject<{ systemKey: SystemKey; product: Product }>();
-  updateItemSelection$ = new Subject<{ itemKey: ItemKey; updatedSelection: QuoteItemSelection }>();
+  showAddItem$ = new Subject<QuoteSystemKey>();
+  addItem$ = new Subject<{ systemKey: QuoteSystemKey; product: Product }>();
+  updateItemSelection$ = new Subject<{
+    itemKey: QuoteItemKey;
+    updatedSelection: QuoteItemSelection;
+  }>();
   reorderSystem$ = new Subject<{ previousIndex: number; currentIndex: number }>();
   reorderItem$ = new Subject<{
-    systemKey: SystemKey;
+    systemKey: QuoteSystemKey;
     previousIndex: number;
     currentIndex: number;
   }>();
@@ -178,7 +181,7 @@ export class QuoteNewService {
 
     this.addSystem$.pipe(takeUntilDestroyed()).subscribe(() =>
       this.state.update((state) => {
-        const newSystemKey: SystemKey = crypto.randomUUID();
+        const newSystemKey: QuoteSystemKey = crypto.randomUUID();
         const newSystem: QuoteSystem = {
           price: 0,
         };
@@ -208,7 +211,7 @@ export class QuoteNewService {
         });
       });
 
-    this.showAddItem$.pipe(takeUntilDestroyed()).subscribe((next: SystemKey) => {
+    this.showAddItem$.pipe(takeUntilDestroyed()).subscribe((next: QuoteSystemKey) => {
       this.state.update((state) => ({
         ...state,
         showAddItem: next,
@@ -217,9 +220,9 @@ export class QuoteNewService {
 
     this.addItem$
       .pipe(takeUntilDestroyed())
-      .subscribe((next: { systemKey: SystemKey; product: Product }) => {
+      .subscribe((next: { systemKey: QuoteSystemKey; product: Product }) => {
         this.state.update((state) => {
-          const newItemKey: ItemKey = crypto.randomUUID();
+          const newItemKey: QuoteItemKey = crypto.randomUUID();
           const newItem: QuoteItem = {
             productId: next.product.id,
             name: next.product.name,
@@ -234,8 +237,8 @@ export class QuoteNewService {
             })),
           };
 
-          const itemKeys: ItemKey[] = state.systemItemKeyMap.get(next.systemKey)!;
-          const updatedItemKeys: ItemKey[] = [...itemKeys, newItemKey];
+          const itemKeys: QuoteItemKey[] = state.systemItemKeyMap.get(next.systemKey)!;
+          const updatedItemKeys: QuoteItemKey[] = [...itemKeys, newItemKey];
 
           return {
             ...state,
@@ -252,7 +255,7 @@ export class QuoteNewService {
 
     this.updateItemSelection$
       .pipe(takeUntilDestroyed())
-      .subscribe((next: { itemKey: ItemKey; updatedSelection: QuoteItemSelection }) => {
+      .subscribe((next: { itemKey: QuoteItemKey; updatedSelection: QuoteItemSelection }) => {
         this.state.update((state) => {
           const item: QuoteItem = state.itemMap.get(next.itemKey)!;
           const updatedItem: QuoteItem = {
@@ -274,20 +277,22 @@ export class QuoteNewService {
         takeUntilDestroyed(),
         filter((next) => next.previousIndex !== next.currentIndex),
       )
-      .subscribe((next: { systemKey: SystemKey; previousIndex: number; currentIndex: number }) => {
-        this.state.update((state) => {
-          const itemKeys = state.systemItemKeyMap.get(next.systemKey)!;
-          const updatedItemKeys = [...itemKeys];
-          moveItemInArray(updatedItemKeys, next.previousIndex, next.currentIndex);
+      .subscribe(
+        (next: { systemKey: QuoteSystemKey; previousIndex: number; currentIndex: number }) => {
+          this.state.update((state) => {
+            const itemKeys = state.systemItemKeyMap.get(next.systemKey)!;
+            const updatedItemKeys = [...itemKeys];
+            moveItemInArray(updatedItemKeys, next.previousIndex, next.currentIndex);
 
-          return {
-            ...state,
-            systemItemKeyMap: new Map([
-              ...state.systemItemKeyMap,
-              [next.systemKey, updatedItemKeys],
-            ]),
-          };
-        });
-      });
+            return {
+              ...state,
+              systemItemKeyMap: new Map([
+                ...state.systemItemKeyMap,
+                [next.systemKey, updatedItemKeys],
+              ]),
+            };
+          });
+        },
+      );
   }
 }

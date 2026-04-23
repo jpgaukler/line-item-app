@@ -9,8 +9,8 @@ import { ProductSelection } from '../../../products/interfaces/product-selection
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { QuoteNewService } from '../../data-access/quote-new.service';
 import { QuoteItemSelection } from '../../interfaces/quote-item-selection.interface';
-import { ItemKey } from '../../interfaces/quote-item.interface';
-import { SystemKey } from '../../interfaces/quote-system.interface';
+import { QuoteItemKey } from '../../interfaces/quote-item.interface';
+import { QuoteSystemKey } from '../../interfaces/quote-system.interface';
 
 @Component({
   selector: 'app-products',
@@ -44,7 +44,7 @@ export class QuoteNewPage implements OnDestroy {
   }
 
   onSelectionChange(
-    itemKey: ItemKey,
+    itemKey: QuoteItemKey,
     itemSelection: QuoteItemSelection,
     productSelection: ProductSelection,
     newValue: string,
@@ -68,7 +68,7 @@ export class QuoteNewPage implements OnDestroy {
     this.quoteNewService.reorderSystem$.next({ previousIndex, currentIndex });
   }
 
-  reorderItem(systemKey: SystemKey, event: CdkDragDrop<any>): void {
+  reorderItem(systemKey: QuoteSystemKey, event: CdkDragDrop<any>): void {
     const previousIndex = event.previousIndex;
     const currentIndex = event.currentIndex;
     this.quoteNewService.reorderItem$.next({ systemKey, previousIndex, currentIndex });
