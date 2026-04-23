@@ -42,7 +42,7 @@ export class QuoteNewPage implements OnDestroy {
   }
 
   onSelectionChange(
-    itemId: string,
+    itemKey: string,
     itemSelection: QuoteItemSelection,
     productSelection: ProductSelection,
     newValue: string,
@@ -57,7 +57,7 @@ export class QuoteNewPage implements OnDestroy {
       value: optionSelected.value,
     };
 
-    this.quoteNewService.updateItemSelection$.next({ itemId, updatedSelection });
+    this.quoteNewService.updateItemSelection$.next({ itemKey, updatedSelection });
   }
 
   reorderSystem(event: CdkDragDrop<any>): void {
@@ -66,10 +66,10 @@ export class QuoteNewPage implements OnDestroy {
     this.quoteNewService.reorderSystem$.next({ previousIndex, currentIndex });
   }
 
-  reorderItem(systemId: string, event: CdkDragDrop<any>): void {
+  reorderItem(systemKey: string, event: CdkDragDrop<any>): void {
     const previousIndex = event.previousIndex;
     const currentIndex = event.currentIndex;
-    this.quoteNewService.reorderItem$.next({ systemId, previousIndex, currentIndex });
+    this.quoteNewService.reorderItem$.next({ systemKey, previousIndex, currentIndex });
   }
 
   toJSON(map: Map<any, any>) {

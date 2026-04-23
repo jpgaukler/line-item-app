@@ -24,7 +24,7 @@ interface QuoteNewState {
 
   systemMap: Map<string, QuoteSystem>;
   showAddItem: string | null;
-  systemItemIdMap: Map<string, string[]>;
+  systemItemKeyMap: Map<string, string[]>;
   itemMap: Map<string, QuoteItem>;
 
   loaded: boolean;
@@ -42,7 +42,7 @@ export class QuoteNewService {
   // state
   private state = signal<QuoteNewState>(
     (() => {
-      const systemId = crypto.randomUUID();
+      const systemKey = crypto.randomUUID();
 
       return {
         products: [],
@@ -50,9 +50,9 @@ export class QuoteNewService {
         name: '',
         customerName: '',
         customerEmail: '',
-        systemMap: new Map<string, QuoteSystem>([[systemId, { price: 0 }]]),
+        systemMap: new Map<string, QuoteSystem>([[systemKey, { price: 0 }]]),
         showAddItem: null,
-        systemItemIdMap: new Map<string, string[]>([[systemId, []]]),
+        systemItemKeyMap: new Map<string, string[]>([[systemKey, []]]),
         itemMap: new Map<string, QuoteItem>(),
         loaded: false,
         error: null,
@@ -66,7 +66,7 @@ export class QuoteNewService {
 
   systemMap = computed(() => this.state().systemMap);
   showAddItem = computed(() => this.state().showAddItem);
-  systemItemIdMap = computed(() => this.state().systemItemIdMap);
+  systemItemKeyMap = computed(() => this.state().systemItemKeyMap);
   itemMap = computed(() => this.state().itemMap);
   quote = computed(() => {
     const quote: QuoteModel = {
@@ -77,7 +77,7 @@ export class QuoteNewService {
         price: system.price,
         name: `System ${systemIndex + 1}`,
         items: this.state()
-          .systemItemIdMap.get(systemKey)!
+          .systemItemKeyMap.get(systemKey)!
           .map((itemKey) => this.state().itemMap.get(itemKey)!)
           .map((item, itemIndex) => ({
             productId: item.productId,
@@ -118,11 +118,11 @@ export class QuoteNewService {
   );
 
   addSystem$ = new Subject<void>();
-  showAddItem$ = new Subject<{ systemId: string }>();
-  addItem$ = new Subject<{ systemId: string; product: Product }>();
-  updateItemSelection$ = new Subject<{ itemId: string; updatedSelection: QuoteItemSelection }>();
+  showAddItem$ = new Subject<{ systemKey: string }>();
+  addItem$ = new Subject<{ systemKey: string; product: Product }>();
+  updateItemSelection$ = new Subject<{ itemKey: string; updatedSelection: QuoteItemSelection }>();
   reorderSystem$ = new Subject<{ previousIndex: number; currentIndex: number }>();
-  reorderItem$ = new Subject<{ systemId: string; previousIndex: number; currentIndex: number }>();
+  reorderItem$ = new Subject<{ systemKey: string; previousIndex: number; currentIndex: number }>();
 
   constructor() {
     // reducers
@@ -159,15 +159,15 @@ export class QuoteNewService {
 
     this.addSystem$.pipe(takeUntilDestroyed()).subscribe(() =>
       this.state.update((state) => {
-        const newSystemId: string = crypto.randomUUID();
+        const newSystemKey: string = crypto.randomUUID();
         const newSystem: QuoteSystem = {
           price: 0,
         };
 
         return {
           ...state,
-          systemMap: new Map([...state.systemMap, [newSystemId, newSystem]]),
-          systemItemIdMap: new Map([...state.systemItemIdMap, [newSystemId, []]]),
+          systemMap: new Map([...state.systemMap, [newSystemKey, newSystem]]),
+          systemItemKeyMap: new Map([...state.systemItemKeyMap, [newSystemKey, []]]),
         };
       }),
     );
@@ -189,18 +189,18 @@ export class QuoteNewService {
         });
       });
 
-    this.showAddItem$.pipe(takeUntilDestroyed()).subscribe((next: { systemId: string }) => {
+    this.showAddItem$.pipe(takeUntilDestroyed()).subscribe((next: { systemKey: string }) => {
       this.state.update((state) => ({
         ...state,
-        showAddItem: next.systemId,
+        showAddItem: next.systemKey,
       }));
     });
 
     this.addItem$
       .pipe(takeUntilDestroyed())
-      .subscribe((next: { systemId: string; product: Product }) => {
+      .subscribe((next: { systemKey: string; product: Product }) => {
         this.state.update((state) => {
-          const newItemId: string = crypto.randomUUID();
+          const newItemKey: string = crypto.randomUUID();
           const newItem: QuoteItem = {
             productId: next.product.id,
             name: next.product.name,
@@ -215,24 +215,27 @@ export class QuoteNewService {
             })),
           };
 
-          const itemIds: string[] = state.systemItemIdMap.get(next.systemId)!;
-          const updatedItemIds: string[] = [...itemIds, newItemId];
+          const itemKeys: string[] = state.systemItemKeyMap.get(next.systemKey)!;
+          const updatedItemKeys: string[] = [...itemKeys, newItemKey];
 
           return {
             ...state,
             showAddItem: null,
             productMap: new Map([...state.productMap, [next.product.id, next.product]]),
-            systemItemIdMap: new Map([...state.systemItemIdMap, [next.systemId, updatedItemIds]]),
-            itemMap: new Map([...state.itemMap, [newItemId, newItem]]),
+            systemItemKeyMap: new Map([
+              ...state.systemItemKeyMap,
+              [next.systemKey, updatedItemKeys],
+            ]),
+            itemMap: new Map([...state.itemMap, [newItemKey, newItem]]),
           };
         });
       });
 
     this.updateItemSelection$
       .pipe(takeUntilDestroyed())
-      .subscribe((next: { itemId: string; updatedSelection: QuoteItemSelection }) => {
+      .subscribe((next: { itemKey: string; updatedSelection: QuoteItemSelection }) => {
         this.state.update((state) => {
-          const item: QuoteItem = state.itemMap.get(next.itemId)!;
+          const item: QuoteItem = state.itemMap.get(next.itemKey)!;
           const updatedItem: QuoteItem = {
             ...item,
             selections: item.selections.map((selection) =>
@@ -242,7 +245,7 @@ export class QuoteNewService {
 
           return {
             ...state,
-            itemMap: new Map([...state.itemMap, [next.itemId, updatedItem]]),
+            itemMap: new Map([...state.itemMap, [next.itemKey, updatedItem]]),
           };
         });
       });
@@ -252,15 +255,18 @@ export class QuoteNewService {
         takeUntilDestroyed(),
         filter((next) => next.previousIndex !== next.currentIndex),
       )
-      .subscribe((next: { systemId: string; previousIndex: number; currentIndex: number }) => {
+      .subscribe((next: { systemKey: string; previousIndex: number; currentIndex: number }) => {
         this.state.update((state) => {
-          const itemIds = state.systemItemIdMap.get(next.systemId)!;
-          const updatedItemIds = [...itemIds];
-          moveItemInArray(updatedItemIds, next.previousIndex, next.currentIndex);
+          const itemKeys = state.systemItemKeyMap.get(next.systemKey)!;
+          const updatedItemKeys = [...itemKeys];
+          moveItemInArray(updatedItemKeys, next.previousIndex, next.currentIndex);
 
           return {
             ...state,
-            systemItemIdMap: new Map([...state.systemItemIdMap, [next.systemId, updatedItemIds]]),
+            systemItemKeyMap: new Map([
+              ...state.systemItemKeyMap,
+              [next.systemKey, updatedItemKeys],
+            ]),
           };
         });
       });

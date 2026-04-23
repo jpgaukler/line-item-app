@@ -61,27 +61,23 @@
       </div>
 
       <div cdkDropList (cdkDropListDropped)="reorderSystem($event)">
-        @for (
-          keyValuePair of quoteNewService.systemMap();
-          track keyValuePair[0];
-          let systemIndex = $index
-        ) {
-          @let systemId = keyValuePair[0];
-          @let itemIds = quoteNewService.systemItemIdMap().get(systemId)!;
+        @for (entry of quoteNewService.systemMap(); track entry[0]; let systemIndex = $index) {
+          @let systemKey = entry[0];
+          @let itemKeys = quoteNewService.systemItemKeyMap().get(systemKey)!;
 
           <div cdkDrag class="bg-card flex flex-col gap-4 rounded-xl border p-6 shadow-sm">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-lg font-semibold">System {{ systemIndex + 1 }}</p>
-                @if (itemIds.length < 1) {
+                @if (itemKeys.length < 1) {
                   <p class="text-foreground/80 mt-1 text-sm">No products added yet</p>
                 } @else {
-                  <p class="text-foreground/80 mt-1 text-sm">{{ itemIds.length }} items</p>
+                  <p class="text-foreground/80 mt-1 text-sm">{{ itemKeys.length }} items</p>
                 }
               </div>
             </div>
 
-            @if (itemIds.length < 1 && quoteNewService.showAddItem() === null) {
+            @if (itemKeys.length < 1 && quoteNewService.showAddItem() === null) {
               <div class="text-foreground/70 rounded-md border border-dotted py-10 text-center">
                 <p class="text-sm">
                   Click <span class="font-semibold">Add Item</span> to get started
@@ -89,9 +85,9 @@
               </div>
             }
 
-            <div cdkDropList (cdkDropListDropped)="reorderItem(systemId, $event)">
-              @for (itemId of itemIds; track itemId; let itemIndex = $index) {
-                @let item = quoteNewService.itemMap().get(itemId)!;
+            <div cdkDropList (cdkDropListDropped)="reorderItem(systemKey, $event)">
+              @for (itemKey of itemKeys; track itemKey; let itemIndex = $index) {
+                @let item = quoteNewService.itemMap().get(itemKey)!;
                 @let product = quoteNewService.productMap().get(item.productId)!;
 
                 <div cdkDrag class="flex flex-col gap-3">
@@ -114,7 +110,7 @@
                       <select
                         [ngModel]="itemSelection.value"
                         (ngModelChange)="
-                          onSelectionChange(itemId, itemSelection, productSelection, $event)
+                          onSelectionChange(itemKey, itemSelection, productSelection, $event)
                         "
                         class="hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
                       >
@@ -157,7 +153,7 @@
               }
             </div>
 
-            @if (quoteNewService.showAddItem() === systemId) {
+            @if (quoteNewService.showAddItem() === systemKey) {
               <div class="flex flex-col gap-4 rounded-md border border-dotted p-6">
                 <!-- <input
                 type="text"
@@ -166,7 +162,7 @@
               /> -->
                 <div class="flex gap-4">
                   @for (product of productListService.products(); track product.id) {
-                    <div appButton (click)="quoteNewService.addItem$.next({ systemId, product })">
+                    <div appButton (click)="quoteNewService.addItem$.next({ systemKey, product })">
                       {{ product.name }}
                     </div>
                   }
@@ -178,7 +174,7 @@
               <button
                 type="button"
                 class="text-primary hover:text-primary/70 cursor-pointer font-medium"
-                (click)="quoteNewService.showAddItem$.next({ systemId })"
+                (click)="quoteNewService.showAddItem$.next({ systemKey })"
               >
                 Add Item
               </button>
