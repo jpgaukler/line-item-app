@@ -19,11 +19,11 @@
     </svg>
   </button>
   <div
-    class="bg-card absolute z-10 mt-1 w-full origin-top rounded-md border shadow-sm transition-all"
+    class="bg-card absolute z-10 mt-1 w-full origin-top rounded-md border shadow-sm"
     [ngClass]="
       isOpen()
-        ? 'scale-y-100 opacity-100 duration-200'
-        : 'pointer-events-none scale-y-0 opacity-0 duration-0'
+        ? 'scale-y-100 opacity-100 transition-all'
+        : 'pointer-events-none scale-y-0 opacity-0 transition-none'
     "
   >
     @for (option of productSelection().options; track option.value) {

@@ -22,6 +22,7 @@
 
 <div class="grid gap-6 xl:grid-cols-[1fr_24rem]">
   <div class="flex flex-col gap-6">
+    <!-- Quote Information -->
     <div class="bg-card rounded-xl border p-6 shadow-sm">
       <div class="mb-6 flex items-center justify-between">
         <div>
@@ -63,7 +64,8 @@
       </div>
     </div>
 
-    <div cdkDropList (cdkDropListDropped)="reorderSystem($event)">
+    <!-- Quote Systems -->
+    <div cdkDropList (cdkDropListDropped)="reorderSystem($event)" class="flex flex-col gap-6">
       @for (entry of quoteNewService.systemMap(); track entry[0]; let systemIndex = $index) {
         @let systemKey = entry[0];
         @let itemKeys = quoteNewService.systemItemKeyMap().get(systemKey)!;
@@ -80,7 +82,7 @@
             </div>
           </div>
 
-          @if (itemKeys.length < 1 && quoteNewService.showAddItem() === null) {
+          @if (itemKeys.length === 0 && quoteNewService.showAddItem() === null) {
             <div class="text-foreground/70 rounded-md border border-dotted py-10 text-center">
               <p class="text-sm">
                 Click <span class="font-semibold">Add Item</span> to get started
@@ -88,6 +90,7 @@
             </div>
           }
 
+          <!-- Quote Items -->
           <div cdkDropList (cdkDropListDropped)="reorderItem(systemKey, $event)">
             @for (itemKey of itemKeys; track itemKey; let itemIndex = $index) {
               @let item = quoteNewService.itemMap().get(itemKey)!;
@@ -131,11 +134,11 @@
 
           @if (quoteNewService.showAddItem() === systemKey) {
             <div class="flex flex-col gap-4 rounded-md border border-dotted p-6">
-              <!-- <input
+              <input
                 type="text"
                 placeholder="Search"
                 class="hover:bg-input focus:bg-input mt-2 w-full rounded-md border p-2"
-              /> -->
+              />
               <div class="flex gap-4">
                 @for (product of productListService.products(); track product.id) {
                   <div appButton (click)="quoteNewService.addItem$.next({ systemKey, product })">
@@ -144,17 +147,17 @@
                 }
               </div>
             </div>
+          } @else {
+            <div>
+              <button
+                type="button"
+                class="text-primary hover:text-primary/70 cursor-pointer font-medium"
+                (click)="quoteNewService.showAddItem$.next(systemKey)"
+              >
+                Add Item
+              </button>
+            </div>
           }
-
-          <div>
-            <button
-              type="button"
-              class="text-primary hover:text-primary/70 cursor-pointer font-medium"
-              (click)="quoteNewService.showAddItem$.next(systemKey)"
-            >
-              Add Item
-            </button>
-          </div>
         </div>
       }
     </div>
@@ -166,8 +169,6 @@
     >
       + Add System
     </button>
-
-    <div class="bg-accent h-500">scroll placeholder</div>
   </div>
 
   <div
