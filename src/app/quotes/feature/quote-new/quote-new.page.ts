@@ -1,20 +1,25 @@
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ProductListService } from '../../../products/data-access/product-list.service';
-import { ProductSelectionOption } from '../../../products/interfaces/product-selection-option.interface';
-import { ProductSelection } from '../../../products/interfaces/product-selection.interface';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { QuoteNewService } from '../../data-access/quote-new.service';
-import { QuoteItemSelection } from '../../interfaces/quote-item-selection.interface';
-import { QuoteItemKey } from '../../interfaces/quote-item.interface';
 import { QuoteSystemKey } from '../../interfaces/quote-system.interface';
+import { QuoteItemSelectComponent } from '../../ui/quote-item-select.component';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, ButtonDirective, ReactiveFormsModule, FormsModule, CdkDropList, CdkDrag],
+  imports: [
+    CommonModule,
+    ButtonDirective,
+    ReactiveFormsModule,
+    FormsModule,
+    CdkDropList,
+    CdkDrag,
+    QuoteItemSelectComponent,
+  ],
   templateUrl: './quote-new.page.html',
   providers: [ProductListService, QuoteNewService],
 })
@@ -22,14 +27,8 @@ export class QuoteNewPage implements OnDestroy {
   private readonly layoutService = inject(LayoutService);
   public readonly productListService = inject(ProductListService);
   public readonly quoteNewService = inject(QuoteNewService);
-  // open = false;
-  // selected: ProductSelectionOption | null = null;
 
-  // select(option: ProductSelectionOption) {
-  //   this.selected = option;
-  //   this.open = false;
-  //   this.onSelectionChange(option.value);
-  // }
+  showDebug = signal<boolean>(false);
 
   constructor() {
     this.layoutService.updateBreadcrumbs$.next([
@@ -41,25 +40,6 @@ export class QuoteNewPage implements OnDestroy {
 
   ngOnDestroy(): void {
     this.layoutService.clearBreadcrumbs$.next();
-  }
-
-  onSelectionChange(
-    itemKey: QuoteItemKey,
-    itemSelection: QuoteItemSelection,
-    productSelection: ProductSelection,
-    newValue: string,
-  ) {
-    const optionSelected: ProductSelectionOption = productSelection.options.find(
-      (o) => o.value === newValue,
-    )!;
-
-    const updatedSelection: QuoteItemSelection = {
-      ...itemSelection,
-      displayText: optionSelected.displayText,
-      value: optionSelected.value,
-    };
-
-    this.quoteNewService.updateItemSelection$.next({ itemKey, updatedSelection });
   }
 
   reorderSystem(event: CdkDragDrop<any>): void {
