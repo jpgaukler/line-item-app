@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, input, model, signal } from '@angular/core';
-import { ProductSelectionOption } from '../../products/interfaces/product-selection-option.interface';
-import { ProductSelection } from '../../products/interfaces/product-selection.interface';
-import { QuoteItemSelection } from '../interfaces/quote-item-selection.interface';
+import { ProductSelectionOption } from '../../../products/interfaces/product-selection-option.interface';
+import { ProductSelection } from '../../../products/interfaces/product-selection.interface';
+import { QuoteItemSelection } from '../../interfaces/quote-item-selection.interface';
 
 @Component({
   selector: 'app-quote-item-select',

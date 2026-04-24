@@ -1,4 +1,4 @@
-import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -7,7 +7,8 @@ import { ProductListService } from '../../../products/data-access/product-list.s
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { QuoteNewService } from '../../data-access/quote-new.service';
 import { QuoteSystemKey } from '../../interfaces/quote-system.interface';
-import { QuoteItemSelectComponent } from '../../ui/quote-item-select.component';
+import { DragHandleComponent } from '../../ui/drag-handle/drag-handle.component';
+import { QuoteItemSelectComponent } from '../../ui/quote-item-select/quote-item-select.component';
 
 @Component({
   selector: 'app-products',
@@ -18,7 +19,9 @@ import { QuoteItemSelectComponent } from '../../ui/quote-item-select.component';
     FormsModule,
     CdkDropList,
     CdkDrag,
+    CdkDragHandle,
     QuoteItemSelectComponent,
+    DragHandleComponent,
   ],
   templateUrl: './quote-new.page.html',
   providers: [ProductListService, QuoteNewService],
