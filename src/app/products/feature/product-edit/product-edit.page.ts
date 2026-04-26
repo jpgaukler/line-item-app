@@ -1,6 +1,6 @@
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, OnDestroy } from '@angular/core';
+import { Component, effect, inject, OnDestroy, signal } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
@@ -24,6 +24,8 @@ export class ProductEditPage implements OnDestroy {
   private readonly layoutService = inject(LayoutService);
   private readonly productFormService = inject(ProductFormService);
   public readonly productEditService = inject(ProductEditService);
+
+  showDebug = signal<boolean>(false);
 
   maxNameLength = MAX_PRODUCT_NAME_LENGTH;
   maxDescriptionLength = MAX_PRODUCT_DESCRIPTION_LENGTH;

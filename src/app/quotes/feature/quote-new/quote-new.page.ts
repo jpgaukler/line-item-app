@@ -1,4 +1,4 @@
-import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -19,7 +19,6 @@ import { QuoteItemSelectComponent } from '../../ui/quote-item-select/quote-item-
     FormsModule,
     CdkDropList,
     CdkDrag,
-    CdkDragHandle,
     QuoteItemSelectComponent,
     DragHandleComponent,
   ],
