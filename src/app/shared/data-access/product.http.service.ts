@@ -10,7 +10,7 @@ import { LocalStorageService } from './local-storage.service';
 export class ProductHttpService {
   private readonly http = inject(HttpClient);
   private readonly localStorageService = inject(LocalStorageService);
-  private baseUrl = 'cadflair.com';
+  private baseUrl = 'line-item.app';
 
   // getProducts(): Observable<Product[]> {
   //   const url: string = `${this.baseUrl}/api/v1/products`;

@@ -7,5 +7,5 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.html',
 })
 export class App {
-  protected readonly title = signal('cadflair-app');
+  protected readonly title = signal('line-item-app');
 }

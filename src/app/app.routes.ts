@@ -14,31 +14,31 @@ export const routes: Routes = [
       // products
       {
         path: 'products',
-        title: 'Products • Cadflair',
+        title: 'Products • Line-Item',
         component: ProductListPage,
       },
       {
         path: 'products/new',
-        title: 'New Product • Cadflair',
+        title: 'New Product • Line-Item',
         component: ProductNewPage,
       },
       {
         path: 'products/:productId',
-        title: 'Edit Product • Cadflair',
+        title: 'Edit Product • Line-Item',
         component: ProductEditPage,
       },
 
       // quotes
       {
         path: 'quotes/new',
-        title: 'New Quote • Cadflair',
+        title: 'New Quote • Line-Item',
         component: QuoteNewPage,
       },
 
       // preferences
       {
         path: 'preferences',
-        title: 'Preferences • Cadflair',
+        title: 'Preferences • Line-Item',
         component: PreferencesPage,
       },
 
