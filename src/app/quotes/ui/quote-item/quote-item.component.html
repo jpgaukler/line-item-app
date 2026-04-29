@@ -1,0 +1,26 @@
+<div class="flex flex-row items-baseline gap-3">
+  <div class="group">
+    <app-drag-handle class="invisible group-hover:visible"></app-drag-handle>
+  </div>
+  <span class="bg-accent rounded-md px-3 font-semibold">
+    {{ systemIndex() + 1 }}.{{ itemIndex() + 1 }}
+  </span>
+  <p class="text-lg">
+    <span class="font-bold">{{ item().productCode }}</span> {{ item().name }}
+  </p>
+</div>
+<p>{{ item().description }}</p>
+<div class="flex flex-col gap-1">
+  @for (
+    productSelection of product().selections;
+    track productSelection.name;
+    let selectionIndex = $index
+  ) {
+    @let itemSelection = item().selections[selectionIndex];
+    <app-quote-item-select
+      [productSelection]="productSelection"
+      [quoteItemSelection]="itemSelection"
+      (quoteItemSelectionChange)="selectionChange($event)"
+    ></app-quote-item-select>
+  }
+</div>

@@ -31,7 +31,7 @@ export class ProductFormService {
         product.description,
         [Validators.required, Validators.maxLength(MAX_PRODUCT_DESCRIPTION_LENGTH)],
       ],
-      productCodeDefinition: [product.productCodeDefinition],
+      productCodeFormula: [product.productCodeFormula],
       selections: this.formBuilder.array(
         product.selections.map((selection) => this.toProductSelectionForm(selection)),
       ),

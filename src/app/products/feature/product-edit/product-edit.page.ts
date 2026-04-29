@@ -34,7 +34,7 @@ export class ProductEditPage implements OnDestroy {
     id: '',
     name: '',
     description: '',
-    productCodeDefinition: '',
+    productCodeFormula: '',
     selections: [],
   });
 

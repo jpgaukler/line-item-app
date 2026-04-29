@@ -53,7 +53,7 @@ export class ProductListService {
             id: crypto.randomUUID(),
             name: next.name,
             description: next.description,
-            productCodeDefinition: '',
+            productCodeFormula: '',
             selections: [],
           },
         ],

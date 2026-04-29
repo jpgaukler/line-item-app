@@ -4,7 +4,7 @@ export interface Product {
   id: string;
   name: string;
   description: string;
-  productCodeDefinition: string;
+  productCodeFormula: string;
   selections: ProductSelection[];
 }
 

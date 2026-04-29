@@ -100,36 +100,15 @@
               @let product = quoteNewService.productMap().get(item.productId)!;
 
               <div cdkDrag class="flex flex-col gap-3">
-                <div class="flex flex-row items-baseline gap-3">
-                  <div class="group">
-                    <app-drag-handle class="invisible group-hover:visible"></app-drag-handle>
-                  </div>
-                  <span class="bg-accent rounded-md px-3 font-semibold">
-                    {{ systemIndex + 1 }}.{{ itemIndex + 1 }}
-                  </span>
-                  <p class="text-lg font-bold">{{ item.name }}</p>
-                </div>
-                <p>{{ item.description }}</p>
-
-                <div class="flex flex-col gap-1">
-                  @for (
-                    productSelection of product.selections;
-                    track productSelection.name;
-                    let selectionIndex = $index
-                  ) {
-                    @let itemSelection = item.selections[selectionIndex];
-                    <app-quote-item-select
-                      [productSelection]="productSelection"
-                      [quoteItemSelection]="itemSelection"
-                      (quoteItemSelectionChange)="
-                        quoteNewService.updateItemSelection$.next({
-                          itemKey: itemKey,
-                          updatedSelection: $event,
-                        })
-                      "
-                    ></app-quote-item-select>
-                  }
-                </div>
+                <app-quote-item
+                  [systemIndex]="systemIndex"
+                  [itemIndex]="itemIndex"
+                  [product]="product"
+                  [item]="item"
+                  (itemChange)="
+                    quoteNewService.updateItem$.next({ itemKey: itemKey, updatedItem: $event })
+                  "
+                ></app-quote-item>
 
                 @if (!$last) {
                   <hr class="my-3" />

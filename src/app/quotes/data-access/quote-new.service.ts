@@ -9,6 +9,7 @@ import { QuoteItemSelection } from '../interfaces/quote-item-selection.interface
 import { QuoteItem, QuoteItemKey } from '../interfaces/quote-item.interface';
 import { QuoteSystem, QuoteSystemKey } from '../interfaces/quote-system.interface';
 import { QuoteModel } from '../interfaces/quote.interface';
+import { evaluateProductCode } from '../utils/quote-utils';
 
 // type ProductKey = `${string}::${number}`;
 
@@ -135,9 +136,9 @@ export class QuoteNewService {
   addSystem$ = new Subject<void>();
   showAddItem$ = new Subject<QuoteSystemKey>();
   addItem$ = new Subject<{ systemKey: QuoteSystemKey; product: Product }>();
-  updateItemSelection$ = new Subject<{
+  updateItem$ = new Subject<{
     itemKey: QuoteItemKey;
-    updatedSelection: QuoteItemSelection;
+    updatedItem: QuoteItem;
   }>();
   reorderSystem$ = new Subject<{ previousIndex: number; currentIndex: number }>();
   reorderItem$ = new Subject<{
@@ -223,18 +224,21 @@ export class QuoteNewService {
       .subscribe((next: { systemKey: QuoteSystemKey; product: Product }) => {
         this.state.update((state) => {
           const newItemKey: QuoteItemKey = crypto.randomUUID();
-          const newItem: QuoteItem = {
-            productId: next.product.id,
-            name: next.product.name,
-            description: next.product.description,
-            productCode: next.product.productCodeDefinition,
-            price: 0,
-            selections: next.product.selections.map((selection) => ({
+          const defaultSelections: QuoteItemSelection[] = next.product.selections.map(
+            (selection) => ({
               name: selection.name,
               value: selection.options[selection.defaultOptionIndex].value,
               displayText: selection.options[selection.defaultOptionIndex].displayText,
               isCustomValue: false,
-            })),
+            }),
+          );
+          const newItem: QuoteItem = {
+            productId: next.product.id,
+            name: next.product.name,
+            description: next.product.description,
+            productCode: evaluateProductCode(next.product.productCodeFormula, defaultSelections),
+            price: 0,
+            selections: defaultSelections,
           };
 
           const itemKeys: QuoteItemKey[] = state.systemItemKeyMap.get(next.systemKey)!;
@@ -253,21 +257,13 @@ export class QuoteNewService {
         });
       });
 
-    this.updateItemSelection$
+    this.updateItem$
       .pipe(takeUntilDestroyed())
-      .subscribe((next: { itemKey: QuoteItemKey; updatedSelection: QuoteItemSelection }) => {
+      .subscribe((next: { itemKey: QuoteItemKey; updatedItem: QuoteItem }) => {
         this.state.update((state) => {
-          const item: QuoteItem = state.itemMap.get(next.itemKey)!;
-          const updatedItem: QuoteItem = {
-            ...item,
-            selections: item.selections.map((selection) =>
-              selection.name === next.updatedSelection.name ? next.updatedSelection : selection,
-            ),
-          };
-
           return {
             ...state,
-            itemMap: new Map([...state.itemMap, [next.itemKey, updatedItem]]),
+            itemMap: new Map([...state.itemMap, [next.itemKey, { ...next.updatedItem }]]),
           };
         });
       });

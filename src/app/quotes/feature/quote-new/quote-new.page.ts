@@ -8,7 +8,7 @@ import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { QuoteNewService } from '../../data-access/quote-new.service';
 import { QuoteSystemKey } from '../../interfaces/quote-system.interface';
 import { DragHandleComponent } from '../../ui/drag-handle/drag-handle.component';
-import { QuoteItemSelectComponent } from '../../ui/quote-item-select/quote-item-select.component';
+import { QuoteItemComponent } from '../../ui/quote-item/quote-item.component';
 
 @Component({
   selector: 'app-products',
@@ -19,8 +19,8 @@ import { QuoteItemSelectComponent } from '../../ui/quote-item-select/quote-item-
     FormsModule,
     CdkDropList,
     CdkDrag,
-    QuoteItemSelectComponent,
     DragHandleComponent,
+    QuoteItemComponent,
   ],
   templateUrl: './quote-new.page.html',
   providers: [ProductListService, QuoteNewService],
