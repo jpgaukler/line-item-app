@@ -18,7 +18,7 @@ export function evaluateProductCode(
     }),
   );
 
-  // replace placeholders in the product code formula with selected values
+  // remove = sign, then replace placeholders in the product code formula with selected values
   return productCodeFormula.substring(1).replace(/{{\s*(\w+)\s*}}/g, (match, selectionName) => {
     const normalizedName = selectionName.replace(whitespace, '');
     return values[normalizedName] ?? '';
