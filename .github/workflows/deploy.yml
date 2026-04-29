@@ -1,9 +1,7 @@
 name: Build and Deploy Angular to S3
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
