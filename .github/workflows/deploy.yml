@@ -1,0 +1,33 @@
+name: Build and Deploy Angular to S3
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6.0.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version-file: 'package.json'  # read node versoin from engines defined in package.json
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Angular App
+        run: npm run build -- --configuration=production
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy to S3
+        run: aws s3 sync ./dist/line-item-app/browser s3://${{ vars.AWS_S3_BUCKET_NAME }} --delete
