@@ -173,17 +173,9 @@ export class ProductEditPage implements OnDestroy {
       return;
     }
 
-    // remove controlId properties
-    const raw = this.productForm.getRawValue();
-    const product: Product = {
-      ...raw,
-      selections: raw.selections.map(({ controlId, options, ...selection }) => ({
-        ...selection,
-        options: options.map(({ controlId, ...option }) => option),
-      })),
-    };
-
-    this.productEditService.updateProduct$.next(product);
+    this.productEditService.updateProduct$.next(
+      this.productFormService.toProduct(this.productForm),
+    );
   }
 
   reset(): void {

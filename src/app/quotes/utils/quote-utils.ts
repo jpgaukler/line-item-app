@@ -52,6 +52,7 @@ export function validateProductCodeFormula(formula: string, selectionNames: stri
   const normalizedNames: string[] = selectionNames
     .map((name) => name.replace(WHITESPACE_REGEX, ''))
     .filter((i) => i !== '');
+
   let match: RegExpExecArray | null;
 
   while ((match = PLACEHOLDERS_REGEX.exec(formula)) !== null) {

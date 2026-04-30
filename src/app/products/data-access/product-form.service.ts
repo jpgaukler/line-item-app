@@ -42,6 +42,18 @@ export class ProductFormService {
     });
   }
 
+  toProduct(productForm: FormGroup<ProductForm>): Product {
+    // remove controlId properties
+    const raw = productForm.getRawValue();
+    return {
+      ...raw,
+      selections: raw.selections.map(({ controlId, options, ...selection }) => ({
+        ...selection,
+        options: options.map(({ controlId, ...option }) => option),
+      })),
+    };
+  }
+
   toProductSelectionForm(selection: ProductSelection): FormGroup<ProductSelectionForm> {
     return this.formBuilder.nonNullable.group({
       controlId: [crypto.randomUUID() as string],
@@ -147,7 +159,6 @@ export class ProductFormService {
     const invalidFields: string[] = validateProductCodeFormula(formula, selectionNames);
 
     if (invalidFields.length > 0) {
-      console.log('invalid fields', invalidFields);
       return {
         invalidFormula: {
           invalidFields: invalidFields,
