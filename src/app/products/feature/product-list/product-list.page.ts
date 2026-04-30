@@ -23,6 +23,22 @@ export class ProductListPage implements OnDestroy {
     ]);
   }
 
+  exportProducts(): void {
+    const products = this.productListService.products();
+
+    // const json = JSON.stringify(products, null, 2); // pretty print
+    const json = JSON.stringify(products);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.download = 'products.json';
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  }
+
   ngOnDestroy(): void {
     this.layoutService.clearBreadcrumbs$.next();
   }
