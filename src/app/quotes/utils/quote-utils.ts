@@ -1,6 +1,6 @@
 import { QuoteItemSelection } from '../interfaces/quote-item-selection.interface';
 
-const PLACEHOLDERS_REGEX: RegExp = /{{\s*(\w+)\s*}}/g;
+const PLACEHOLDERS_REGEX: RegExp = /\[\s*(\w+)\s*\]/g;
 const WHITESPACE_REGEX: RegExp = /\s/g;
 
 /**
