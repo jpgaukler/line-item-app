@@ -54,6 +54,22 @@
           placeholder="Product Code"
           formControlName="productCodeFormula"
         />
+
+        @if (
+          productForm.controls.productCodeFormula.hasError('invalidFormula') &&
+          productForm.controls.productCodeFormula.touched
+        ) {
+          <div class="text-destructive">
+            Unknown field(s):
+            <span class="font-semibold">
+              {{
+                productForm.controls.productCodeFormula
+                  .getError('invalidFormula')
+                  ?.invalidFields.join(', ')
+              }}
+            </span>
+          </div>
+        }
       </div>
 
       <div formArrayName="selections" class="flex flex-col gap-6 rounded-md p-4">

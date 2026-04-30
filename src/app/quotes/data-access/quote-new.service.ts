@@ -9,7 +9,7 @@ import { QuoteItemSelection } from '../interfaces/quote-item-selection.interface
 import { QuoteItem, QuoteItemKey } from '../interfaces/quote-item.interface';
 import { QuoteSystem, QuoteSystemKey } from '../interfaces/quote-system.interface';
 import { QuoteModel } from '../interfaces/quote.interface';
-import { evaluateProductCode } from '../utils/quote-utils';
+import { evaluateProductCodeFormula } from '../utils/quote-utils';
 
 // type ProductKey = `${string}::${number}`;
 
@@ -236,7 +236,10 @@ export class QuoteNewService {
             productId: next.product.id,
             name: next.product.name,
             description: next.product.description,
-            productCode: evaluateProductCode(next.product.productCodeFormula, defaultSelections),
+            productCode: evaluateProductCodeFormula(
+              next.product.productCodeFormula,
+              defaultSelections,
+            ),
             price: 0,
             selections: defaultSelections,
           };

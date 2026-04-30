@@ -8,6 +8,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import { validateProductCodeFormula } from '../../quotes/utils/quote-utils';
 import { ProductForm } from '../interfaces/product-form.interface';
 import { ProductSelectionForm } from '../interfaces/product-selection-form.interface';
 import { ProductSelectionOptionForm } from '../interfaces/product-selection-option-form.interface';
@@ -31,7 +32,10 @@ export class ProductFormService {
         product.description,
         [Validators.required, Validators.maxLength(MAX_PRODUCT_DESCRIPTION_LENGTH)],
       ],
-      productCodeFormula: [product.productCodeFormula],
+      productCodeFormula: [
+        product.productCodeFormula,
+        ProductFormService.productCodeFormulaValidator,
+      ],
       selections: this.formBuilder.array(
         product.selections.map((selection) => this.toProductSelectionForm(selection)),
       ),
@@ -124,5 +128,33 @@ export class ProductFormService {
     );
 
     return isDuplicate ? { duplicateOptionDisplayText: true } : null;
+  };
+
+  private static productCodeFormulaValidator: ValidatorFn = (
+    control: AbstractControl,
+  ): ValidationErrors | null => {
+    const formula: string = control.value;
+    const form = control?.parent as FormGroup<ProductForm>;
+
+    if (!formula || !form) {
+      return null;
+    }
+
+    const selectionNames: string[] =
+      form.controls.selections.controls.map(
+        (selection: FormGroup<ProductSelectionForm>) => selection.controls.name.value,
+      ) ?? [];
+    const invalidFields: string[] = validateProductCodeFormula(formula, selectionNames);
+
+    if (invalidFields.length > 0) {
+      console.log('invalid fields', invalidFields);
+      return {
+        invalidFormula: {
+          invalidFields: invalidFields,
+        },
+      };
+    }
+
+    return null;
   };
 }

@@ -3,7 +3,7 @@ import { Component, input, model } from '@angular/core';
 import { Product } from '../../../products/interfaces/product.interface';
 import { QuoteItemSelection } from '../../interfaces/quote-item-selection.interface';
 import { QuoteItem } from '../../interfaces/quote-item.interface';
-import { evaluateProductCode } from '../../utils/quote-utils';
+import { evaluateProductCodeFormula } from '../../utils/quote-utils';
 import { DragHandleComponent } from '../drag-handle/drag-handle.component';
 import { QuoteItemSelectComponent } from '../quote-item-select/quote-item-select.component';
 
@@ -26,7 +26,10 @@ export class QuoteItemComponent {
 
       return {
         ...item,
-        productCode: evaluateProductCode(this.product().productCodeFormula, updatedSelections),
+        productCode: evaluateProductCodeFormula(
+          this.product().productCodeFormula,
+          updatedSelections,
+        ),
         selections: updatedSelections,
       };
     });
