@@ -1,13 +1,11 @@
-<div class="flex flex-row items-baseline gap-3">
-  <div class="group">
+<div class="relative flex flex-row items-center gap-2">
+  <div class="group absolute -translate-x-full">
     <app-drag-handle class="invisible group-hover:visible"></app-drag-handle>
   </div>
   <span class="bg-accent rounded-md px-3 font-semibold">
     {{ systemIndex() + 1 }}.{{ itemIndex() + 1 }}
   </span>
-  <p class="text-lg">
-    <span class="font-bold">{{ item().productCode }}</span> {{ item().name }}
-  </p>
+  <span class="font-bold">{{ item().productCode }}</span>
 </div>
 <p>{{ item().description }}</p>
 <div class="flex flex-col gap-1">

@@ -71,8 +71,8 @@
         @let itemKeys = quoteNewService.systemItemKeyMap().get(systemKey)!;
 
         <div cdkDrag class="bg-card flex flex-col gap-4 rounded-xl border p-6 shadow-sm">
-          <div class="flex items-center">
-            <div class="group">
+          <div class="relative">
+            <div class="group absolute -translate-x-full">
               <app-drag-handle class="invisible group-hover:visible"></app-drag-handle>
             </div>
             <div>
@@ -109,7 +109,6 @@
                     quoteNewService.updateItem$.next({ itemKey: itemKey, updatedItem: $event })
                   "
                 ></app-quote-item>
-
                 @if (!$last) {
                   <hr class="my-3" />
                 }
