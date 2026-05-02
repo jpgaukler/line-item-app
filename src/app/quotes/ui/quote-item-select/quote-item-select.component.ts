@@ -18,6 +18,7 @@ export class QuoteItemSelectComponent {
   productSelection = input.required<ProductSelection>();
   quoteItemSelection = model.required<QuoteItemSelection>();
   isOpen = signal<boolean>(false);
+  isEditingCustomText = signal<boolean>(false);
 
   optionClick(option: ProductSelectionOption) {
     this.quoteItemSelection.update((selection) => ({

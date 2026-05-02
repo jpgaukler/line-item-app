@@ -1,38 +1,67 @@
 <div class="relative">
-  <button
-    type="button"
-    (click)="isOpen.set(!isOpen())"
-    class="group hover:outline-border flex w-full cursor-pointer items-center justify-between rounded-md px-2 py-1 text-left hover:outline"
-    [ngClass]="{ 'outline-border outline': isOpen() }"
-  >
-    <span>• {{ quoteItemSelection().displayText }}</span>
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="2"
-      stroke="currentColor"
-      class="invisible size-3 transition-transform group-hover:visible"
-      [ngClass]="{ 'visible rotate-180': isOpen() }"
-    >
-      <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-    </svg>
-  </button>
   <div
-    class="bg-card absolute z-10 mt-1 w-full origin-top rounded-md border shadow-sm"
-    [ngClass]="
-      isOpen()
-        ? 'scale-y-100 opacity-100 transition-all'
-        : 'pointer-events-none scale-y-0 opacity-0 transition-none'
-    "
+    class="group flex flex-row gap-2"
+    [ngClass]="{
+      'before:absolute before:-inset-x-3 before:-inset-y-2 before:z-0 before:rounded-md before:shadow-[0_0_16px_2px_rgba(0,0,0,0.08)]':
+        isEditingCustomText(),
+    }"
   >
-    @for (option of productSelection().options; track option.value) {
-      <div (click)="optionClick(option)" class="hover:bg-input cursor-pointer p-2">
-        <div class="font-semibold">{{ option.displayText }}</div>
-        <div class="text-foreground/70 text-sm">
-          {{ productSelection().name }} = {{ option.value }}
-        </div>
+    <div class="relative flex-1">
+      <button
+        type="button"
+        (click)="isOpen.set(!isOpen())"
+        class="hover:outline-border flex w-full cursor-pointer items-center justify-between rounded-md px-2 py-1 text-left hover:outline"
+        [ngClass]="{ 'outline-border outline': isOpen() }"
+      >
+        <span>• {{ quoteItemSelection().displayText }}</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          class="invisible size-3 transition-transform group-hover:visible"
+          [ngClass]="{ 'visible rotate-180': isOpen() }"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+      <div
+        class="bg-card absolute z-10 mt-1 w-full origin-top rounded-md border shadow-sm"
+        [ngClass]="
+          isOpen()
+            ? 'scale-y-100 opacity-100 transition-all'
+            : 'pointer-events-none scale-y-0 opacity-0 transition-none'
+        "
+      >
+        @for (option of productSelection().options; track option.value) {
+          <div (click)="optionClick(option)" class="hover:bg-input cursor-pointer p-2">
+            <div class="font-semibold">{{ option.displayText }}</div>
+            <div class="text-foreground/70 text-sm">
+              {{ productSelection().name }} = {{ option.value }}
+            </div>
+          </div>
+        }
       </div>
-    }
+    </div>
+    <button
+      class="invisible z-10 cursor-pointer group-hover:visible"
+      (click)="isEditingCustomText.set(!isEditingCustomText())"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="size-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+        />
+      </svg>
+    </button>
   </div>
 </div>
