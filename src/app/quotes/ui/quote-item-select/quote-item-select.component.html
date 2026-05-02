@@ -1,84 +1,120 @@
-<div class="relative">
-  <div
-    class="group flex flex-row gap-2"
-    [ngClass]="{
-      'before:absolute before:-inset-x-3 before:-inset-y-2 before:z-0 before:rounded-md before:shadow-[0_0_16px_2px_rgba(0,0,0,0.08)]':
-        quoteItemSelection().isCustomValue,
-    }"
-  >
-    <div class="relative flex-1">
-      @if (quoteItemSelection().isCustomValue) {
-        <div class="flex flex-row gap-2">
+@if (showCustomInputs()) {
+  <div class="relative">
+    <div
+      class="before:bg-card before:absolute before:-inset-x-4 before:-inset-y-4 before:z-10 before:rounded-md before:shadow-[0_0_16px_2px_rgba(0,0,0,0.08)]"
+    >
+      <div class="relative z-10 flex flex-row gap-3">
+        <div class="relative flex flex-1 items-center">
+          <span class="pointer-events-none absolute left-2">•</span>
           <input
+            #customDisplayTextElement
+            [id]="productSelection().name + '-custom-text-input'"
+            [(ngModel)]="customDisplayText"
             type="text"
-            [ngModel]="quoteItemSelection().displayText"
-            (ngModelChange)="displayTextChange($event)"
-            placeholder="Enter custom Text"
-            class="hover:outline-border flex-1 rounded-md px-2 py-1 hover:outline"
-          />
-          <input
-            type="text"
-            [ngModel]="quoteItemSelection().value"
-            (ngModelChange)="valueChange($event)"
-            placeholder="Enter custom value"
-            class="hover:outline-border rounded-md px-2 py-1 hover:outline"
+            placeholder="Enter custom text"
+            class="outline-border w-full rounded-md px-2 py-1 pl-6 outline"
           />
         </div>
-      } @else {
-        <button
-          type="button"
-          (click)="isOpen.set(!isOpen())"
-          class="hover:outline-border flex w-full cursor-pointer items-center justify-between rounded-md px-2 py-1 text-left hover:outline"
-          [ngClass]="{ 'outline-border outline': isOpen() }"
+
+        <div class="flex items-baseline gap-1">
+          <span class="text-foreground/70 text-sm"> {{ productSelection().name }} = </span>
+          <input
+            [id]="productSelection().name + '-custom-value-input'"
+            type="text"
+            [(ngModel)]="customValue"
+            class="outline-border rounded-md px-2 py-1 outline"
+          />
+        </div>
+
+        <button (click)="cancelCustomValueClick()" class="cursor-pointer">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="size-4"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+        <button (click)="saveCustomValueClick()" class="cursor-pointer">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="size-4"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+} @else {
+  <!-- dropdown -->
+  <div class="group relative w-full">
+    <div class="relative flex items-center">
+      <span class="pointer-events-none absolute left-2">•</span>
+      <button
+        type="button"
+        (click)="dropdownOpen.set(!dropdownOpen())"
+        class="hover:outline-border flex w-full cursor-pointer items-center justify-between rounded-md px-2 py-1 pl-6 text-left hover:outline"
+        [ngClass]="{ 'outline-border outline': dropdownOpen() }"
+      >
+        <span [ngClass]="{ underline: quoteItemSelection().isCustomValue }">
+          {{ quoteItemSelection().displayText }}
+        </span>
+        <div
+          class="invisible flex items-center gap-2 group-hover:visible"
+          [ngClass]="{ visible: dropdownOpen() }"
         >
-          <span>• {{ quoteItemSelection().displayText }}</span>
+          <span class="text-foreground/70 text-sm">
+            {{ productSelection().name }} = {{ quoteItemSelection().value }}
+          </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             stroke-width="2"
             stroke="currentColor"
-            class="invisible size-3 transition-transform group-hover:visible"
-            [ngClass]="{ 'visible rotate-180': isOpen() }"
+            class="size-3 transition-transform"
+            [ngClass]="{ 'rotate-180': dropdownOpen() }"
           >
             <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
           </svg>
-        </button>
-        <div
-          class="bg-card absolute z-10 mt-1 w-full origin-top rounded-md border shadow-sm"
-          [ngClass]="
-            isOpen()
-              ? 'scale-y-100 opacity-100 transition-all'
-              : 'pointer-events-none scale-y-0 opacity-0 transition-none'
-          "
-        >
-          @for (option of productSelection().options; track option.value) {
-            <div (click)="optionClick(option)" class="hover:bg-input cursor-pointer p-2">
-              <div class="font-semibold">{{ option.displayText }}</div>
-              <div class="text-foreground/70 text-sm">
-                {{ productSelection().name }} = {{ option.value }}
-              </div>
-            </div>
-          }
+        </div>
+      </button>
+    </div>
+
+    <div
+      class="bg-card absolute z-10 mt-1 w-full origin-top rounded-md border shadow-sm"
+      [ngClass]="
+        dropdownOpen()
+          ? 'scale-y-100 opacity-100 transition-all'
+          : 'pointer-events-none scale-y-0 opacity-0 transition-none'
+      "
+    >
+      @for (option of productSelection().options; track option.value) {
+        <div (click)="optionClick(option)" class="hover:bg-input cursor-pointer p-2">
+          <div class="font-semibold">{{ option.displayText }}</div>
+          <div class="text-foreground/70 text-sm">
+            {{ productSelection().name }} = {{ option.value }}
+          </div>
+        </div>
+      }
+      @if (productSelection().allowCustomValue) {
+        <div (click)="enterCustomValueClick()" class="hover:bg-input cursor-pointer p-2">
+          <div class="font-semibold">Enter custom value</div>
+          <div class="text-foreground/70 text-sm">Custom</div>
         </div>
       }
     </div>
-    @if (productSelection().allowCustomValue) {
-      <button
-        class="invisible z-10 cursor-pointer group-hover:visible"
-        (click)="toggleCustomValue()"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          class="size-4"
-        >
-          <path
-            d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z"
-          />
-        </svg>
-      </button>
-    }
   </div>
-</div>
+}

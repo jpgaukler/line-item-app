@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, input, model, signal } from '@angular/core';
+import {
+  Component,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  model,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProductSelectionOption } from '../../../products/interfaces/product-selection-option.interface';
 import { ProductSelection } from '../../../products/interfaces/product-selection.interface';
@@ -15,39 +24,63 @@ import { QuoteItemSelection } from '../../interfaces/quote-item-selection.interf
 })
 export class QuoteItemSelectComponent {
   private el = inject(ElementRef);
+  customDisplayTextElement = viewChild<ElementRef<HTMLInputElement>>('customDisplayTextElement');
 
   productSelection = input.required<ProductSelection>();
   quoteItemSelection = model.required<QuoteItemSelection>();
-  isOpen = signal<boolean>(false);
+  dropdownOpen = signal<boolean>(false);
+  showCustomInputs = signal<boolean>(false);
+  customDisplayText = signal<string>('');
+  customValue = signal<string>('');
+
+  constructor() {
+    effect(() => {
+      const input = this.customDisplayTextElement();
+      if (input) {
+        queueMicrotask(() => {
+          input.nativeElement.select();
+        });
+      }
+    });
+  }
 
   optionClick(option: ProductSelectionOption) {
     this.quoteItemSelection.update((selection) => ({
       ...selection,
+      isCustomValue: false,
       displayText: option.displayText,
       value: option.value,
     }));
 
-    this.isOpen.set(false);
+    this.dropdownOpen.set(false);
   }
 
-  toggleCustomValue(): void {
+  enterCustomValueClick(): void {
+    this.customDisplayText.set(this.quoteItemSelection().displayText);
+    this.customValue.set(this.quoteItemSelection().value);
+    this.showCustomInputs.set(true);
+    this.dropdownOpen.set(false);
+  }
+
+  saveCustomValueClick(): void {
     this.quoteItemSelection.update((selection) => {
-      const isCustom = !selection.isCustomValue;
-      const matchingOption = this.productSelection().options.find(
-        (i) => i.value === selection.value,
-      );
+      const displayText = this.customDisplayText();
+      const value = this.customValue();
+      const existingOption = this.productSelection().options.find((i) => i.value === value);
 
       return {
         ...selection,
-        isCustomValue: isCustom,
-        displayText: isCustom
-          ? selection.displayText
-          : (matchingOption?.displayText ?? this.productSelection().options[0].displayText),
-        value: isCustom
-          ? selection.value
-          : (matchingOption?.value ?? this.productSelection().options[0].value),
+        isCustomValue: existingOption === undefined,
+        displayText: displayText,
+        value: value,
       };
     });
+
+    this.showCustomInputs.set(false);
+  }
+
+  cancelCustomValueClick(): void {
+    this.showCustomInputs.set(false);
   }
 
   displayTextChange(displayText: string): void {
@@ -68,8 +101,8 @@ export class QuoteItemSelectComponent {
     const clickedInside = this.el.nativeElement.contains(event.target);
 
     // Close if the click was outside
-    if (!clickedInside && this.isOpen()) {
-      this.isOpen.set(false);
+    if (!clickedInside && this.dropdownOpen()) {
+      this.dropdownOpen.set(false);
     }
   }
 }

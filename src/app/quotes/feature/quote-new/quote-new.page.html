@@ -94,12 +94,15 @@
           }
 
           <!-- Quote Items -->
-          <div cdkDropList (cdkDropListDropped)="reorderItem(systemKey, $event)">
+          <div
+            cdkDropList
+            (cdkDropListDropped)="reorderItem(systemKey, $event)"
+            class="flex flex-col gap-3"
+          >
             @for (itemKey of itemKeys; track itemKey; let itemIndex = $index) {
               @let item = quoteNewService.itemMap().get(itemKey)!;
               @let product = quoteNewService.productMap().get(item.productId)!;
-
-              <div cdkDrag class="flex flex-col gap-3">
+              <div cdkDrag>
                 <app-quote-item
                   [systemIndex]="systemIndex"
                   [itemIndex]="itemIndex"
@@ -109,9 +112,7 @@
                     quoteNewService.updateItem$.next({ itemKey: itemKey, updatedItem: $event })
                   "
                 ></app-quote-item>
-                @if (!$last) {
-                  <hr class="my-3" />
-                }
+                <hr class="my-3" />
               </div>
             }
           </div>
