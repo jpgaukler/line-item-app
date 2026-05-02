@@ -28,6 +28,7 @@ export class ProductListService {
 
   addProduct$ = new Subject<{ name: string; description: string }>();
   deleteProduct$ = new Subject<{ productId: string }>();
+  clearProducts$ = new Subject<void>();
 
   // sources
   private productsLoaded$ = this.productHttpService.getProducts();
@@ -64,6 +65,13 @@ export class ProductListService {
       this.state.update((state) => ({
         ...state,
         products: state.products.filter((product) => product.id !== next.productId),
+      })),
+    );
+
+    this.clearProducts$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => ({
+        ...state,
+        products: [],
       })),
     );
 

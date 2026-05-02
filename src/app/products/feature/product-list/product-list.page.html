@@ -9,6 +9,7 @@
   </div>
   <div>
     <button appButton (click)="exportProducts()">Export</button>
+    <button appButton (click)="productListService.clearProducts$.next()">Clear</button>
     <a appButton variant="primary" routerLink="/products/new"> + New </a>
   </div>
 </div>

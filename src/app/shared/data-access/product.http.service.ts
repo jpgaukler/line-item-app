@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { delay, map, Observable, of } from 'rxjs';
+import { delay, map, Observable, of, switchMap, tap } from 'rxjs';
 import { Product } from '../../products/interfaces/product.interface';
 import { LocalStorageService } from './local-storage.service';
 
@@ -40,6 +40,14 @@ export class ProductHttpService {
     return this.localStorageService.loadJson<Product[]>('products').pipe(
       delay(500),
       map((products) => products ?? []),
+      tap((products) =>
+        products.length === 0
+          ? console.log('No products in local storage. Loading default products.')
+          : console.log(`${products.length} products loaded from local storage.`),
+      ),
+      switchMap((products) =>
+        products.length === 0 ? this.http.get<Product[]>('data/products.json') : of(products),
+      ),
     );
   }
 
