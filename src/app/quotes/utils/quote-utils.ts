@@ -17,7 +17,7 @@ export function evaluateProductCodeFormula(
     return productCodeFormula;
   }
 
-  // Map inputs to a Record<string, string> with normalized field names
+  // map inputs to a Record<string, string> with normalized field names
   const values: Record<string, string> = Object.fromEntries(
     inputs.map((input) => {
       const normalizedName = input.name.replace(WHITESPACE_REGEX, '');
@@ -25,13 +25,18 @@ export function evaluateProductCodeFormula(
     }),
   );
 
-  // remove "=", then replace placeholders in the product code formula with selected values
-  const result: string = productCodeFormula
-    .substring(1)
+  // replace placeholders in the product code formula with selected values
+  let result: string = productCodeFormula
+    .substring(1) // remove "=" character
     .replace(PLACEHOLDERS_REGEX, (match, inputName) => {
       const normalizedName = inputName.replace(WHITESPACE_REGEX, '');
       return values[normalizedName] ?? '';
     });
+
+  // append -X if there are any custom inputs
+  if (inputs.some((i) => i.isCustomValue)) {
+    result = result + '-X';
+  }
 
   return result;
 }
