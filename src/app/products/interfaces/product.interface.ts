@@ -1,11 +1,11 @@
-import { ProductSelection } from './product-selection.interface';
+import { ProductInput } from './product-input.interface';
 
 export interface Product {
   id: string;
   name: string;
   description: string;
   productCodeFormula: string;
-  selections: ProductSelection[];
+  inputs: ProductInput[];
 }
 
 export const MAX_PRODUCT_NAME_LENGTH = 30;

@@ -1,0 +1,57 @@
+<div class="relative">
+  <div
+    class="before:bg-card before:absolute before:-inset-x-4 before:-inset-y-4 before:z-10 before:rounded-md before:shadow-[0_0_16px_2px_rgba(0,0,0,0.08)]"
+  >
+    <div class="relative z-10 flex flex-row gap-3">
+      <div class="relative flex flex-1 items-center">
+        <span class="pointer-events-none absolute left-2">•</span>
+        <input
+          #customDisplayTextElement
+          [(ngModel)]="customDisplayText"
+          type="text"
+          placeholder="Enter custom text"
+          class="outline-border w-full rounded-md px-2 py-1 pl-6 outline"
+        />
+      </div>
+
+      <div class="flex items-baseline gap-1">
+        <span class="text-foreground/70 text-sm"> {{ productInput().name }} = </span>
+        <input
+          type="text"
+          [(ngModel)]="customValue"
+          class="outline-border rounded-md px-2 py-1 outline"
+        />
+      </div>
+
+      <button (click)="saveClick.emit()" class="hover:bg-input cursor-pointer rounded-full p-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="size-4"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </button>
+
+      <button (click)="cancelClick.emit()" class="hover:bg-input cursor-pointer rounded-full p-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="size-4"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

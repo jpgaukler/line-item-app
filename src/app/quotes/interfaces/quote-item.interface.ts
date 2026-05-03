@@ -1,4 +1,4 @@
-import { QuoteItemSelection } from './quote-item-selection.interface';
+import { QuoteItemInput } from './quote-item-input.interface';
 
 /** Key format for tracking the state of items on a quote. This matches the format of cryto.randomUUID() */
 export type QuoteItemKey = `${string}-${string}-${string}-${string}-${string}`;
@@ -11,5 +11,5 @@ export interface QuoteItem {
   description: string;
   productCode: string;
   price: number;
-  selections: QuoteItemSelection[];
+  inputs: QuoteItemInput[];
 }

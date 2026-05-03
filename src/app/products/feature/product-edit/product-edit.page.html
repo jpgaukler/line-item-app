@@ -72,17 +72,13 @@
         }
       </div>
 
-      <div formArrayName="selections" class="flex flex-col gap-6 rounded-md p-4">
+      <div formArrayName="inputs" class="flex flex-col gap-6 rounded-md p-4">
         <div class="flex flex-row items-center justify-between">
-          <div class="text-2xl font-bold">Selections</div>
+          <div class="text-2xl font-bold">Inputs</div>
         </div>
 
-        @for (
-          selection of selectionsArray.controls;
-          track selection.value.controlId;
-          let selectionIndex = $index
-        ) {
-          <div [formGroupName]="selectionIndex" class="flex flex-col gap-2 rounded-md border p-4">
+        @for (input of inputsArray.controls; track input.value.controlId; let inputIndex = $index) {
+          <div [formGroupName]="inputIndex" class="flex flex-col gap-2 rounded-md border p-4">
             <div class="flex flex-row justify-between gap-4">
               <input
                 type="text"
@@ -90,22 +86,21 @@
                 formControlName="name"
                 [ngClass]="{
                   'border-destructive border':
-                    selection.controls.name.hasError('duplicateSelectionName') &&
-                    selection.controls.name.touched,
+                    input.controls.name.hasError('duplicateInputName') &&
+                    input.controls.name.touched,
                 }"
               />
 
               @if (
-                selection.controls.name.hasError('duplicateSelectionName') &&
-                selection.controls.name.touched
+                input.controls.name.hasError('duplicateInputName') && input.controls.name.touched
               ) {
-                <div class="text-destructive">Selection names must be unique</div>
+                <div class="text-destructive">Input names must be unique</div>
               }
 
               <button
                 type="button"
                 class="hover:bg-muted rounded-md p-2"
-                (click)="removeSelection(selectionIndex)"
+                (click)="removeInput(inputIndex)"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -124,10 +119,10 @@
               class="flex flex-col gap-4"
               formArrayName="options"
               cdkDropList
-              (cdkDropListDropped)="reorderOption(selectionIndex, $event)"
+              (cdkDropListDropped)="reorderOption(inputIndex, $event)"
             >
               @for (
-                option of optionsAt(selectionIndex).controls;
+                option of optionsAt(inputIndex).controls;
                 track option.value.controlId;
                 let optionIndex = $index
               ) {
@@ -139,14 +134,14 @@
                   <button
                     type="button"
                     class="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full"
-                    (click)="setDefaultOption(selectionIndex, optionIndex)"
+                    (click)="setDefaultOption(inputIndex, optionIndex)"
                   >
                     <div
                       class="bg-input h-3 w-3 rounded-full"
                       [ngClass]="{
-                        'bg-primary': selection.controls.defaultOptionIndex.value === optionIndex,
+                        'bg-primary': input.controls.defaultOptionIndex.value === optionIndex,
                         'group-hover:bg-primary':
-                          selection.controls.defaultOptionIndex.value !== optionIndex,
+                          input.controls.defaultOptionIndex.value !== optionIndex,
                       }"
                     ></div>
                   </button>
@@ -192,7 +187,7 @@
                   <button
                     type="button"
                     class="hover:bg-muted rounded-md p-2"
-                    (click)="removeOption(selectionIndex, optionIndex)"
+                    (click)="removeOption(inputIndex, optionIndex)"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -217,7 +212,7 @@
               <button
                 type="button"
                 class="text-primary hover:text-primary/80 cursor-pointer font-medium"
-                (click)="addOption(selectionIndex)"
+                (click)="addOption(inputIndex)"
               >
                 Add Option
               </button>
@@ -233,9 +228,9 @@
         <button
           type="button"
           class="hover:bg-muted cursor-pointer rounded-md border border-dotted p-4 text-left font-medium"
-          (click)="addSelection()"
+          (click)="addInput()"
         >
-          + Add Selection
+          + Add Input
         </button>
       </div>
     </form>

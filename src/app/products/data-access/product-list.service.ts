@@ -55,7 +55,7 @@ export class ProductListService {
             name: next.name,
             description: next.description,
             productCodeFormula: '',
-            selections: [],
+            inputs: [],
           },
         ],
       })),

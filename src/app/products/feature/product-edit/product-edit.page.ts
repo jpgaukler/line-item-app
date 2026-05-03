@@ -7,7 +7,7 @@ import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { ProductEditService } from '../../data-access/product-edit.service';
 import { ProductFormService } from '../../data-access/product-form.service';
 import { ProductForm } from '../../interfaces/product-form.interface';
-import { ProductSelectionOptionForm } from '../../interfaces/product-selection-option-form.interface';
+import { ProductInputOptionForm } from '../../interfaces/product-input-option-form.interface';
 import {
   MAX_PRODUCT_DESCRIPTION_LENGTH,
   MAX_PRODUCT_NAME_LENGTH,
@@ -35,19 +35,19 @@ export class ProductEditPage implements OnDestroy {
     name: '',
     description: '',
     productCodeFormula: '',
-    selections: [],
+    inputs: [],
   });
 
-  get selectionsArray() {
-    return this.productForm.controls.selections;
+  get inputsArray() {
+    return this.productForm.controls.inputs;
   }
 
-  optionsAt(selectionIndex: number) {
-    return this.productForm.controls.selections.at(selectionIndex).controls.options;
+  optionsAt(inputIndex: number) {
+    return this.productForm.controls.inputs.at(inputIndex).controls.options;
   }
 
-  defaultOptionAt(selectionIndex: number) {
-    return this.productForm.controls.selections.at(selectionIndex).controls.defaultOptionIndex;
+  defaultOptionAt(inputIndex: number) {
+    return this.productForm.controls.inputs.at(inputIndex).controls.defaultOptionIndex;
   }
 
   constructor() {
@@ -72,10 +72,10 @@ export class ProductEditPage implements OnDestroy {
     this.productForm = this.productFormService.toProductForm(product);
   }
 
-  addSelection(): void {
-    this.selectionsArray.push(
-      this.productFormService.toProductSelectionForm({
-        name: `Selection (${this.selectionsArray.length + 1})`,
+  addInput(): void {
+    this.inputsArray.push(
+      this.productFormService.toProductInputForm({
+        name: `Input (${this.inputsArray.length + 1})`,
         defaultOptionIndex: 0,
         allowCustomValue: false,
         options: [{ displayText: 'Option (1)', value: 'Value (1)' }],
@@ -85,16 +85,16 @@ export class ProductEditPage implements OnDestroy {
     this.productForm.markAsDirty();
   }
 
-  removeSelection(selectionIndex: number): void {
-    this.selectionsArray.removeAt(selectionIndex);
+  removeInput(inputIndex: number): void {
+    this.inputsArray.removeAt(inputIndex);
     this.productForm.markAsDirty();
   }
 
-  addOption(selectionIndex: number): void {
-    const optionsArray = this.optionsAt(selectionIndex);
+  addOption(inputIndex: number): void {
+    const optionsArray = this.optionsAt(inputIndex);
 
     optionsArray.push(
-      this.productFormService.toProductSelectionOptionForm({
+      this.productFormService.toProductInputOptionForm({
         displayText: `Option (${optionsArray.length + 1})`,
         value: `Value (${optionsArray.length + 1})`,
       }),
@@ -103,8 +103,8 @@ export class ProductEditPage implements OnDestroy {
     this.productForm.markAsDirty();
   }
 
-  removeOption(selectionIndex: number, optionIndex: number): void {
-    const optionsArray = this.optionsAt(selectionIndex);
+  removeOption(inputIndex: number, optionIndex: number): void {
+    const optionsArray = this.optionsAt(inputIndex);
 
     if (optionsArray.length <= 1) {
       return;
@@ -112,7 +112,7 @@ export class ProductEditPage implements OnDestroy {
 
     optionsArray.removeAt(optionIndex);
 
-    const defaultOptionControl = this.defaultOptionAt(selectionIndex);
+    const defaultOptionControl = this.defaultOptionAt(inputIndex);
     const currentDefaultIndex = defaultOptionControl.value;
 
     if (currentDefaultIndex === optionIndex) {
@@ -122,16 +122,13 @@ export class ProductEditPage implements OnDestroy {
     this.productForm.markAsDirty();
   }
 
-  setDefaultOption(selectionIndex: number, optionIndex: number): void {
-    const defaultOptionControl = this.defaultOptionAt(selectionIndex);
+  setDefaultOption(inputIndex: number, optionIndex: number): void {
+    const defaultOptionControl = this.defaultOptionAt(inputIndex);
     defaultOptionControl.setValue(optionIndex);
     this.productForm.markAsDirty();
   }
 
-  reorderOption(
-    selectionIndex: number,
-    event: CdkDragDrop<FormGroup<ProductSelectionOptionForm>>,
-  ): void {
+  reorderOption(inputIndex: number, event: CdkDragDrop<FormGroup<ProductInputOptionForm>>): void {
     const previousIndex = event.previousIndex;
     const currentIndex = event.currentIndex;
 
@@ -139,8 +136,8 @@ export class ProductEditPage implements OnDestroy {
       return;
     }
 
-    const optionsArray = this.optionsAt(selectionIndex);
-    const defaultOptionControl = this.defaultOptionAt(selectionIndex);
+    const optionsArray = this.optionsAt(inputIndex);
+    const defaultOptionControl = this.defaultOptionAt(inputIndex);
 
     // Move the options FormGroup
     moveItemInArray(optionsArray.controls, previousIndex, currentIndex);

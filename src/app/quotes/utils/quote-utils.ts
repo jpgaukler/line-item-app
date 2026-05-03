@@ -1,35 +1,35 @@
-import { QuoteItemSelection } from '../interfaces/quote-item-selection.interface';
+import { QuoteItemInput } from '../interfaces/quote-item-input.interface';
 
 const PLACEHOLDERS_REGEX: RegExp = /\[\s*(\w+)\s*\]/g;
 const WHITESPACE_REGEX: RegExp = /\s/g;
 
 /**
- * Calculate the product code for a line item based on the current selections when editing a quote.
+ * Calculate the product code for a line item based on the current inputs when editing a quote.
  * @param productCodeFormula The product code formula for the given product.
- * @param selections The quote item selections that are currently selected on the line item.
- * @returns The calculated product code for the given product with the current selections.
+ * @param inputs The quote item inputs that are currently selected on the line item.
+ * @returns The calculated product code for the given product with the current inputs.
  */
 export function evaluateProductCodeFormula(
   productCodeFormula: string,
-  selections: QuoteItemSelection[],
+  inputs: QuoteItemInput[],
 ): string {
   if (productCodeFormula[0] !== '=') {
     return productCodeFormula;
   }
 
-  // Map selections to a Record<string, string> with normalized field names
+  // Map inputs to a Record<string, string> with normalized field names
   const values: Record<string, string> = Object.fromEntries(
-    selections.map((selection) => {
-      const normalizedName = selection.name.replace(WHITESPACE_REGEX, '');
-      return [normalizedName, selection.value];
+    inputs.map((input) => {
+      const normalizedName = input.name.replace(WHITESPACE_REGEX, '');
+      return [normalizedName, input.value];
     }),
   );
 
   // remove "=", then replace placeholders in the product code formula with selected values
   const result: string = productCodeFormula
     .substring(1)
-    .replace(PLACEHOLDERS_REGEX, (match, selectionName) => {
-      const normalizedName = selectionName.replace(WHITESPACE_REGEX, '');
+    .replace(PLACEHOLDERS_REGEX, (match, inputName) => {
+      const normalizedName = inputName.replace(WHITESPACE_REGEX, '');
       return values[normalizedName] ?? '';
     });
 
@@ -37,19 +37,19 @@ export function evaluateProductCodeFormula(
 }
 
 /**
- * Validate that a user defined product code formula is using valid selection names within placeholder sections.
+ * Validate that a user defined product code formula is using valid input names within placeholder sections.
  * @param formula The product code formula entered by the user.
- * @param selectionNames The names of all selections on the product.
+ * @param inputNames The names of all inputs on the product.
  * @returns The names of any invalid fields, or an empty array if formula is valid.
  */
-export function validateProductCodeFormula(formula: string, selectionNames: string[]): string[] {
+export function validateProductCodeFormula(formula: string, inputNames: string[]): string[] {
   const invalidFields: string[] = [];
 
   if (formula[0] !== '=') {
     return invalidFields;
   }
 
-  const normalizedNames: string[] = selectionNames
+  const normalizedNames: string[] = inputNames
     .map((name) => name.replace(WHITESPACE_REGEX, ''))
     .filter((i) => i !== '');
 

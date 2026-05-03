@@ -1,0 +1,16 @@
+@if (showCustom()) {
+  <app-quote-item-input-custom
+    [productInput]="productInput()"
+    [(customValue)]="customValue"
+    [(customDisplayText)]="customDisplayText"
+    (saveClick)="saveCustomClick()"
+    (cancelClick)="cancelCustomClick()"
+  ></app-quote-item-input-custom>
+} @else {
+  <app-quote-item-input-dropdown
+    [quoteItemInput]="quoteItemInput()"
+    [productInput]="productInput()"
+    (selectedOptionChange)="selectedOptionChange($event)"
+    (showCustomClick)="showCustomClick()"
+  ></app-quote-item-input-dropdown>
+}

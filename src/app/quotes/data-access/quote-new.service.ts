@@ -5,7 +5,7 @@ import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, filter, Subject } from 'rxjs';
 import { Product } from '../../products/interfaces/product.interface';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
-import { QuoteItemSelection } from '../interfaces/quote-item-selection.interface';
+import { QuoteItemInput } from '../interfaces/quote-item-input.interface';
 import { QuoteItem, QuoteItemKey } from '../interfaces/quote-item.interface';
 import { QuoteSystem, QuoteSystemKey } from '../interfaces/quote-system.interface';
 import { QuoteModel } from '../interfaces/quote.interface';
@@ -102,11 +102,11 @@ export class QuoteNewService {
             description: item.description,
             productCode: item.productCode,
             price: 0,
-            selections: item.selections.map((selection) => ({
-              name: selection.name,
-              value: selection.value,
-              displayText: selection.displayText,
-              isCustomValue: selection.isCustomValue,
+            inputs: item.inputs.map((input) => ({
+              name: input.name,
+              value: input.value,
+              displayText: input.displayText,
+              isCustomValue: input.isCustomValue,
             })),
           })),
       })),
@@ -224,24 +224,19 @@ export class QuoteNewService {
       .subscribe((next: { systemKey: QuoteSystemKey; product: Product }) => {
         this.state.update((state) => {
           const newItemKey: QuoteItemKey = crypto.randomUUID();
-          const defaultSelections: QuoteItemSelection[] = next.product.selections.map(
-            (selection) => ({
-              name: selection.name,
-              value: selection.options[selection.defaultOptionIndex].value,
-              displayText: selection.options[selection.defaultOptionIndex].displayText,
-              isCustomValue: false,
-            }),
-          );
+          const defaultInputs: QuoteItemInput[] = next.product.inputs.map((input) => ({
+            name: input.name,
+            value: input.options[input.defaultOptionIndex].value,
+            displayText: input.options[input.defaultOptionIndex].displayText,
+            isCustomValue: false,
+          }));
           const newItem: QuoteItem = {
             productId: next.product.id,
             name: next.product.name,
             description: next.product.description,
-            productCode: evaluateProductCodeFormula(
-              next.product.productCodeFormula,
-              defaultSelections,
-            ),
+            productCode: evaluateProductCodeFormula(next.product.productCodeFormula, defaultInputs),
             price: 0,
-            selections: defaultSelections,
+            inputs: defaultInputs,
           };
 
           const itemKeys: QuoteItemKey[] = state.systemItemKeyMap.get(next.systemKey)!;

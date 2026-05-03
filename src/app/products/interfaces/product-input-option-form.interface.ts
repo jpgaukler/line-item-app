@@ -1,6 +1,6 @@
 import { FormControl } from '@angular/forms';
 
-export interface ProductSelectionOptionForm {
+export interface ProductInputOptionForm {
   /**
    * This is a unique id generated when constructing the FormGroup, used only for tracking in HTML for loop.
    */

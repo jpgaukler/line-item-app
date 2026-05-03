@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, model } from '@angular/core';
 import { Product } from '../../../products/interfaces/product.interface';
-import { QuoteItemSelection } from '../../interfaces/quote-item-selection.interface';
+import { QuoteItemInput } from '../../interfaces/quote-item-input.interface';
 import { QuoteItem } from '../../interfaces/quote-item.interface';
 import { evaluateProductCodeFormula } from '../../utils/quote-utils';
 import { DragHandleComponent } from '../drag-handle/drag-handle.component';
-import { QuoteItemSelectComponent } from '../quote-item-select/quote-item-select.component';
+import { QuoteItemInputComponent } from '../quote-item-input/quote-item-input.component';
 
 @Component({
   selector: 'app-quote-item',
-  imports: [CommonModule, DragHandleComponent, QuoteItemSelectComponent],
+  imports: [CommonModule, DragHandleComponent, QuoteItemInputComponent],
   templateUrl: './quote-item.component.html',
 })
 export class QuoteItemComponent {
@@ -18,19 +18,16 @@ export class QuoteItemComponent {
   item = model.required<QuoteItem>();
   product = model.required<Product>();
 
-  selectionChange(updatedSelection: QuoteItemSelection): void {
+  inputChange(updatedInput: QuoteItemInput): void {
     this.item.update((item) => {
-      const updatedSelections = item.selections.map((selection) =>
-        selection.name === updatedSelection.name ? updatedSelection : selection,
+      const updatedInputs = item.inputs.map((input) =>
+        input.name === updatedInput.name ? updatedInput : input,
       );
 
       return {
         ...item,
-        productCode: evaluateProductCodeFormula(
-          this.product().productCodeFormula,
-          updatedSelections,
-        ),
-        selections: updatedSelections,
+        productCode: evaluateProductCodeFormula(this.product().productCodeFormula, updatedInputs),
+        inputs: updatedInputs,
       };
     });
   }

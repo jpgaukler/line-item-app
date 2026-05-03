@@ -10,17 +10,13 @@
   </div>
   <p>{{ item().description }}</p>
   <div class="flex flex-col gap-1">
-    @for (
-      productSelection of product().selections;
-      track productSelection.name;
-      let selectionIndex = $index
-    ) {
-      @let itemSelection = item().selections[selectionIndex];
-      <app-quote-item-select
-        [productSelection]="productSelection"
-        [quoteItemSelection]="itemSelection"
-        (quoteItemSelectionChange)="selectionChange($event)"
-      ></app-quote-item-select>
+    @for (input of product().inputs; track input.name; let inputIndex = $index) {
+      @let itemInput = item().inputs[inputIndex];
+      <app-quote-item-input
+        [productInput]="input"
+        [quoteItemInput]="itemInput"
+        (quoteItemInputChange)="inputChange($event)"
+      ></app-quote-item-input>
     }
   </div>
 </div>

@@ -18,7 +18,7 @@ export class ProductEditService {
 
   // state
   private state = signal<ProductEditState>({
-    product: { id: '', name: '', description: '', productCodeFormula: '', selections: [] },
+    product: { id: '', name: '', description: '', productCodeFormula: '', inputs: [] },
     loaded: false,
     error: null,
   });

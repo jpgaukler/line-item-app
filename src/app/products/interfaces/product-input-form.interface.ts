@@ -1,7 +1,7 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
-import { ProductSelectionOptionForm } from './product-selection-option-form.interface';
+import { ProductInputOptionForm } from './product-input-option-form.interface';
 
-export interface ProductSelectionForm {
+export interface ProductInputForm {
   /**
    * This is a unique id generated when constructing the FormGroup, used only for tracking in HTML for loop.
    */
@@ -9,5 +9,5 @@ export interface ProductSelectionForm {
   name: FormControl<string>;
   allowCustomValue: FormControl<boolean>;
   defaultOptionIndex: FormControl<number>;
-  options: FormArray<FormGroup<ProductSelectionOptionForm>>;
+  options: FormArray<FormGroup<ProductInputOptionForm>>;
 }
