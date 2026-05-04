@@ -1,3 +1,4 @@
+import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy, signal } from '@angular/core';
@@ -16,7 +17,15 @@ import {
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, FormsModule, ButtonDirective, ReactiveFormsModule, CdkDropList, CdkDrag],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ButtonDirective,
+    ReactiveFormsModule,
+    CdkDropList,
+    CdkDrag,
+    CdkCopyToClipboard,
+  ],
   templateUrl: './product-edit.page.html',
   providers: [ProductEditService, ProductFormService],
 })
