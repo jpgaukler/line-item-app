@@ -115,34 +115,40 @@
                 <hr class="my-3" />
               </div>
             }
+
+            @if (quoteNewService.showAddItem() === systemKey) {
+              <div class="flex flex-col gap-2">
+                <div class="flex flex-row items-baseline gap-2">
+                  <span class="rounded-md border border-dashed px-3 font-semibold">
+                    {{ systemIndex + 1 }}.{{ itemKeys.length + 1 }}
+                  </span>
+                  <span class="font-bold">Select a product</span>
+                  <!-- <input
+                    type="text"
+                    placeholder="Search products"
+                    class="hover:bg-input focus:bg-input w-full rounded-md border p-1"
+                  /> -->
+                </div>
+                <div class="flex gap-4">
+                  @for (product of productListService.products(); track product.id) {
+                    <div appButton (click)="quoteNewService.addItem$.next({ systemKey, product })">
+                      {{ product.name }}
+                    </div>
+                  }
+                </div>
+              </div>
+            }
           </div>
 
-          @if (quoteNewService.showAddItem() === systemKey) {
-            <div class="flex flex-col gap-4 rounded-md border border-dotted p-6">
-              <input
-                type="text"
-                placeholder="Search"
-                class="hover:bg-input focus:bg-input mt-2 w-full rounded-md border p-2"
-              />
-              <div class="flex gap-4">
-                @for (product of productListService.products(); track product.id) {
-                  <div appButton (click)="quoteNewService.addItem$.next({ systemKey, product })">
-                    {{ product.name }}
-                  </div>
-                }
-              </div>
-            </div>
-          } @else {
-            <div>
-              <button
-                type="button"
-                class="text-primary hover:text-primary/70 cursor-pointer font-medium"
-                (click)="quoteNewService.showAddItem$.next(systemKey)"
-              >
-                Add Item
-              </button>
-            </div>
-          }
+          <div>
+            <button
+              type="button"
+              class="text-primary hover:text-primary/70 cursor-pointer font-medium"
+              (click)="quoteNewService.showAddItem$.next(systemKey)"
+            >
+              Add Item
+            </button>
+          </div>
         </div>
       }
     </div>
