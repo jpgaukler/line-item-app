@@ -5,6 +5,7 @@ import { Component, effect, inject, OnDestroy, signal } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
+import { logJsonSize } from '../../../shared/utils/data-utils';
 import { ProductEditService } from '../../data-access/product-edit.service';
 import { ProductFormService } from '../../data-access/product-form.service';
 import { ProductForm } from '../../interfaces/product-form.interface';
@@ -186,5 +187,9 @@ export class ProductEditPage implements OnDestroy {
 
   reset(): void {
     this.initializeProductForm(this.productEditService.product());
+  }
+
+  calculateJsonSize() {
+    logJsonSize(this.productEditService.product());
   }
 }
