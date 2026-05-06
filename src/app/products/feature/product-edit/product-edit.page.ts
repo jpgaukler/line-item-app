@@ -3,6 +3,7 @@ import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy, signal } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { logJsonSize } from '../../../shared/utils/data-utils';
@@ -26,6 +27,7 @@ import {
     CdkDropList,
     CdkDrag,
     CdkCopyToClipboard,
+    RouterLink,
   ],
   templateUrl: './product-edit.page.html',
   providers: [ProductEditService, ProductFormService],
@@ -64,7 +66,6 @@ export class ProductEditPage implements OnDestroy {
     this.layoutService.updateBreadcrumbs$.next([
       { label: 'Home', url: '/' },
       { label: 'Products', url: '/products' },
-      { label: 'Edit Product', url: '/products/edit' },
     ]);
 
     effect(() => {

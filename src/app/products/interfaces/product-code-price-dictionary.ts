@@ -1,6 +1,7 @@
 export type ProductCode = string;
 
 export interface ProductCodePriceDictionary {
-  productInputsHash: string;
+  productId: string;
+  productCodeHash: string;
   prices: Record<ProductCode, number>;
 }

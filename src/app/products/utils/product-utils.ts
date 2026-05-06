@@ -1,36 +1,7 @@
+import fnv1a from '@sindresorhus/fnv1a';
 import { ProductInputOption } from '../interfaces/product-input-option.interface';
 import { ProductInput } from '../interfaces/product-input.interface';
 import { Product } from '../interfaces/product.interface';
-
-// export function generateProductVariations(product: Product): ProductVariation[] {
-//   const inputs: ProductInput[] = product.inputs;
-//   const variations: ProductVariation[] = [];
-//   const currentInputs: Record<ProductInput['name'], ProductInputOption['value']> = {};
-
-//   function buildVariation(index: number) {
-//     // base case: full permutation built, add to results array
-//     if (index === inputs.length) {
-//       variations.push({
-//         productCode: calculateProductCode(product.productCodeFormula, currentInputs),
-//         inputs: { ...currentInputs },
-//         price: 0,
-//       });
-
-//       return;
-//     }
-
-//     const input: ProductInput = inputs[index];
-
-//     for (const option of input.options) {
-//       currentInputs[input.name] = option.value;
-//       buildVariation(index + 1);
-//     }
-//   }
-
-//   buildVariation(0);
-
-//   return variations;
-// }
 
 export function generateProductCodes(product: Product): string[] {
   const inputs: ProductInput[] = product.inputs;
@@ -81,32 +52,31 @@ export function calculateProductCode(
 }
 
 /**
- * Can be used to detect if permuations have changed since last generating them.
- * @param inputs
- * @returns
+ * Generate a hash of the inputs that determine product codes (this includes the product code formula
+ * and the possible input values). This hash can be used to determine if the price dictionary is out of date,
+ * if product inputs have changed since last generating the pricing dictionary.
+ * @param product
+ * @returns A unique hash of product inputs as a bigint
  */
-export async function buildProductsInputsHash(inputs: ProductInput[]): Promise<string> {
-  // generate the string fingerprint
-  const fingerprint = inputs
-    .map(
-      (i) =>
-        `${i.name}:${i.options
-          .map((o) => o.value)
-          .sort()
-          .join(',')}`,
-    )
-    .sort()
+export function buildProductCodeHash(product: Product): string {
+  // Helper to ensure consistent formatting for every string fragment
+  const normalize = (val: string | undefined | null) => (val ?? '').trim().toLowerCase();
+
+  const formula = normalize(product.productCodeFormula);
+  const inputs = product.inputs
+    .map((i) => {
+      const normalizedName = normalize(i.name);
+      const normalizedOptions = i.options
+        .map((o) => normalize(o.value))
+        .sort() // Ensure option values are deterministic
+        .join(',');
+
+      return `${normalizedName}:${normalizedOptions}`;
+    })
+    .sort() // Ensure input order doesn't change the hash
     .join('|');
 
-  // convert string to ArrayBuffer
-  const msgBuffer = new TextEncoder().encode(fingerprint);
+  const fingerprint = `${formula}|${inputs}`;
 
-  // hash the message
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-
-  // convert ArrayBuffer to hex string
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-
-  return hashHex;
+  return fnv1a(fingerprint, { size: 64 }).toString();
 }

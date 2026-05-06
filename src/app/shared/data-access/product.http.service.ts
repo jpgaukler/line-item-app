@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { delay, map, Observable, of, switchMap, tap } from 'rxjs';
+import { ProductCodePriceDictionary } from '../../products/interfaces/product-code-price-dictionary';
 import { Product } from '../../products/interfaces/product.interface';
 import { LocalStorageService } from './local-storage.service';
 
@@ -25,6 +26,29 @@ export class ProductHttpService {
     const products = this.localStorageService.getJson<Product[]>('products') || [];
     const updatedProducts = products.map((p) => (p.id === product.id ? product : p));
     this.localStorageService.setJson('products', updatedProducts);
+  }
+
+  saveProductCodePriceDictionary(productCodePriceDictionary: ProductCodePriceDictionary): void {
+    const localStorageKey: string = 'product-code-price-dictionaries';
+
+    const data =
+      this.localStorageService.getJson<ProductCodePriceDictionary[]>(localStorageKey) || [];
+
+    let updatedData: ProductCodePriceDictionary[] = [];
+
+    if (data.some((i) => i.productId === productCodePriceDictionary.productId)) {
+      updatedData = data.map((dictionary) =>
+        dictionary.productId === productCodePriceDictionary.productId
+          ? productCodePriceDictionary
+          : dictionary,
+      );
+    } else {
+      updatedData = [...data, productCodePriceDictionary];
+    }
+
+    console.log('updated', updatedData);
+
+    this.localStorageService.setJson(localStorageKey, updatedData);
   }
 
   // saveProduct(product: Product): Observable<void> {
@@ -69,6 +93,24 @@ export class ProductHttpService {
         }
       }),
     );
+  }
+
+  getProductCodePriceDictionaryByProductId(
+    productId: string,
+  ): Observable<ProductCodePriceDictionary | null> {
+    return this.localStorageService
+      .loadJson<ProductCodePriceDictionary[]>('product-code-price-dictionaries')
+      .pipe(
+        delay(500),
+        map((dictionaries) => {
+          const dictionary = dictionaries?.find((d) => d.productId === productId);
+          if (!dictionary) {
+            return null;
+          } else {
+            return dictionary;
+          }
+        }),
+      );
   }
 
   // createProduct(): Observable<Product[] | null> {
