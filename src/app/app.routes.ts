@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { LayoutComponent } from './layout/layout.component';
 import { PreferencesPage } from './preferences/preferences.page';
+import { ProductEditPriceDictionaryPage } from './products/feature/product-edit-price-dictionary/product-edit-price-dictionary.page';
 import { ProductEditPage } from './products/feature/product-edit/product-edit.page';
 import { ProductListPage } from './products/feature/product-list/product-list.page';
 import { ProductNewPage } from './products/feature/product-new/product-new.page';
@@ -23,9 +24,14 @@ export const routes: Routes = [
         component: ProductNewPage,
       },
       {
-        path: 'products/:productId',
+        path: 'products/:productId/edit',
         title: 'Edit Product • Line-Item',
         component: ProductEditPage,
+      },
+      {
+        path: 'products/:productId/edit/prices',
+        title: 'Edit Product • Line-Item',
+        component: ProductEditPriceDictionaryPage,
       },
 
       // quotes

@@ -80,33 +80,33 @@ export function calculateProductCode(
     .replace(inputNames, (match, inputName) => values[inputName] ?? '?'); // replace input names with values
 }
 
-// /**
-//  * Can be used to detect if permuations have changed since last generating them.
-//  * @param inputs
-//  * @returns
-//  */
-// export async function buildInputsHash(inputs: ProductInput[]): Promise<string> {
-//   // generate the string fingerprint
-//   const fingerprint = inputs
-//     .map(
-//       (i) =>
-//         `${i.name}:${i.options
-//           .map((o) => o.value)
-//           .sort()
-//           .join(',')}`,
-//     )
-//     .sort()
-//     .join('|');
+/**
+ * Can be used to detect if permuations have changed since last generating them.
+ * @param inputs
+ * @returns
+ */
+export async function buildProductsInputsHash(inputs: ProductInput[]): Promise<string> {
+  // generate the string fingerprint
+  const fingerprint = inputs
+    .map(
+      (i) =>
+        `${i.name}:${i.options
+          .map((o) => o.value)
+          .sort()
+          .join(',')}`,
+    )
+    .sort()
+    .join('|');
 
-//   // convert string to ArrayBuffer
-//   const msgBuffer = new TextEncoder().encode(fingerprint);
+  // convert string to ArrayBuffer
+  const msgBuffer = new TextEncoder().encode(fingerprint);
 
-//   // hash the message
-//   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  // hash the message
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
 
-//   // convert ArrayBuffer to hex string
-//   const hashArray = Array.from(new Uint8Array(hashBuffer));
-//   const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  // convert ArrayBuffer to hex string
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
-//   return hashHex;
-// }
+  return hashHex;
+}

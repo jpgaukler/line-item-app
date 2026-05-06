@@ -1,0 +1,24 @@
+@if (productEditService.error()) {
+  <p class="text-destructive">Error: {{ productEditService.error() }}</p>
+}
+
+@if (!productEditService.loaded()) {
+  <p>Loading...</p>
+} @else {
+  <div class="flex flex-col gap-4">
+    <button appButton (click)="productEditService.generateProductCodePriceDictionary$.next()">
+      Generate
+    </button>
+    @for (entry of productEditService.productCodePriceDictionary(); track entry.productCode) {
+      <div class="flex flex-row justify-between gap-2">
+        <p class="font-semibold">{{ entry.productCode }}</p>
+        <input
+          type="number"
+          class="hover:bg-input focus:bg-input rounded-md p-2 text-right"
+          placeholder="$0.00"
+        />
+      </div>
+      <hr />
+    }
+  </div>
+}
