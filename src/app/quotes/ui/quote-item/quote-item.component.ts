@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, model } from '@angular/core';
 import { Product } from '../../../products/interfaces/product.interface';
+import { calculateProductCode } from '../../../products/utils/product-utils';
 import { QuoteItemInput } from '../../interfaces/quote-item-input.interface';
 import { QuoteItem } from '../../interfaces/quote-item.interface';
-import { evaluateProductCodeFormula } from '../../utils/quote-utils';
 import { DragHandleComponent } from '../drag-handle/drag-handle.component';
 import { QuoteItemInputComponent } from '../quote-item-input/quote-item-input.component';
 
@@ -26,7 +26,10 @@ export class QuoteItemComponent {
 
       return {
         ...item,
-        productCode: evaluateProductCodeFormula(this.product().productCodeFormula, updatedInputs),
+        productCode: calculateProductCode(
+          this.product(),
+          Object.fromEntries(updatedInputs.map((input) => [input.name, input.value])),
+        ),
         inputs: updatedInputs,
       };
     });

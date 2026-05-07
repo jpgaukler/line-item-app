@@ -3,6 +3,80 @@ import { ProductInputOption } from '../interfaces/product-input-option.interface
 import { ProductInput } from '../interfaces/product-input.interface';
 import { Product } from '../interfaces/product.interface';
 
+const INPUT_NAME_REGEX: RegExp = /\[\s*(\w+)\s*\]/g;
+const WHITESPACE_REGEX: RegExp = /\s/g;
+
+/**
+ * Validate that a user defined product code formula is using valid input names within placeholder sections.
+ * @param formula The product code formula entered by the user.
+ * @param inputNames The names of all inputs on the product.
+ * @returns The names of any invalid fields, or an empty array if formula is valid.
+ */
+export function validateProductCodeFormula(formula: string, inputNames: string[]): string[] {
+  const invalidFields: string[] = [];
+
+  if (formula[0] !== '=') {
+    return invalidFields;
+  }
+
+  const normalizedNames: string[] = inputNames
+    .map((name) => name.replace(WHITESPACE_REGEX, ''))
+    .filter((i) => i !== '');
+
+  let match: RegExpExecArray | null;
+
+  while ((match = INPUT_NAME_REGEX.exec(formula)) !== null) {
+    const field = match[1].replace(WHITESPACE_REGEX, '');
+
+    if (!normalizedNames.includes(field)) {
+      invalidFields.push(field);
+    }
+  }
+
+  return invalidFields; // Empty array means valid
+}
+
+/**
+ * Calculate the product code for a given product code formula and set of product inputs.
+ * @param productCodeFormula
+ * @param inputs
+ * @returns The product code for the given set of inputs.
+ */
+export function calculateProductCode(product: Product, inputs: Record<string, string>): string {
+  if (product.productCodeFormula[0] !== '=') {
+    return product.productCodeFormula;
+  }
+
+  // remove whitespace to normalize input names
+  const normalizedInputs: Record<string, string> = Object.fromEntries(
+    Object.entries(inputs).map(([name, value]) => [name.replace(WHITESPACE_REGEX, ''), value]),
+  );
+
+  // replace placeholders in the product code formula with selected values
+  let result: string = product.productCodeFormula
+    .substring(1) // remove "=" character
+    .replace(WHITESPACE_REGEX, '') // remove any whitespace
+    .replace(INPUT_NAME_REGEX, (match, inputName) => normalizedInputs[inputName] ?? '?'); // replace input names with values
+
+  // append -X if there are any custom inputs
+  const hasCustomOptionValue = product.inputs.some((input) => {
+    const optionValue = inputs[input.name];
+    const matchingOption = input.options.find((opt) => opt.value === optionValue);
+    return !matchingOption; // If no match found, it's custom
+  });
+
+  if (hasCustomOptionValue) {
+    result += '-X';
+  }
+
+  return result;
+}
+
+/**
+ * Generate all possible product codes for a Product, based on it's product code formula and inputs definition.
+ * @param product
+ * @returns Array of all possible product codes.
+ */
 export function generateProductCodes(product: Product): string[] {
   const inputs: ProductInput[] = product.inputs;
   const productCodes: string[] = [];
@@ -11,7 +85,7 @@ export function generateProductCodes(product: Product): string[] {
   function buildVariation(index: number) {
     // base case: full permutation built, add to results array
     if (index === inputs.length) {
-      productCodes.push(calculateProductCode(product.productCodeFormula, currentInputs));
+      productCodes.push(calculateProductCode(product, currentInputs));
       return;
     }
 
@@ -26,29 +100,6 @@ export function generateProductCodes(product: Product): string[] {
   buildVariation(0);
 
   return productCodes;
-}
-
-export function calculateProductCode(
-  productCodeFormula: string,
-  inputs: Record<string, string>,
-): string {
-  if (productCodeFormula[0] !== '=') {
-    return productCodeFormula;
-  }
-
-  const inputNames: RegExp = /\[\s*(\w+)\s*\]/g;
-  const whitespace: RegExp = /\s/g;
-
-  // remove whitespace to normalize input names
-  const values: Record<string, string> = Object.fromEntries(
-    Object.entries(inputs).map(([name, value]) => [name.replace(whitespace, ''), value]),
-  );
-
-  // replace placeholders in the product code formula with selected values
-  return productCodeFormula
-    .substring(1) // remove "=" character
-    .replace(whitespace, '') // remove any whitespace
-    .replace(inputNames, (match, inputName) => values[inputName] ?? '?'); // replace input names with values
 }
 
 /**

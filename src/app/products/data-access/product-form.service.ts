@@ -8,7 +8,6 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { validateProductCodeFormula } from '../../quotes/utils/quote-utils';
 import { ProductForm } from '../interfaces/product-form.interface';
 import { ProductInputForm } from '../interfaces/product-input-form.interface';
 import { ProductInputOptionForm } from '../interfaces/product-input-option-form.interface';
@@ -19,6 +18,7 @@ import {
   MAX_PRODUCT_NAME_LENGTH,
   Product,
 } from '../interfaces/product.interface';
+import { validateProductCodeFormula } from '../utils/product-utils';
 
 @Injectable()
 export class ProductFormService {

@@ -2,14 +2,14 @@ import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, map, Subject, switchMap } from 'rxjs';
 import { Product } from '../../products/interfaces/product.interface';
+import { calculateProductCode } from '../../products/utils/product-utils';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
 import { QuoteItemInput } from '../interfaces/quote-item-input.interface';
 import { QuoteItem, QuoteItemKey } from '../interfaces/quote-item.interface';
+import { QuoteModel } from '../interfaces/quote-model.interface';
 import { QuoteSystem, QuoteSystemKey } from '../interfaces/quote-system.interface';
-import { QuoteModel } from '../interfaces/quote.interface';
-import { evaluateProductCodeFormula } from '../utils/quote-utils';
 
 // type ProductKey = `${string}::${number}`;
 
@@ -220,23 +220,38 @@ export class QuoteNewService {
     });
 
     this.addItem$
-      .pipe(takeUntilDestroyed())
-      .subscribe((next: { systemKey: QuoteSystemKey; product: Product }) => {
-        this.state.update((state) => {
-          const newItemKey: QuoteItemKey = crypto.randomUUID();
+      .pipe(
+        map((next) => {
           const defaultInputs: QuoteItemInput[] = next.product.inputs.map((input) => ({
             name: input.name,
             value: input.options[input.defaultOptionIndex].value,
             displayText: input.options[input.defaultOptionIndex].displayText,
             isCustomValue: false,
           }));
+          const productCode: string = calculateProductCode(
+            next.product,
+            Object.fromEntries(defaultInputs.map((input) => [input.name, input.value])),
+          );
+
+          return { ...next, defaultInputs, productCode };
+        }),
+        switchMap((next) =>
+          this.productHttpService
+            .getProductPrice(next.product.id, next.productCode)
+            .pipe(map((price) => ({ ...next, price }))),
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe((next) => {
+        this.state.update((state) => {
+          const newItemKey: QuoteItemKey = crypto.randomUUID();
           const newItem: QuoteItem = {
             productId: next.product.id,
             name: next.product.name,
             description: next.product.description,
-            productCode: evaluateProductCodeFormula(next.product.productCodeFormula, defaultInputs),
-            price: 0,
-            inputs: defaultInputs,
+            productCode: next.productCode,
+            price: next.price,
+            inputs: next.defaultInputs,
           };
 
           const itemKeys: QuoteItemKey[] = state.systemItemKeyMap.get(next.systemKey)!;
@@ -256,8 +271,17 @@ export class QuoteNewService {
       });
 
     this.updateItem$
-      .pipe(takeUntilDestroyed())
-      .subscribe((next: { itemKey: QuoteItemKey; updatedItem: QuoteItem }) => {
+      .pipe(
+        takeUntilDestroyed(),
+        switchMap((next) =>
+          this.productHttpService
+            .getProductPrice(next.updatedItem.productId, next.updatedItem.productCode)
+            .pipe(
+              map((price) => ({ ...next, updatedItem: { ...next.updatedItem, price: price } })),
+            ),
+        ),
+      )
+      .subscribe((next) => {
         this.state.update((state) => {
           return {
             ...state,
@@ -268,8 +292,8 @@ export class QuoteNewService {
 
     this.reorderItem$
       .pipe(
-        takeUntilDestroyed(),
         filter((next) => next.previousIndex !== next.currentIndex),
+        takeUntilDestroyed(),
       )
       .subscribe(
         (next: { systemKey: QuoteSystemKey; previousIndex: number; currentIndex: number }) => {

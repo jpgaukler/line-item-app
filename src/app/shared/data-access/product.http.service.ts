@@ -113,6 +113,19 @@ export class ProductHttpService {
       );
   }
 
-  // createProduct(): Observable<Product[] | null> {
-  // }
+  getProductPrice(productId: string, productCode: string): Observable<number> {
+    return this.localStorageService
+      .loadJson<ProductCodePriceDictionary[]>('product-code-price-dictionaries')
+      .pipe(
+        map((dictionaries) => {
+          const price = dictionaries?.find((d) => d.productId === productId)?.prices[productCode];
+
+          if (!price) {
+            throw new Error('Product price could not be determined!');
+          }
+
+          return price;
+        }),
+      );
+  }
 }
