@@ -1,3 +1,7 @@
+@if (quoteNewService.error()) {
+  <p class="text-destructive">Error loading products: {{ quoteNewService.error() }}</p>
+}
+
 <button appButton type="button" (click)="showDebug.set(!showDebug())">Toggle Debug</button>
 @if (showDebug()) {
   <div class="bg-sidebar mt-8 border p-4">

@@ -2,7 +2,16 @@ import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, map, Subject, switchMap } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  of,
+  Subject,
+  switchMap,
+} from 'rxjs';
 import { Product } from '../../products/interfaces/product.interface';
 import { calculateProductCode } from '../../products/utils/product-utils';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
@@ -272,22 +281,29 @@ export class QuoteNewService {
 
     this.updateItem$
       .pipe(
-        takeUntilDestroyed(),
         switchMap((next) =>
           this.productHttpService
             .getProductPrice(next.updatedItem.productId, next.updatedItem.productCode)
             .pipe(
               map((price) => ({ ...next, updatedItem: { ...next.updatedItem, price: price } })),
+              catchError((err) => {
+                // if no price match found (ie: -X product), then need to decide what to do.
+                // Maybe user should enter manual price?
+                console.error('Error getting price', err);
+                return of(next);
+              }),
             ),
         ),
+        takeUntilDestroyed(),
       )
-      .subscribe((next) => {
-        this.state.update((state) => {
-          return {
+      .subscribe({
+        next: (next) => {
+          this.state.update((state) => ({
             ...state,
             itemMap: new Map([...state.itemMap, [next.itemKey, { ...next.updatedItem }]]),
-          };
-        });
+          }));
+        },
+        error: (err) => this.state.update((state) => ({ ...state, error: err })),
       });
 
     this.reorderItem$
