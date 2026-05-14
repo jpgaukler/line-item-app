@@ -89,33 +89,40 @@ export class QuoteNewService {
   systemItemKeyMap = computed(() => this.state().systemItemKeyMap);
   itemMap = computed(() => this.state().itemMap);
   quote = computed(() => {
-    const quote: QuoteModel = {
-      name: this.state().name,
-      customerName: this.state().customerName,
-      customerEmail: this.state().customerEmail,
-      systems: Array.from(this.state().systemMap.entries(), ([systemKey, system], systemIndex) => ({
-        price: system.price,
-        name: `System ${systemIndex + 1}`,
-        items: this.state()
-          .systemItemKeyMap.get(systemKey)!
-          .map((itemKey) => this.state().itemMap.get(itemKey)!)
-          .map((item, itemIndex) => ({
-            productId: item.productId,
-            itemNumber: `${systemIndex + 1}.${itemIndex + 1}`,
-            name: item.name,
-            description: item.description,
-            productCode: item.productCode,
-            price: 0,
-            inputs: item.inputs.map((input) => ({
-              name: input.name,
-              value: input.value,
-              displayText: input.displayText,
-              isCustomValue: input.isCustomValue,
-            })),
+    const state = this.state();
+    const systems = Array.from(state.systemMap.entries(), ([systemKey, system], systemIndex) => ({
+      price: state.systemItemKeyMap.get(systemKey)!.reduce((total, itemKey) => {
+        const item = state.itemMap.get(itemKey)!;
+        return total + item.price;
+      }, 0),
+      name: `System ${systemIndex + 1}`,
+      items: state.systemItemKeyMap
+        .get(systemKey)!
+        .map((itemKey) => state.itemMap.get(itemKey)!)
+        .map((item, itemIndex) => ({
+          productId: item.productId,
+          itemNumber: `${systemIndex + 1}.${itemIndex + 1}`,
+          name: item.name,
+          description: item.description,
+          productCode: item.productCode,
+          price: 0,
+          inputs: item.inputs.map((input) => ({
+            name: input.name,
+            value: input.value,
+            displayText: input.displayText,
+            isCustomValue: input.isCustomValue,
           })),
-      })),
-      price: 0,
+        })),
+    }));
+
+    const quote: QuoteModel = {
+      name: state.name,
+      customerName: state.customerName,
+      customerEmail: state.customerEmail,
+      systems: systems,
+      price: systems.reduce((total, system) => total + system.price, 0),
     };
+
     return quote;
   });
   loaded = computed(() => this.state().loaded);
@@ -235,13 +242,18 @@ export class QuoteNewService {
             next.product,
             Object.fromEntries(defaultInputs.map((input) => [input.name, input.value])),
           );
-
           return { ...next, defaultInputs, productCode };
         }),
         switchMap((next) =>
-          this.productHttpService
-            .getProductPrice(next.product.id, next.productCode)
-            .pipe(map((price) => ({ ...next, price }))),
+          this.productHttpService.getProductPrice(next.product.id, next.productCode).pipe(
+            map((price) => ({ ...next, price })),
+            catchError((err) => {
+              // if no price match found (ie: -X product), then need to decide what to do.
+              // Maybe user should enter manual price?
+              console.error('Error getting price', err);
+              return of({ ...next, price: 0 });
+            }),
+          ),
         ),
         takeUntilDestroyed(),
       )
