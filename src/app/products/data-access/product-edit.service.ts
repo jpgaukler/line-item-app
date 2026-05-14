@@ -1,7 +1,7 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { map, Subject, switchMap, tap } from 'rxjs';
+import { Subject, switchMap } from 'rxjs';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
 import { Product } from '../interfaces/product.interface';
 
@@ -18,7 +18,13 @@ export class ProductEditService {
 
   // state
   private state = signal<ProductEditState>({
-    product: { id: '', name: '', description: '', productCodeFormula: '', inputs: [] },
+    product: {
+      id: '',
+      name: '',
+      description: '',
+      productCodeFormula: '',
+      inputs: [],
+    },
     loaded: false,
     error: null,
   });
@@ -47,23 +53,15 @@ export class ProductEditService {
       error: (err) => this.state.update((state) => ({ ...state, error: err })),
     });
 
-    this.updateProduct$
-      .pipe(
-        takeUntilDestroyed(),
-        switchMap((product) =>
-          this.productHttpService
-            .saveProduct(product)
-            .pipe(map((response) => ({ product, response }))),
-        ),
-        tap(({ product, response }) => {
-          console.log('updated product', product);
-        }),
-      )
-      .subscribe((result) => {
-        this.state.update((state) => ({
-          ...state,
-          product: result.product,
-        }));
-      });
+    this.updateProduct$.pipe(takeUntilDestroyed()).subscribe((next) => {
+      this.state.update((state) => ({ ...state, product: next }));
+    });
+
+    // effects
+    effect(() => {
+      if (this.loaded()) {
+        this.productHttpService.saveProduct(this.product());
+      }
+    });
   }
 }

@@ -21,7 +21,7 @@
     @for (product of productListService.products(); track product.name) {
       <a
         class="bg-card border-border hover:border-primary w-64 rounded-md border p-2 hover:shadow-md"
-        [routerLink]="['/products', product.id]"
+        [routerLink]="['/products', product.id, 'edit']"
       >
         <div class="mb-2 text-lg font-bold">{{ product.name }}</div>
         <div>{{ product.description }}</div>

@@ -1,0 +1,62 @@
+@if (productEditPriceDictionaryService.error()) {
+  <p class="text-destructive">Error: {{ productEditPriceDictionaryService.error() }}</p>
+}
+
+@if (!productEditPriceDictionaryService.loaded()) {
+  <p>Loading...</p>
+} @else {
+  <button appButton type="button" (click)="showDebug.set(!showDebug())">Toggle Debug</button>
+  @if (showDebug()) {
+    <div class="bg-sidebar mt-8 border p-4">
+      <h3 class="font-bold">Debug Form Value:</h3>
+      <pre>{{ productEditPriceDictionaryService.productCodePriceDictionary() | json }}</pre>
+      <button
+        class="hover:bg-input cursor-pointer rounded-md border p-2"
+        (click)="calculateJsonSize()"
+      >
+        Calculate size
+      </button>
+    </div>
+  }
+
+  <p class="text-destructive font-semibold">
+    {{ productEditPriceDictionaryService.productCodeHash() }}
+  </p>
+  <p class="text-destructive font-semibold">
+    {{ productEditPriceDictionaryService.productCodePriceDictionary().productCodeHash }}
+  </p>
+  @if (
+    productEditPriceDictionaryService.productCodeHash() !==
+    productEditPriceDictionaryService.productCodePriceDictionary().productCodeHash
+  ) {
+    <p class="text-destructive font-semibold">Prices need to be regenerated!</p>
+  }
+
+  <div class="flex flex-col gap-4">
+    <button
+      appButton
+      (click)="productEditPriceDictionaryService.generateProductCodePriceDictionary$.next()"
+    >
+      Generate
+    </button>
+    <p>Total Variations: {{ productCodePrices().length }}</p>
+    @for (entry of productCodePrices(); track entry.productCode) {
+      <div class="flex flex-row justify-between gap-2">
+        <p class="font-semibold">{{ entry.productCode }}</p>
+        <input
+          type="number"
+          class="hover:bg-input focus:bg-input rounded-md p-2 text-right"
+          placeholder="$0.00"
+          [ngModel]="entry.price"
+          (ngModelChange)="
+            productEditPriceDictionaryService.updatePrice$.next({
+              productCode: entry.productCode,
+              price: $event,
+            })
+          "
+        />
+      </div>
+      <hr />
+    }
+  </div>
+}

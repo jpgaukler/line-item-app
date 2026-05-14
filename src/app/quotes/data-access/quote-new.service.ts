@@ -2,18 +2,23 @@ import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, filter, Subject } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  of,
+  Subject,
+  switchMap,
+} from 'rxjs';
 import { Product } from '../../products/interfaces/product.interface';
+import { calculateProductCode } from '../../products/utils/product-utils';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
 import { QuoteItemInput } from '../interfaces/quote-item-input.interface';
 import { QuoteItem, QuoteItemKey } from '../interfaces/quote-item.interface';
+import { QuoteModel } from '../interfaces/quote-model.interface';
 import { QuoteSystem, QuoteSystemKey } from '../interfaces/quote-system.interface';
-import { QuoteModel } from '../interfaces/quote.interface';
-import { evaluateProductCodeFormula } from '../utils/quote-utils';
-
-// type ProductKey = `${string}::${number}`;
-
-// export const toProductKey = (productId: string, version: number) => `${productId}::${version}`;
 
 interface QuoteNewState {
   /** User defined name for the quote */
@@ -79,42 +84,47 @@ export class QuoteNewService {
   // selectors
   products = computed(() => this.state().products.sort((a, b) => a.name.localeCompare(b.name)));
   productMap = computed(() => this.state().productMap);
-
   systemMap = computed(() => this.state().systemMap);
   showAddItem = computed(() => this.state().showAddItem);
   systemItemKeyMap = computed(() => this.state().systemItemKeyMap);
   itemMap = computed(() => this.state().itemMap);
   quote = computed(() => {
-    const quote: QuoteModel = {
-      name: this.state().name,
-      customerName: this.state().customerName,
-      customerEmail: this.state().customerEmail,
-      systems: Array.from(this.state().systemMap.entries(), ([systemKey, system], systemIndex) => ({
-        price: system.price,
-        name: `System ${systemIndex + 1}`,
-        items: this.state()
-          .systemItemKeyMap.get(systemKey)!
-          .map((itemKey) => this.state().itemMap.get(itemKey)!)
-          .map((item, itemIndex) => ({
-            productId: item.productId,
-            itemNumber: `${systemIndex + 1}.${itemIndex + 1}`,
-            name: item.name,
-            description: item.description,
-            productCode: item.productCode,
-            price: 0,
-            inputs: item.inputs.map((input) => ({
-              name: input.name,
-              value: input.value,
-              displayText: input.displayText,
-              isCustomValue: input.isCustomValue,
-            })),
+    const state = this.state();
+    const systems = Array.from(state.systemMap.entries(), ([systemKey, system], systemIndex) => ({
+      price: state.systemItemKeyMap.get(systemKey)!.reduce((total, itemKey) => {
+        const item = state.itemMap.get(itemKey)!;
+        return total + item.price;
+      }, 0),
+      name: `System ${systemIndex + 1}`,
+      items: state.systemItemKeyMap
+        .get(systemKey)!
+        .map((itemKey) => state.itemMap.get(itemKey)!)
+        .map((item, itemIndex) => ({
+          productId: item.productId,
+          itemNumber: `${systemIndex + 1}.${itemIndex + 1}`,
+          name: item.name,
+          description: item.description,
+          productCode: item.productCode,
+          price: 0,
+          inputs: item.inputs.map((input) => ({
+            name: input.name,
+            value: input.value,
+            displayText: input.displayText,
+            isCustomValue: input.isCustomValue,
           })),
-      })),
-      price: 0,
+        })),
+    }));
+
+    const quote: QuoteModel = {
+      name: state.name,
+      customerName: state.customerName,
+      customerEmail: state.customerEmail,
+      systems: systems,
+      price: systems.reduce((total, system) => total + system.price, 0),
     };
+
     return quote;
   });
-
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
 
@@ -220,23 +230,43 @@ export class QuoteNewService {
     });
 
     this.addItem$
-      .pipe(takeUntilDestroyed())
-      .subscribe((next: { systemKey: QuoteSystemKey; product: Product }) => {
-        this.state.update((state) => {
-          const newItemKey: QuoteItemKey = crypto.randomUUID();
+      .pipe(
+        map((next) => {
           const defaultInputs: QuoteItemInput[] = next.product.inputs.map((input) => ({
             name: input.name,
             value: input.options[input.defaultOptionIndex].value,
             displayText: input.options[input.defaultOptionIndex].displayText,
             isCustomValue: false,
           }));
+          const productCode: string = calculateProductCode(
+            next.product,
+            Object.fromEntries(defaultInputs.map((input) => [input.name, input.value])),
+          );
+          return { ...next, defaultInputs, productCode };
+        }),
+        switchMap((next) =>
+          this.productHttpService.getProductPrice(next.product.id, next.productCode).pipe(
+            map((price) => ({ ...next, price })),
+            catchError((err) => {
+              // if no price match found (ie: -X product), then need to decide what to do.
+              // Maybe user should enter manual price?
+              console.error('Error getting price', err);
+              return of({ ...next, price: 0 });
+            }),
+          ),
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe((next) => {
+        this.state.update((state) => {
+          const newItemKey: QuoteItemKey = crypto.randomUUID();
           const newItem: QuoteItem = {
             productId: next.product.id,
             name: next.product.name,
             description: next.product.description,
-            productCode: evaluateProductCodeFormula(next.product.productCodeFormula, defaultInputs),
-            price: 0,
-            inputs: defaultInputs,
+            productCode: next.productCode,
+            price: next.price,
+            inputs: next.defaultInputs,
           };
 
           const itemKeys: QuoteItemKey[] = state.systemItemKeyMap.get(next.systemKey)!;
@@ -256,20 +286,36 @@ export class QuoteNewService {
       });
 
     this.updateItem$
-      .pipe(takeUntilDestroyed())
-      .subscribe((next: { itemKey: QuoteItemKey; updatedItem: QuoteItem }) => {
-        this.state.update((state) => {
-          return {
+      .pipe(
+        switchMap((next) =>
+          this.productHttpService
+            .getProductPrice(next.updatedItem.productId, next.updatedItem.productCode)
+            .pipe(
+              map((price) => ({ ...next, updatedItem: { ...next.updatedItem, price: price } })),
+              catchError((err) => {
+                // if no price match found (ie: -X product), then need to decide what to do.
+                // Maybe user should enter manual price?
+                console.error('Error getting price', err);
+                return of(next);
+              }),
+            ),
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe({
+        next: (next) => {
+          this.state.update((state) => ({
             ...state,
             itemMap: new Map([...state.itemMap, [next.itemKey, { ...next.updatedItem }]]),
-          };
-        });
+          }));
+        },
+        error: (err) => this.state.update((state) => ({ ...state, error: err })),
       });
 
     this.reorderItem$
       .pipe(
-        takeUntilDestroyed(),
         filter((next) => next.previousIndex !== next.currentIndex),
+        takeUntilDestroyed(),
       )
       .subscribe(
         (next: { systemKey: QuoteSystemKey; previousIndex: number; currentIndex: number }) => {

@@ -1,3 +1,7 @@
+@if (quoteNewService.error()) {
+  <p class="text-destructive">Error loading products: {{ quoteNewService.error() }}</p>
+}
+
 <button appButton type="button" (click)="showDebug.set(!showDebug())">Toggle Debug</button>
 @if (showDebug()) {
   <div class="bg-sidebar mt-8 border p-4">
@@ -140,7 +144,7 @@
             }
           </div>
 
-          <div>
+          <div class="flex flex-row justify-between">
             <button
               type="button"
               class="text-primary hover:text-primary/70 cursor-pointer font-medium"
@@ -148,6 +152,13 @@
             >
               Add Item
             </button>
+
+            <div class="flex flex-row items-baseline gap-2">
+              <p class="text-sm tracking-widest uppercase">Subtotal</p>
+              <p class="mt-1 font-semibold">
+                {{ quoteNewService.quote().systems[systemIndex].price | currency }}
+              </p>
+            </div>
           </div>
         </div>
       }
@@ -163,42 +174,46 @@
   </div>
 
   <div
-    class="sticky top-[calc(var(--spacing-topbar-height)+1.5rem)] flex flex-col gap-6 self-start"
+    class="bg-card sticky top-[calc(var(--spacing-topbar-height)+1.5rem)] flex max-h-[calc(100dvh-var(--spacing-topbar-height)-3rem)] flex-col gap-6 overflow-auto rounded-xl border p-6 shadow-sm"
   >
-    <div class="bg-card flex flex-col gap-6 rounded-xl border p-6 shadow-sm">
-      <div class="flex flex-col gap-4 text-sm">
-        <p class="text-lg font-semibold">Quote Summary</p>
-        <div class="flex items-center justify-between">
-          <span>Systems:</span>
-          <span>1</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span>Total Products:</span>
-          <span>0</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span>Total Units:</span>
-          <span>0</span>
-        </div>
+    <div class="flex flex-col gap-4 text-sm">
+      <p class="text-lg font-semibold">Quote Summary</p>
+      <div class="flex items-center justify-between">
+        <span>Systems:</span>
+        <span>{{ quoteNewService.systemMap().size }}</span>
       </div>
-
-      <div>
-        <p class="text-sm tracking-widest uppercase">Total</p>
-        <p class="mt-1 text-3xl font-semibold">$0</p>
+      <div class="flex items-center justify-between">
+        <span>Total Products:</span>
+        <span>{{ quoteNewService.itemMap().size }}</span>
       </div>
+    </div>
 
-      <div class="flex flex-col gap-2">
-        <button type="button" appButton variant="secondary">Save as Draft</button>
-        <button type="button" appButton variant="primary">Submit Quote</button>
-      </div>
+    <div>
+      <p class="text-sm tracking-widest uppercase">Total</p>
+      <p class="mt-1 text-3xl font-semibold">{{ quoteNewService.quote().price | currency }}</p>
+    </div>
 
-      <hr />
+    <div class="flex flex-col gap-2">
+      <button type="button" appButton variant="secondary">Save as Draft</button>
+      <button type="button" appButton variant="primary">Submit Quote</button>
+    </div>
 
+    <hr />
+
+    <div class="overflow-auto">
       <p class="text-lg font-semibold">Systems Overview</p>
-      <div class="rounded-2xl border p-4">
-        <p class="text-sm font-semibold">System 1</p>
-        <p class="mt-1 text-sm">No products yet</p>
-        <p class="mt-4 text-lg font-semibold">$0</p>
+      <div class="flex flex-col gap-4">
+        @for (entry of quoteNewService.systemMap(); track entry[0]; let systemIndex = $index) {
+          @let systemKey = entry[0];
+          @let itemKeys = quoteNewService.systemItemKeyMap().get(systemKey)!;
+          <div class="flex flex-col">
+            <p class="text-sm font-semibold">System {{ systemIndex + 1 }}</p>
+            <p class="text-sm">{{ itemKeys.length }} items</p>
+            <p class="text-sm">
+              {{ quoteNewService.quote().systems[systemIndex].price | currency }}
+            </p>
+          </div>
+        }
       </div>
     </div>
   </div>

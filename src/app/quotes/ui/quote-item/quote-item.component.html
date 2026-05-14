@@ -7,6 +7,7 @@
       {{ systemIndex() + 1 }}.{{ itemIndex() + 1 }}
     </span>
     <span class="font-bold">{{ item().productCode }}</span>
+    <span class="ml-auto font-bold">{{ item().price | currency }}</span>
   </div>
   <p>{{ item().description }}</p>
   <div class="flex flex-col gap-1">

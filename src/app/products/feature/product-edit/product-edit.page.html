@@ -22,8 +22,15 @@
         >
           Copy
         </button>
+        <button
+          class="hover:bg-input cursor-pointer rounded-md border p-2"
+          (click)="calculateJsonSize()"
+        >
+          Calculate size
+        </button>
       </div>
     }
+    <a routerLink="./prices" class="cursor-pointer hover:underline">Product Codes Pricing</a>
 
     <form [formGroup]="productForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
       <div class="flex flex-row justify-between gap-4">
