@@ -20,10 +20,6 @@ import { QuoteItem, QuoteItemKey } from '../interfaces/quote-item.interface';
 import { QuoteModel } from '../interfaces/quote-model.interface';
 import { QuoteSystem, QuoteSystemKey } from '../interfaces/quote-system.interface';
 
-// type ProductKey = `${string}::${number}`;
-
-// export const toProductKey = (productId: string, version: number) => `${productId}::${version}`;
-
 interface QuoteNewState {
   /** User defined name for the quote */
   name: string;
@@ -88,7 +84,6 @@ export class QuoteNewService {
   // selectors
   products = computed(() => this.state().products.sort((a, b) => a.name.localeCompare(b.name)));
   productMap = computed(() => this.state().productMap);
-
   systemMap = computed(() => this.state().systemMap);
   showAddItem = computed(() => this.state().showAddItem);
   systemItemKeyMap = computed(() => this.state().systemItemKeyMap);
@@ -123,7 +118,6 @@ export class QuoteNewService {
     };
     return quote;
   });
-
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
 
