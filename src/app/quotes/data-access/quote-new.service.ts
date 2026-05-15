@@ -93,10 +93,9 @@ export class QuoteNewService {
   quote = computed(() => {
     const state = this.state();
     const systems = Array.from(state.systemMap.entries(), ([systemKey, system], systemIndex) => ({
-      price: state.systemItemKeyMap.get(systemKey)!.reduce((total, itemKey) => {
-        const item = state.itemMap.get(itemKey)!;
-        return total + item.price;
-      }, 0),
+      price: state.systemItemKeyMap
+        .get(systemKey)!
+        .reduce((total, itemKey) => total + state.itemMap.get(itemKey)!.price, 0),
       name: `System ${systemIndex + 1}`,
       items: state.systemItemKeyMap
         .get(systemKey)!
@@ -107,12 +106,11 @@ export class QuoteNewService {
           name: item.name,
           description: item.description,
           productCode: item.productCode,
-          price: 0,
+          price: item.price,
           inputs: item.inputs.map((input) => ({
             name: input.name,
             value: input.value,
             displayText: input.displayText,
-            isCustomValue: input.isCustomValue,
           })),
         })),
     }));
