@@ -82,7 +82,9 @@ export class QuoteNewService {
   );
 
   // selectors
-  products = computed(() => this.state().products.sort((a, b) => a.name.localeCompare(b.name)));
+  products = computed(() =>
+    [...this.state().products].sort((a, b) => a.name.localeCompare(b.name)),
+  );
   productMap = computed(() => this.state().productMap);
   systemMap = computed(() => this.state().systemMap);
   showAddItem = computed(() => this.state().showAddItem);
