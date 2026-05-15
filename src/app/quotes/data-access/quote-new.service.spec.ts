@@ -70,7 +70,10 @@ describe('QuoteNewService', () => {
         QuoteNewService,
         {
           provide: ProductHttpService,
-          useValue: { getProducts: () => of(mockProducts) },
+          useValue: {
+            getProducts: () => of(mockProducts),
+            getProductPrice: () => of(999),
+          },
         },
       ],
       teardown: { destroyAfterEach: false },
@@ -83,83 +86,109 @@ describe('QuoteNewService', () => {
     expect(service).toBeTruthy();
     expect(service.loaded(), 'state is loaded').toBe(true);
     expect(service.products().length, 'products are loaded').toBe(mockProducts.length);
-    expect(service.quote().systems.length, 'quote has 1 system').toBe(1);
+    expect(service.quote().systems.length, 'quote starts with 1 system').toBe(1);
     expect(service.quote().systems[0].items.length, 'system 1 has no items').toBe(0);
+    expect(service.quote().price, 'quote has 0 price').toBe(0);
   });
 
-  it('should add an item to the default system', async () => {
+  it('should add an item to the default system', () => {
     const systemKey = service.systemMap().keys().next().value as QuoteSystemKey;
+    const product = mockProducts[0];
 
-    service.addItem$.next({ systemKey, product: mockProducts[0] });
+    service.addItem$.next({ systemKey, product: product });
 
-    const itemKeys = service.systemItemKeyMap().get(systemKey)!;
-    const item = service.itemMap().get(itemKeys[0])!;
+    const system1 = service.quote().systems[0];
+    const item1 = service.quote().systems[0].items[0];
 
-    expect(service.quote().systems[0].items.length, 'system 1 has 1 item').toBe(1);
-    expect(service.productMap().size, 'product map has 1 product').toBe(1);
-    expect(item.productCode, 'item has default product code').toBe('SKU-RED');
+    expect(system1.items.length, 'system 1 has 1 item').toBe(1);
+    expect(item1.itemNumber, 'item number is 1.1').toBe('1.1');
+    expect(item1.name, 'item has product name').toBe(product.name);
+    expect(item1.description, 'item has product description').toBe(product.description);
+    expect(item1.productCode, 'item has default product code').toBe('SKU-RED');
+    expect(item1.price, 'item price is greater than 0').toBeGreaterThan(0);
   });
 
-  it('should update the item', () => {
+  it('should update the item description', () => {
     const systemKey = service.systemMap().keys().next().value as QuoteSystemKey;
     const itemKey = service.systemItemKeyMap().get(systemKey)![0];
+    const currentItem = service.itemMap().get(itemKey)!;
+    const newDescription = 'New item description';
 
     service.updateItem$.next({
       itemKey,
       updatedItem: {
-        ...service.itemMap().get(itemKey)!,
-        description: 'Updated test description',
+        ...currentItem,
+        description: newDescription,
       },
     });
 
-    const updatedItem = service.itemMap().get(itemKey)!;
-    expect(updatedItem.description, 'item description is updated').toBe('Updated test description');
+    const updatedItem = service.quote().systems[0].items[0];
+    expect(updatedItem.description, 'item description is updated').toBe(newDescription);
   });
 
   it('should add a second item', () => {
     const systemKey = service.systemMap().keys().next().value as QuoteSystemKey;
-    service.addItem$.next({ systemKey, product: mockProducts[1] });
+    const product = mockProducts[1];
 
-    const itemKeys = service.systemItemKeyMap().get(systemKey)!;
-    const item = service.itemMap().get(itemKeys[1])!;
+    service.addItem$.next({ systemKey, product: product });
 
-    expect(service.quote().systems[0].items.length, 'system 1 has 2 items').toBe(2);
-    expect(service.itemMap().size, 'item map has 2 items').toBe(2);
-    expect(service.productMap().size, 'product map has 2 products').toBe(2);
-    expect(item.productCode, 'item has default product code').toBe('SKU-LRG');
+    const system1 = service.quote().systems[0];
+    const item2 = service.quote().systems[0].items[1];
+
+    expect(system1.items.length, 'system 1 has 2 items').toBe(2);
+    expect(item2.itemNumber, 'item number is 1.2').toBe('1.2');
+    expect(item2.name, 'item has product name').toBe(product.name);
+    expect(item2.description, 'item has product description').toBe(product.description);
+    expect(item2.productCode, 'item has default product code').toBe('SKU-LRG');
+    expect(item2.price, 'item price is greater than 0').toBeGreaterThan(0);
   });
 
   it('should add a third item', () => {
     const systemKey = service.systemMap().keys().next().value as QuoteSystemKey;
-    service.addItem$.next({ systemKey, product: mockProducts[2] });
+    const product = mockProducts[2];
 
-    const itemKeys = service.systemItemKeyMap().get(systemKey)!;
-    const item = service.itemMap().get(itemKeys[2])!;
+    service.addItem$.next({ systemKey, product: product });
 
-    expect(service.quote().systems[0].items.length, 'system 1 has 3 items').toBe(3);
-    expect(service.itemMap().size, 'item map has 3 items').toBe(3);
-    expect(service.productMap().size, 'product map has 3 products').toBe(3);
-    expect(item.productCode, 'item has default product code').toBe('SKU-1');
+    const system1 = service.quote().systems[0];
+    const item3 = service.quote().systems[0].items[2];
+
+    expect(system1.items.length, 'system 1 has 3 items').toBe(3);
+    expect(item3.itemNumber, 'item number is 1.3').toBe('1.3');
+    expect(item3.name, 'item has product name').toBe(product.name);
+    expect(item3.description, 'item has product description').toBe(product.description);
+    expect(item3.productCode, 'item has default product code').toBe('SKU-1');
+    expect(item3.price, 'item price is greater than 0').toBeGreaterThan(0);
   });
 
   it('should move the third item to the first position', () => {
     const systemKey = service.systemMap().keys().next().value as QuoteSystemKey;
-    const keysBefore = service.systemItemKeyMap().get(systemKey)!;
-    const thirdItemKey = keysBefore[2];
 
     service.reorderItem$.next({ systemKey, previousIndex: 2, currentIndex: 0 });
 
-    const keysAfter = service.systemItemKeyMap().get(systemKey)!;
-    expect(keysAfter.length, 'item keys length is 3').toBe(3);
-    expect(keysAfter[0], 'third item is moved to first position').toBe(thirdItemKey);
-    expect(keysAfter[1], 'first item is moved to second position').toBe(keysBefore[0]);
-    expect(keysAfter[2], 'second item is moved to third position').toBe(keysBefore[1]);
+    const product1 = mockProducts[0];
+    const product2 = mockProducts[1];
+    const product3 = mockProducts[2];
+
+    const item1 = service.quote().systems[0].items[0];
+    const item2 = service.quote().systems[0].items[1];
+    const item3 = service.quote().systems[0].items[2];
+
+    expect(item1.itemNumber, 'first item number is 1.1').toBe('1.1');
+    expect(item2.itemNumber, 'second item number is 1.2').toBe('1.2');
+    expect(item3.itemNumber, 'third item is 1.3').toBe('1.3');
+    expect(item1.productId, 'first item number is third product').toBe(product3.id);
+    expect(item2.productId, 'second item number is first product').toBe(product1.id);
+    expect(item3.productId, 'third item is second product').toBe(product2.id);
   });
 
   it('should add a system to the quote', () => {
     service.addSystem$.next();
+
+    const system1 = service.quote().systems[0];
+    const system2 = service.quote().systems[1];
+
     expect(service.quote().systems.length, 'quote has 2 systems').toBe(2);
-    expect(service.quote().systems[0].items.length, 'system 1 has 3 items').toBe(3);
-    expect(service.quote().systems[1].items.length, 'system 2 has 0 items').toBe(0);
+    expect(system1.items.length, 'system 1 has 3 items').toBe(3);
+    expect(system2.items.length, 'system 2 has 0 items').toBe(0);
   });
 });
