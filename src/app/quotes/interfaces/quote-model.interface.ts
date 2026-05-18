@@ -17,7 +17,6 @@ export interface QuoteModel {
         name: string;
         value: string;
         displayText: string;
-        isCustomValue: boolean;
       }[];
     }[];
   }[];

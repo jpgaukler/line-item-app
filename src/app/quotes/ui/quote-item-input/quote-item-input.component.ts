@@ -27,7 +27,6 @@ export class QuoteItemInputComponent {
   selectedOptionChange(option: ProductInputOption) {
     this.quoteItemInput.update((inputs) => ({
       ...inputs,
-      isCustomValue: false,
       displayText: option.displayText,
       value: option.value,
     }));
@@ -40,18 +39,11 @@ export class QuoteItemInputComponent {
   }
 
   saveCustomClick() {
-    this.quoteItemInput.update((input) => {
-      const displayText = this.customDisplayText();
-      const value = this.customValue();
-      const existingOption = this.productInput().options.find((i) => i.value === value);
-
-      return {
-        ...input,
-        isCustomValue: existingOption === undefined,
-        displayText: displayText,
-        value: value,
-      };
-    });
+    this.quoteItemInput.update((input) => ({
+      ...input,
+      displayText: this.customDisplayText(),
+      value: this.customValue(),
+    }));
 
     this.showCustom.set(false);
   }
