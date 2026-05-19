@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, input, output, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProductInputOption } from '../../../products/interfaces/product-input-option.interface';
 import { ProductInput } from '../../../products/interfaces/product-input.interface';
+import { isCustomProductInputValue } from '../../../products/utils/product-utils';
 import { QuoteItemInput } from '../../interfaces/quote-item-input.interface';
 
 @Component({
@@ -21,6 +22,9 @@ export class QuoteItemInputDropdownComponent {
   selectedOptionChange = output<ProductInputOption>();
   dropdownOpen = signal<boolean>(false);
   showCustomClick = output();
+  isCustomValue = computed(() =>
+    isCustomProductInputValue(this.productInput(), this.quoteItemInput().value),
+  );
 
   optionClick(option: ProductInputOption) {
     this.dropdownOpen.set(false);

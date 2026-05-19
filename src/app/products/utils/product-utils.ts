@@ -61,8 +61,7 @@ export function calculateProductCode(product: Product, inputs: Record<string, st
   // append -X if there are any custom inputs
   const hasCustomOptionValue = product.inputs.some((input) => {
     const optionValue = inputs[input.name];
-    const matchingOption = input.options.find((opt) => opt.value === optionValue);
-    return !matchingOption; // If no match found, it's custom
+    return isCustomProductInputValue(input, optionValue);
   });
 
   if (hasCustomOptionValue) {
@@ -70,6 +69,17 @@ export function calculateProductCode(product: Product, inputs: Record<string, st
   }
 
   return result;
+}
+
+/**
+ * Determines if a given value is a custom value for a product input.
+ * @param productInput The product input to check.
+ * @param value The value to check.
+ * @returns True if the value is custom, false otherwise.
+ */
+export function isCustomProductInputValue(productInput: ProductInput, value: string): boolean {
+  const matchingOption = productInput.options.find((opt) => opt.value === value);
+  return !matchingOption; // If no match found, it's custom
 }
 
 /**

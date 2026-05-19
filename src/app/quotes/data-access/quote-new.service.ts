@@ -236,7 +236,6 @@ export class QuoteNewService {
             name: input.name,
             value: input.options[input.defaultOptionIndex].value,
             displayText: input.options[input.defaultOptionIndex].displayText,
-            isCustomValue: false,
           }));
           const productCode: string = calculateProductCode(
             next.product,
