@@ -23,7 +23,7 @@ export class ProductEditPriceDictionaryPage implements OnDestroy {
   productId = toSignal(this.activatedRoute.paramMap.pipe(map((params) => params.get('productId'))));
   showDebug = signal<boolean>(false);
   productCodePrices = computed(() =>
-    Object.entries(this.productEditService.productCodePriceDictionary().prices)
+    Object.entries(this.productEditService.priceDictionary().prices)
       .map(([productCode, price]) => ({
         productCode,
         price,
@@ -47,7 +47,7 @@ export class ProductEditPriceDictionaryPage implements OnDestroy {
   }
 
   calculateJsonSize() {
-    logJsonSize(this.productEditService.productCodePriceDictionary());
+    logJsonSize(this.productEditService.priceDictionary());
   }
 
   ngOnDestroy(): void {

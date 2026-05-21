@@ -3,16 +3,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin, Subject, switchMap } from 'rxjs';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
 import { ProductAdder } from '../interfaces/product-adder.interface';
-import {
-  ProductCode,
-  ProductCodePriceDictionary,
-} from '../interfaces/product-code-price-dictionary';
+import { ProductCode, ProductPriceDictionary } from '../interfaces/product-code-price-dictionary';
 import { Product } from '../interfaces/product.interface';
 import { buildProductCodeHash, generateProductCodes } from '../utils/product-utils';
 
 interface ProductEditState {
   product: Product;
-  productCodePriceDictionary: ProductCodePriceDictionary;
+  priceDictionary: ProductPriceDictionary;
   loaded: boolean;
   error: string | null;
 }
@@ -31,7 +28,7 @@ export class ProductEditService {
       inputs: [],
       adders: [],
     },
-    productCodePriceDictionary: {
+    priceDictionary: {
       productId: '',
       productCodeHash: '',
       prices: {},
@@ -42,7 +39,7 @@ export class ProductEditService {
 
   // selectors
   product = computed(() => this.state().product);
-  productCodePriceDictionary = computed(() => this.state().productCodePriceDictionary);
+  priceDictionary = computed(() => this.state().priceDictionary);
   productCodeHash = computed(() => buildProductCodeHash(this.state().product));
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
@@ -51,7 +48,7 @@ export class ProductEditService {
   loadProduct$ = new Subject<{ productId: string }>();
   updateProduct$ = new Subject<Product>();
   updateAdder$ = new Subject<{ index: number; adder: ProductAdder }>();
-  generateProductCodePriceDictionary$ = new Subject<void>();
+  generatePriceDictionary$ = new Subject<void>();
   updatePrice$ = new Subject<{ productCode: string; price: number }>();
 
   constructor() {
@@ -61,8 +58,7 @@ export class ProductEditService {
         switchMap((next) =>
           forkJoin({
             product: this.productHttpService.getProductById(next.productId),
-            productCodePriceDictionary:
-              this.productHttpService.getProductCodePriceDictionaryByProductId(next.productId),
+            priceDictionary: this.productHttpService.getPriceDictionaryByProductId(next.productId),
           }),
         ),
         takeUntilDestroyed(),
@@ -72,8 +68,8 @@ export class ProductEditService {
           this.state.update((state) => ({
             ...state,
             product: data.product,
-            productCodePriceDictionary: data.productCodePriceDictionary ?? {
-              ...state.productCodePriceDictionary,
+            priceDictionary: data.priceDictionary ?? {
+              ...state.priceDictionary,
               productId: data.product.id,
             },
             loaded: true,
@@ -86,20 +82,20 @@ export class ProductEditService {
       this.state.update((state) => ({ ...state, product: next }));
     });
 
-    this.generateProductCodePriceDictionary$.pipe(takeUntilDestroyed()).subscribe(() => {
+    this.generatePriceDictionary$.pipe(takeUntilDestroyed()).subscribe(() => {
       this.state.update((state) => {
         const productCodes: string[] = generateProductCodes(state.product);
         const prices: Record<ProductCode, number> = Object.fromEntries(
           productCodes.map((productCode) => [
             productCode,
-            state.productCodePriceDictionary?.prices[productCode] ?? 0,
+            state.priceDictionary?.prices[productCode] ?? 0,
           ]),
         );
 
         return {
           ...state,
-          productCodePriceDictionary: {
-            ...state.productCodePriceDictionary,
+          priceDictionary: {
+            ...state.priceDictionary,
             productId: state.product.id,
             productCodeHash: buildProductCodeHash(this.state().product),
             prices: prices,
@@ -111,14 +107,14 @@ export class ProductEditService {
     this.updatePrice$.pipe(takeUntilDestroyed()).subscribe((next) => {
       this.state.update((state) => {
         const updatedPrices: Record<ProductCode, number> = {
-          ...state.productCodePriceDictionary.prices,
+          ...state.priceDictionary.prices,
           [next.productCode]: next.price,
         };
 
         return {
           ...state,
-          productCodePriceDictionary: {
-            ...state.productCodePriceDictionary,
+          priceDictionary: {
+            ...state.priceDictionary,
             prices: updatedPrices,
           },
         };
@@ -143,7 +139,7 @@ export class ProductEditService {
         return;
       }
 
-      const dictionary = this.productCodePriceDictionary();
+      const dictionary = this.priceDictionary();
       const product = this.product();
 
       if (product) {
@@ -151,7 +147,7 @@ export class ProductEditService {
       }
 
       if (dictionary) {
-        this.productHttpService.saveProductCodePriceDictionary(dictionary);
+        this.productHttpService.savePriceDictionary(dictionary);
       }
     });
   }

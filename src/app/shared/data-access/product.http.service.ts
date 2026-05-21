@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { delay, map, Observable, of, switchMap, tap } from 'rxjs';
-import { ProductCodePriceDictionary } from '../../products/interfaces/product-code-price-dictionary';
+import { ProductPriceDictionary } from '../../products/interfaces/product-code-price-dictionary';
 import { Product } from '../../products/interfaces/product.interface';
 import { LocalStorageService } from './local-storage.service';
 
@@ -28,22 +28,19 @@ export class ProductHttpService {
     this.localStorageService.setJson('products', updatedProducts);
   }
 
-  saveProductCodePriceDictionary(productCodePriceDictionary: ProductCodePriceDictionary): void {
+  savePriceDictionary(priceDictionary: ProductPriceDictionary): void {
     const localStorageKey: string = 'product-code-price-dictionaries';
 
-    const data =
-      this.localStorageService.getJson<ProductCodePriceDictionary[]>(localStorageKey) || [];
+    const data = this.localStorageService.getJson<ProductPriceDictionary[]>(localStorageKey) || [];
 
-    let updatedData: ProductCodePriceDictionary[] = [];
+    let updatedData: ProductPriceDictionary[] = [];
 
-    if (data.some((i) => i.productId === productCodePriceDictionary.productId)) {
+    if (data.some((i) => i.productId === priceDictionary.productId)) {
       updatedData = data.map((dictionary) =>
-        dictionary.productId === productCodePriceDictionary.productId
-          ? productCodePriceDictionary
-          : dictionary,
+        dictionary.productId === priceDictionary.productId ? priceDictionary : dictionary,
       );
     } else {
-      updatedData = [...data, productCodePriceDictionary];
+      updatedData = [...data, priceDictionary];
     }
 
     console.log('updated', updatedData);
@@ -95,37 +92,31 @@ export class ProductHttpService {
     );
   }
 
-  getProductCodePriceDictionaryByProductId(
-    productId: string,
-  ): Observable<ProductCodePriceDictionary | null> {
-    return this.localStorageService
-      .loadJson<ProductCodePriceDictionary[]>('product-code-price-dictionaries')
-      .pipe(
-        delay(500),
-        map((dictionaries) => {
-          const dictionary = dictionaries?.find((d) => d.productId === productId);
-          if (!dictionary) {
-            return null;
-          } else {
-            return dictionary;
-          }
-        }),
-      );
+  getPriceDictionaryByProductId(productId: string): Observable<ProductPriceDictionary | null> {
+    return this.localStorageService.loadJson<ProductPriceDictionary[]>('price-dictionaries').pipe(
+      delay(500),
+      map((dictionaries) => {
+        const dictionary = dictionaries?.find((d) => d.productId === productId);
+        if (!dictionary) {
+          return null;
+        } else {
+          return dictionary;
+        }
+      }),
+    );
   }
 
   getProductPrice(productId: string, productCode: string): Observable<number> {
-    return this.localStorageService
-      .loadJson<ProductCodePriceDictionary[]>('product-code-price-dictionaries')
-      .pipe(
-        map((dictionaries) => {
-          const price = dictionaries?.find((d) => d.productId === productId)?.prices[productCode];
+    return this.localStorageService.loadJson<ProductPriceDictionary[]>('price-dictionaries').pipe(
+      map((dictionaries) => {
+        const price = dictionaries?.find((d) => d.productId === productId)?.prices[productCode];
 
-          if (!price) {
-            throw new Error('Product price could not be determined!');
-          }
+        if (!price) {
+          throw new Error('Product price could not be determined!');
+        }
 
-          return price;
-        }),
-      );
+        return price;
+      }),
+    );
   }
 }

@@ -9,7 +9,7 @@
   @if (showDebug()) {
     <div class="bg-sidebar mt-8 border p-4">
       <h3 class="font-bold">Debug Form Value:</h3>
-      <pre>{{ productEditService.productCodePriceDictionary() | json }}</pre>
+      <pre>{{ productEditService.priceDictionary() | json }}</pre>
       <button
         class="hover:bg-input cursor-pointer rounded-md border p-2"
         (click)="calculateJsonSize()"
@@ -23,19 +23,16 @@
     {{ productEditService.productCodeHash() }}
   </p>
   <p class="text-destructive font-semibold">
-    {{ productEditService.productCodePriceDictionary().productCodeHash }}
+    {{ productEditService.priceDictionary().productCodeHash }}
   </p>
   @if (
-    productEditService.productCodeHash() !==
-    productEditService.productCodePriceDictionary().productCodeHash
+    productEditService.productCodeHash() !== productEditService.priceDictionary().productCodeHash
   ) {
     <p class="text-destructive font-semibold">Prices need to be regenerated!</p>
   }
 
   <div class="flex flex-col gap-4">
-    <button appButton (click)="productEditService.generateProductCodePriceDictionary$.next()">
-      Generate
-    </button>
+    <button appButton (click)="productEditService.generatePriceDictionary$.next()">Generate</button>
     <p>Total Variations: {{ productCodePrices().length }}</p>
     @for (entry of productCodePrices(); track entry.productCode) {
       <div class="flex flex-row justify-between gap-2">
