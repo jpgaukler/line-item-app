@@ -5,6 +5,7 @@ import { ProductEditPriceDictionaryPage } from './products/feature/product-edit-
 import { ProductEditPage } from './products/feature/product-edit/product-edit.page';
 import { ProductListPage } from './products/feature/product-list/product-list.page';
 import { ProductNewPage } from './products/feature/product-new/product-new.page';
+import { ProfileEditComponent } from './profile/feature/profile-edit/profile-edit.component';
 import { QuoteNewPage } from './quotes/feature/quote-new/quote-new.page';
 
 export const routes: Routes = [
@@ -46,6 +47,13 @@ export const routes: Routes = [
         path: 'preferences',
         title: 'Preferences • Line-Item',
         component: PreferencesPage,
+      },
+
+      // profile
+      {
+        path: 'profile',
+        title: 'Profile • Line-Item',
+        component: ProfileEditComponent,
       },
 
       // { path: '**', redirectTo: 'home' }, // catch-all for unknown routes, redirect to home

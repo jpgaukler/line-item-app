@@ -1,0 +1,27 @@
+@if (authService.error()) {
+  <p class="text-destructive">Error: {{ authService.error() }}</p>
+}
+
+<h1 class="text-2xl font-semibold">Edit Profile</h1>
+
+@if (!authService.loaded()) {
+  <p>Loading...</p>
+} @else {
+  @if (!authService.isAuthenticated()) {
+    <p>You are not authenticated. Please log in or sign up.</p>
+
+    <div class="flex flex-col gap-3">
+      <button appButton (click)="authService.signup$.next()">Sign Up</button>
+      <button appButton (click)="authService.login$.next()">Log In</button>
+    </div>
+  } @else {
+    <div>IsAuthenticated: {{ authService.isAuthenticated() }}</div>
+
+    <div class="bg-sidebar mt-8 border p-4">
+      <h3 class="font-bold">User:</h3>
+      <pre>{{ authService.user() | json }}</pre>
+    </div>
+
+    <button appButton (click)="authService.logout$.next()">Logout</button>
+  }
+}
