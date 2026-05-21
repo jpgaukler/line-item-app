@@ -1,0 +1,22 @@
+@if (productEditService.error()) {
+  <p class="text-destructive">Error: {{ productEditService.error() }}</p>
+}
+
+@if (!productEditService.loaded()) {
+  <p>Loading...</p>
+} @else {
+  <div class="flex flex-col gap-4">
+    <!-- Product Info Display -->
+    <div class="flex flex-col gap-2 rounded-md bg-sidebar p-4">
+      <h2 class="text-lg font-bold">{{ productEditService.product().name }}</h2>
+      <p class="text-sm text-muted-foreground">{{ productEditService.product().description }}</p>
+      <p class="text-sm">Product ID: {{ productEditService.product().id }}</p>
+    </div>
+
+    <!-- Adders Section (Placeholder) -->
+    <div class="flex flex-col gap-2 rounded-md border p-4">
+      <h3 class="font-bold">Adders</h3>
+      <p class="text-sm text-muted-foreground">Adders management section will be added here</p>
+    </div>
+  </div>
+}

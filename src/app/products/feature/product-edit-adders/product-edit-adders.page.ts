@@ -1,0 +1,41 @@
+import { CommonModule } from '@angular/common';
+import { Component, effect, inject, OnDestroy } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs';
+import { LayoutService } from '../../../layout/data-access/layout.service';
+import { ProductEditService } from '../../data-access/product-edit.service';
+
+@Component({
+  selector: 'app-product-edit-adders',
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  providers: [ProductEditService],
+  templateUrl: './product-edit-adders.page.html',
+})
+export class ProductEditAddersPage implements OnDestroy {
+  private readonly layoutService = inject(LayoutService);
+  public readonly productEditService = inject(ProductEditService);
+  private readonly activatedRoute = inject(ActivatedRoute);
+
+  productId = toSignal(this.activatedRoute.paramMap.pipe(map((params) => params.get('productId'))));
+
+  constructor() {
+    this.layoutService.updateBreadcrumbs$.next([
+      { label: 'Home', url: '/' },
+      { label: 'Products', url: '/products' },
+    ]);
+
+    effect(() => {
+      const productId = this.productId();
+
+      if (productId) {
+        this.productEditService.loadProduct$.next({ productId });
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.layoutService.clearBreadcrumbs$.next();
+  }
+}

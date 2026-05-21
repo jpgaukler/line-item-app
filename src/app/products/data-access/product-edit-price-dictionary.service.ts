@@ -31,6 +31,7 @@ export class ProductEditPriceDictionaryService {
       description: '',
       productCodeFormula: '',
       inputs: [],
+      adders: [],
     },
     productCodeHash: '',
     productCodePriceDictionary: {

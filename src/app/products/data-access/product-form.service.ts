@@ -49,6 +49,7 @@ export class ProductFormService {
         ...input,
         options: options.map(({ controlId, ...option }) => option),
       })),
+      adders: [],
     };
   }
 

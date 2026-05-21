@@ -58,6 +58,7 @@ export class ProductListService {
             description: next.description,
             productCodeFormula: '',
             inputs: [],
+            adders: [],
           },
         ],
       })),

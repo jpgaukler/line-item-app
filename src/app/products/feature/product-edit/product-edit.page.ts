@@ -2,8 +2,10 @@ import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { map } from 'rxjs';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { logJsonSize } from '../../../shared/utils/data-utils';
@@ -36,11 +38,13 @@ export class ProductEditPage implements OnDestroy {
   private readonly layoutService = inject(LayoutService);
   private readonly productFormService = inject(ProductFormService);
   public readonly productEditService = inject(ProductEditService);
+  private readonly activatedRoute = inject(ActivatedRoute);
 
   showDebug = signal<boolean>(false);
 
   maxNameLength = MAX_PRODUCT_NAME_LENGTH;
   maxDescriptionLength = MAX_PRODUCT_DESCRIPTION_LENGTH;
+  productId = toSignal(this.activatedRoute.paramMap.pipe(map((params) => params.get('productId'))));
 
   productForm: FormGroup<ProductForm> = this.productFormService.toProductForm({
     id: '',
@@ -48,6 +52,7 @@ export class ProductEditPage implements OnDestroy {
     description: '',
     productCodeFormula: '',
     inputs: [],
+    adders: [],
   });
 
   get inputsArray() {
@@ -71,6 +76,14 @@ export class ProductEditPage implements OnDestroy {
     effect(() => {
       if (this.productEditService.loaded()) {
         this.initializeProductForm(this.productEditService.product());
+      }
+    });
+
+    effect(() => {
+      const productId = this.productId();
+
+      if (productId) {
+        this.productEditService.loadProduct$.next({ productId });
       }
     });
   }
