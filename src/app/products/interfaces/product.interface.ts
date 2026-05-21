@@ -1,3 +1,4 @@
+import { ProductAdder } from './product-adder.interface';
 import { ProductInput } from './product-input.interface';
 
 export interface Product {
@@ -6,6 +7,7 @@ export interface Product {
   description: string;
   productCodeFormula: string;
   inputs: ProductInput[];
+  adders: ProductAdder[];
 }
 
 export const MAX_PRODUCT_NAME_LENGTH = 30;
