@@ -18,6 +18,5 @@ export class LayoutSidebarComponent {
     { label: 'Products', route: '/products' },
     { label: 'New Quote', route: '/quotes/new' },
     { label: 'Preferences', route: '/preferences' },
-    { label: 'Profile', route: '/profile' },
   ];
 }

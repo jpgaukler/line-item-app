@@ -19,7 +19,7 @@
 
     <div class="bg-sidebar mt-8 border p-4">
       <h3 class="font-bold">User:</h3>
-      <div>{{ authService.user() | json }}</div>
+      <pre>{{ authService.user() | json }}</pre>
     </div>
 
     <button appButton (click)="authService.logout$.next()">Logout</button>
