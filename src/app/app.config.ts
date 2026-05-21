@@ -1,3 +1,4 @@
+import { provideHttpClient } from '@angular/common/http';
 import {
   ApplicationConfig,
   inject,
@@ -31,6 +32,7 @@ export const appConfig: ApplicationConfig = {
     provideEnvironmentInitializer(() => {
       inject(AuthService); // inject AuthService before bootstrap to handle Auth0 redirects
     }),
+    provideHttpClient(),
     // provideHttpClient(withInterceptors([authHttpInterceptorFn])),
   ],
 };
