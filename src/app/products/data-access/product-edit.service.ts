@@ -1,12 +1,18 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, switchMap } from 'rxjs';
+import { forkJoin, Subject, switchMap } from 'rxjs';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
 import { ProductAdder } from '../interfaces/product-adder.interface';
+import {
+  ProductCode,
+  ProductCodePriceDictionary,
+} from '../interfaces/product-code-price-dictionary';
 import { Product } from '../interfaces/product.interface';
+import { buildProductCodeHash, generateProductCodes } from '../utils/product-utils';
 
 interface ProductEditState {
   product: Product;
+  productCodePriceDictionary: ProductCodePriceDictionary;
   loaded: boolean;
   error: string | null;
 }
@@ -25,12 +31,19 @@ export class ProductEditService {
       inputs: [],
       adders: [],
     },
+    productCodePriceDictionary: {
+      productId: '',
+      productCodeHash: '',
+      prices: {},
+    },
     loaded: false,
     error: null,
   });
 
   // selectors
   product = computed(() => this.state().product);
+  productCodePriceDictionary = computed(() => this.state().productCodePriceDictionary);
+  productCodeHash = computed(() => buildProductCodeHash(this.state().product));
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
 
@@ -38,19 +51,31 @@ export class ProductEditService {
   loadProduct$ = new Subject<{ productId: string }>();
   updateProduct$ = new Subject<Product>();
   updateAdder$ = new Subject<{ index: number; adder: ProductAdder }>();
+  generateProductCodePriceDictionary$ = new Subject<void>();
+  updatePrice$ = new Subject<{ productCode: string; price: number }>();
 
   constructor() {
     // reducers
     this.loadProduct$
       .pipe(
-        switchMap((next) => this.productHttpService.getProductById(next.productId)),
+        switchMap((next) =>
+          forkJoin({
+            product: this.productHttpService.getProductById(next.productId),
+            productCodePriceDictionary:
+              this.productHttpService.getProductCodePriceDictionaryByProductId(next.productId),
+          }),
+        ),
         takeUntilDestroyed(),
       )
       .subscribe({
-        next: (product: Product) => {
+        next: (data) => {
           this.state.update((state) => ({
             ...state,
-            product: product,
+            product: data.product,
+            productCodePriceDictionary: data.productCodePriceDictionary ?? {
+              ...state.productCodePriceDictionary,
+              productId: data.product.id,
+            },
             loaded: true,
           }));
         },
@@ -59,6 +84,45 @@ export class ProductEditService {
 
     this.updateProduct$.pipe(takeUntilDestroyed()).subscribe((next) => {
       this.state.update((state) => ({ ...state, product: next }));
+    });
+
+    this.generateProductCodePriceDictionary$.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.state.update((state) => {
+        const productCodes: string[] = generateProductCodes(state.product);
+        const prices: Record<ProductCode, number> = Object.fromEntries(
+          productCodes.map((productCode) => [
+            productCode,
+            state.productCodePriceDictionary?.prices[productCode] ?? 0,
+          ]),
+        );
+
+        return {
+          ...state,
+          productCodePriceDictionary: {
+            ...state.productCodePriceDictionary,
+            productId: state.product.id,
+            productCodeHash: buildProductCodeHash(this.state().product),
+            prices: prices,
+          },
+        };
+      });
+    });
+
+    this.updatePrice$.pipe(takeUntilDestroyed()).subscribe((next) => {
+      this.state.update((state) => {
+        const updatedPrices: Record<ProductCode, number> = {
+          ...state.productCodePriceDictionary.prices,
+          [next.productCode]: next.price,
+        };
+
+        return {
+          ...state,
+          productCodePriceDictionary: {
+            ...state.productCodePriceDictionary,
+            prices: updatedPrices,
+          },
+        };
+      });
     });
 
     this.updateAdder$.pipe(takeUntilDestroyed()).subscribe((next) => {
@@ -75,8 +139,19 @@ export class ProductEditService {
 
     // effects
     effect(() => {
-      if (this.loaded()) {
-        this.productHttpService.saveProduct(this.product());
+      if (!this.loaded()) {
+        return;
+      }
+
+      const dictionary = this.productCodePriceDictionary();
+      const product = this.product();
+
+      if (product) {
+        this.productHttpService.saveProduct(product);
+      }
+
+      if (dictionary) {
+        this.productHttpService.saveProductCodePriceDictionary(dictionary);
       }
     });
   }
