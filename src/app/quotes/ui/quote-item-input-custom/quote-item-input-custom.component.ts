@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -14,7 +13,7 @@ import { ProductInput } from '../../../products/interfaces/product-input.interfa
 
 @Component({
   selector: 'app-quote-item-input-custom',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './quote-item-input-custom.component.html',
   host: {
     '(document:click)': 'onDocumentClick($event)',

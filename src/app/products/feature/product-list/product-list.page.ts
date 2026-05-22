@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -8,7 +7,7 @@ import { ProductListService } from '../../data-access/product-list.service';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, FormsModule, RouterLink, ButtonDirective],
+  imports: [FormsModule, RouterLink, ButtonDirective],
   templateUrl: './product-list.page.html',
   providers: [ProductListService],
 })
