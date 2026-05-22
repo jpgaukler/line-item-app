@@ -1,4 +1,3 @@
-import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { describe, expect, it } from 'vitest';
@@ -66,7 +65,6 @@ describe('QuoteNewService', () => {
   beforeAll(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideZonelessChangeDetection(),
         QuoteNewService,
         {
           provide: ProductHttpService,
