@@ -1,0 +1,56 @@
+<div class="flex flex-col gap-2 rounded-md border p-4">
+  <div class="flex flex-row justify-between gap-4">
+    <input
+      type="text"
+      class="hover:bg-input focus:bg-input rounded-md text-lg font-bold"
+      [ngModel]="adder().name"
+      (ngModelChange)="updateName($event)"
+    />
+
+    <button type="button" class="hover:bg-muted rounded-md p-2" (click)="removeClick.emit()">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="size-6"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-4" cdkDropList (cdkDropListDropped)="reorderOption($event)">
+    @for (option of adder().options; track $index; let index = $index) {
+      <div cdkDrag>
+        <app-product-adder-option
+          [option]="option"
+          (optionChange)="updateOption(index, $event)"
+          [isDefaultOption]="index === adder().defaultOptionIndex"
+          (setDefaultClick)="updateDefaultOptionIndex(index)"
+          (removeClick)="removeOption(index)"
+        ></app-product-adder-option>
+      </div>
+    }
+  </div>
+
+  <div class="mx-2 mt-2 flex flex-row justify-between">
+    <button
+      type="button"
+      class="text-primary hover:text-primary/80 cursor-pointer font-medium"
+      (click)="addOption()"
+    >
+      Add Option
+    </button>
+
+    <label>
+      <input
+        type="checkbox"
+        [ngModel]="adder().allowCustomValue"
+        (ngModelChange)="updateAllowCustomValue($event)"
+      />
+      Allow custom value
+    </label>
+  </div>
+</div>
