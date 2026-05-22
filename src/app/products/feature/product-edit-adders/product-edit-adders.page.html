@@ -37,9 +37,6 @@
         </div>
 
         <div class="flex flex-col gap-6 rounded-md p-4">
-          <div class="flex flex-row items-center justify-between">
-            <div class="text-2xl font-bold">Adders</div>
-          </div>
           <div
             class="flex flex-col gap-4"
             cdkDropList
@@ -54,7 +51,7 @@
               <div cdkDrag>
                 <app-product-adder
                   [adder]="adder"
-                  (adderChange)="productEditService.updateAdder$.next({ index, adder })"
+                  (adderChange)="productEditService.updateAdder$.next({ index, adder: $event })"
                   (removeClick)="productEditService.removeAdder$.next({ index })"
                 ></app-product-adder>
               </div>

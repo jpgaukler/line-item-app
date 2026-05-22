@@ -1,7 +1,7 @@
 import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, forkJoin, Subject, switchMap } from 'rxjs';
+import { debounceTime, filter, forkJoin, Subject, switchMap } from 'rxjs';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
 import { ProductAdder } from '../interfaces/product-adder.interface';
 import { ProductCode, ProductPriceDictionary } from '../interfaces/product-code-price-dictionary';
@@ -14,6 +14,8 @@ interface ProductEditState {
   loaded: boolean;
   error: string | null;
 }
+
+const UPDATE_DEBOUNCE_TIME = 300;
 
 @Injectable()
 export class ProductEditService {
@@ -83,9 +85,11 @@ export class ProductEditService {
         error: (err) => this.state.update((state) => ({ ...state, error: err })),
       });
 
-    this.updateProduct$.pipe(takeUntilDestroyed()).subscribe((next) => {
-      this.state.update((state) => ({ ...state, product: next }));
-    });
+    this.updateProduct$
+      .pipe(debounceTime(UPDATE_DEBOUNCE_TIME), takeUntilDestroyed())
+      .subscribe((next) => {
+        this.state.update((state) => ({ ...state, product: next }));
+      });
 
     this.generatePriceDictionary$.pipe(takeUntilDestroyed()).subscribe(() => {
       this.state.update((state) => {
@@ -134,7 +138,7 @@ export class ProductEditService {
           adders: [
             ...state.product.adders,
             {
-              name: `Product Adder (${state.product.adders.length})`,
+              name: `Adder (${state.product.adders.length + 1})`,
               defaultOptionIndex: 0,
               allowCustomValue: false,
               options: [
@@ -149,17 +153,19 @@ export class ProductEditService {
       }));
     });
 
-    this.updateAdder$.pipe(takeUntilDestroyed()).subscribe((next) => {
-      this.state.update((state) => ({
-        ...state,
-        product: {
-          ...state.product,
-          adders: state.product.adders.map((adder, index) =>
-            index === next.index ? next.adder : adder,
-          ),
-        },
-      }));
-    });
+    this.updateAdder$
+      .pipe(debounceTime(UPDATE_DEBOUNCE_TIME), takeUntilDestroyed())
+      .subscribe((next) => {
+        this.state.update((state) => ({
+          ...state,
+          product: {
+            ...state.product,
+            adders: state.product.adders.map((adder, index) =>
+              index === next.index ? next.adder : adder,
+            ),
+          },
+        }));
+      });
 
     this.reorderAdder$
       .pipe(
