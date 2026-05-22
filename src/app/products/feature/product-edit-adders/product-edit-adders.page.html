@@ -47,13 +47,14 @@
               })
             "
           >
-            @for (adder of productEditService.product().adders; track $index; let index = $index) {
+            @for (
+              adderForm of productEditService.productForm.product.adders;
+              track $index;
+              let index = $index
+            ) {
               <div cdkDrag>
                 <app-product-adder
-                  [adders]="productEditService.product().adders"
-                  [index]="index"
-                  [adder]="adder"
-                  (adderChange)="productEditService.updateAdder$.next({ index, adder: $event })"
+                  [adderForm]="adderForm"
                   (removeClick)="productEditService.removeAdder$.next({ index })"
                 ></app-product-adder>
               </div>

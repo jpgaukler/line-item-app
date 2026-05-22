@@ -16,8 +16,7 @@
   <div class="flex flex-1 flex-col">
     <input
       type="text"
-      [ngModel]="option().displayText"
-      (ngModelChange)="updateDisplayText($event)"
+      [formField]="optionForm().displayText"
       placeholder="Option"
       class="hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
     />
@@ -32,8 +31,7 @@
   <div class="flex flex-col">
     <input
       type="number"
-      [ngModel]="option().price"
-      (ngModelChange)="updatePrice($event)"
+      [formField]="optionForm().price"
       placeholder="Price"
       class="hover:bg-input focus:bg-input rounded-md border p-2"
     />

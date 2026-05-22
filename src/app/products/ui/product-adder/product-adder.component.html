@@ -3,15 +3,15 @@
     <input
       type="text"
       class="hover:bg-input focus:bg-input rounded-md text-lg font-bold"
-      [formControl]="nameControl"
+      [formField]="adderForm().name"
       [ngClass]="{
-        'border-destructive border': nameControl.hasError('duplicateName') && nameControl.touched,
+        'border-destructive border': adderForm().name().invalid() && adderForm().name().touched,
       }"
     />
 
-    @if (nameControl.hasError('duplicateName') && nameControl.touched) {
+    <!-- @if (nameControl.hasError('duplicateName') && nameControl.touched) {
       <div class="text-destructive">Name must be unique</div>
-    }
+    } -->
 
     <button type="button" class="hover:bg-muted rounded-md p-2" (click)="removeClick.emit()">
       <svg
@@ -28,13 +28,12 @@
   </div>
 
   <div class="flex flex-col gap-4" cdkDropList (cdkDropListDropped)="reorderOption($event)">
-    @for (option of adder().options; track $index; let index = $index) {
+    @for (optionForm of adderForm().options; track $index; let index = $index) {
       <div cdkDrag>
         <app-product-adder-option
-          [option]="option"
-          (optionChange)="updateOption(index, $event)"
-          [isDefaultOption]="index === adder().defaultOptionIndex"
-          (setDefaultClick)="updateDefaultOptionIndex(index)"
+          [optionForm]="optionForm"
+          [isDefaultOption]="index === adderForm().defaultOptionIndex().value()"
+          (setDefaultClick)="adderForm().defaultOptionIndex().value.set(index)"
           (removeClick)="removeOption(index)"
         ></app-product-adder-option>
       </div>
@@ -51,11 +50,7 @@
     </button>
 
     <label>
-      <input
-        type="checkbox"
-        [ngModel]="adder().allowCustomValue"
-        (ngModelChange)="updateAllowCustomValue($event)"
-      />
+      <input type="checkbox" [formField]="adderForm().allowCustomValue" />
       Allow custom value
     </label>
   </div>

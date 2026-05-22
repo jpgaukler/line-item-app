@@ -1,6 +1,15 @@
 import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  applyEach,
+  debounce,
+  form,
+  maxLength,
+  min,
+  minLength,
+  required,
+} from '@angular/forms/signals';
 import { filter, forkJoin, Subject, switchMap } from 'rxjs';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
 import { ProductAdder } from '../interfaces/product-adder.interface';
@@ -36,6 +45,44 @@ export class ProductEditService {
     },
     loaded: false,
     error: null,
+  });
+
+  productForm = form(this.state, (form) => {
+    debounce(form, 300);
+    required(form.product.name);
+    required(form.product.description);
+    required(form.product.productCodeFormula);
+
+    applyEach(form.product.inputs, (input) => {
+      required(input.name);
+      minLength(input.name, 1);
+      maxLength(input.name, 30);
+
+      applyEach(input.options, (option) => {
+        required(option.displayText);
+        minLength(option.displayText, 1);
+        maxLength(option.displayText, 100);
+
+        required(option.value);
+        minLength(option.value, 1);
+        maxLength(option.value, 5);
+      });
+    });
+
+    applyEach(form.product.adders, (adder) => {
+      required(adder.name);
+      minLength(adder.name, 1);
+      maxLength(adder.name, 30);
+
+      applyEach(adder.options, (option) => {
+        required(option.displayText);
+        minLength(option.displayText, 1);
+        maxLength(option.displayText, 100);
+
+        required(option.price);
+        min(option.price, 0);
+      });
+    });
   });
 
   // selectors
