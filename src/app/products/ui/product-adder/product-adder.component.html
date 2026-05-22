@@ -3,9 +3,15 @@
     <input
       type="text"
       class="hover:bg-input focus:bg-input rounded-md text-lg font-bold"
-      [ngModel]="adder().name"
-      (ngModelChange)="updateName($event)"
+      [formControl]="nameControl"
+      [ngClass]="{
+        'border-destructive border': nameControl.hasError('duplicateName') && nameControl.touched,
+      }"
     />
+
+    @if (nameControl.hasError('duplicateName') && nameControl.touched) {
+      <div class="text-destructive">Name must be unique</div>
+    }
 
     <button type="button" class="hover:bg-muted rounded-md p-2" (click)="removeClick.emit()">
       <svg
