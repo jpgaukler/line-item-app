@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ProductHttpService } from '../../../shared/data-access/product.http.service';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
-import { ProductListService } from '../../data-access/product-list.service';
 import {
   MAX_PRODUCT_DESCRIPTION_LENGTH,
   MAX_PRODUCT_NAME_LENGTH,
@@ -16,7 +15,6 @@ import {
   selector: 'app-products',
   imports: [CommonModule, ButtonDirective, FormField],
   templateUrl: './product-new.page.html',
-  providers: [ProductListService],
 })
 export class ProductNewPage implements OnDestroy {
   private readonly router = inject(Router);
