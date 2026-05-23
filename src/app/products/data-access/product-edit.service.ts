@@ -15,7 +15,7 @@ import { ProductHttpService } from '../../shared/data-access/product.http.servic
 import { ProductAdder } from '../interfaces/product-adder.interface';
 import { ProductCode, ProductPriceDictionary } from '../interfaces/product-code-price-dictionary';
 import { Product } from '../interfaces/product.interface';
-import { buildProductCodeHash, generateProductCodes } from '../utils/product-utils';
+import { buildProductCodeHash, generateProductCodes, uniqueInArray } from '../utils/product-utils';
 
 interface ProductEditState {
   product: Product;
@@ -54,33 +54,37 @@ export class ProductEditService {
     required(form.product.productCodeFormula);
 
     applyEach(form.product.inputs, (input) => {
-      required(input.name);
+      required(input.name, { message: 'Required' });
       minLength(input.name, 1);
       maxLength(input.name, 30);
+      uniqueInArray(input.name, form.product.inputs);
 
       applyEach(input.options, (option) => {
-        required(option.displayText);
+        required(option.displayText, { message: 'Required' });
         minLength(option.displayText, 1);
         maxLength(option.displayText, 100);
+        uniqueInArray(option.displayText, input.options);
 
-        required(option.value);
+        required(option.value, { message: 'Required' });
         minLength(option.value, 1);
         maxLength(option.value, 5);
       });
     });
 
     applyEach(form.product.adders, (adder) => {
-      required(adder.name);
+      required(adder.name, { message: 'Required' });
       minLength(adder.name, 1);
       maxLength(adder.name, 30);
+      uniqueInArray(adder.name, form.product.adders);
 
       applyEach(adder.options, (option) => {
-        required(option.displayText);
+        required(option.displayText, { message: 'Required' });
         minLength(option.displayText, 1);
         maxLength(option.displayText, 100);
+        uniqueInArray(option.displayText, adder.options);
 
-        required(option.price);
-        min(option.price, 0);
+        required(option.price, { message: 'Required' });
+        min(option.price, 0, { message: 'Price cannot be negative' });
       });
     });
   });

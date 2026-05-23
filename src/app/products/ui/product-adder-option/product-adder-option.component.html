@@ -19,13 +19,17 @@
       [formField]="optionForm().displayText"
       placeholder="Option"
       class="hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
+      [ngClass]="{
+        'border-destructive': optionForm().displayText().invalid(),
+      }"
     />
-    <!-- @if (
-      option.controls.displayText.hasError('duplicateOptionDisplayText') &&
-      option.controls.displayText.touched
-    ) {
-      <div class="text-destructive text-sm">Display text must be unique</div>
-    } -->
+    @if (optionForm().displayText().invalid()) {
+      <div>
+        @for (error of optionForm().displayText().errors(); track error.kind) {
+          <p class="text-destructive">{{ error.message }}</p>
+        }
+      </div>
+    }
   </div>
 
   <div class="flex flex-col">
@@ -34,7 +38,17 @@
       [formField]="optionForm().price"
       placeholder="Price"
       class="hover:bg-input focus:bg-input rounded-md border p-2"
+      [ngClass]="{
+        'border-destructive': optionForm().price().invalid(),
+      }"
     />
+    @if (optionForm().price().invalid()) {
+      <div>
+        @for (error of optionForm().price().errors(); track error.kind) {
+          <p class="text-destructive">{{ error.message }}</p>
+        }
+      </div>
+    }
   </div>
 
   <button type="button" class="hover:bg-muted rounded-md p-2" (click)="removeClick.emit()">
