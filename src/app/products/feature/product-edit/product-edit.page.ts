@@ -1,5 +1,5 @@
 import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
-import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -10,7 +10,6 @@ import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { logJsonSize } from '../../../shared/utils/data-utils';
 import { ProductEditService } from '../../data-access/product-edit.service';
-import { ProductFormService } from '../../data-access/product-form.service';
 import { ProductInputComponent } from '../../ui/product-input/product-input.component';
 
 @Component({
@@ -26,7 +25,7 @@ import { ProductInputComponent } from '../../ui/product-input/product-input.comp
     ProductInputComponent,
   ],
   templateUrl: './product-edit.page.html',
-  providers: [ProductEditService, ProductFormService],
+  providers: [ProductEditService],
 })
 export class ProductEditPage implements OnDestroy {
   private readonly layoutService = inject(LayoutService);
@@ -57,29 +56,43 @@ export class ProductEditPage implements OnDestroy {
   }
 
   addInput() {
-    this.productEditService.productForm.product.inputs().value.update((inputs) => ({
-      ...inputs,
-      options: [
+    this.productEditService
+      .productForm()
+      .inputs()
+      .value.update((inputs) => [
         ...inputs,
         {
-          name: `Input (${inputs.length + 1})`,
+          name: `New Input (${inputs.length + 1})`,
           defaultOptionIndex: 0,
           allowCustomValue: false,
-          options: [{ displayText: 'Option (1)', value: 'Value (1)' }],
+          options: [{ displayText: 'Option (1)', value: '1' }],
         },
-      ],
-    }));
+      ]);
+  }
+
+  reorderInput(event: CdkDragDrop<any>) {
+    const previousIndex = event.previousIndex;
+    const currentIndex = event.currentIndex;
+
+    if (previousIndex === currentIndex) {
+      return;
+    }
+
+    const updatedInputs = [...this.productEditService.productForm().inputs().value()];
+    moveItemInArray(updatedInputs, previousIndex, currentIndex);
+    this.productEditService.productForm().inputs().value.set(updatedInputs);
   }
 
   removeInput(index: number) {
-    const inputsArray = this.productEditService.productForm.product.inputs().value();
+    const inputsArray = this.productEditService.productForm().inputs().value();
 
     if (inputsArray.length <= 1) {
       return;
     }
 
     // remove option
-    this.productEditService.productForm.product
+    this.productEditService
+      .productForm()
       .inputs()
       .value.update((inputs) => inputs.filter((_, i) => i !== index));
   }

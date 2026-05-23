@@ -1,4 +1,3 @@
-import { moveItemInArray } from '@angular/cdk/drag-drop';
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -11,9 +10,8 @@ import {
   required,
   validate,
 } from '@angular/forms/signals';
-import { filter, forkJoin, Subject, switchMap } from 'rxjs';
+import { forkJoin, Subject, switchMap } from 'rxjs';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
-import { ProductAdder } from '../interfaces/product-adder.interface';
 import {
   ProductCode,
   ProductPriceDictionary,
@@ -56,7 +54,7 @@ export class ProductEditService {
     error: null,
   });
 
-  productForm = form(this.state, (form) => {
+  private form = form(this.state, (form) => {
     const product = form.product;
     debounce(form, 300);
 
@@ -100,6 +98,7 @@ export class ProductEditService {
         required(option.value, { message: 'Required' });
         minLength(option.value, 1);
         maxLength(option.value, 5);
+        uniqueInArray(option.value, input.options);
       });
     });
 
@@ -124,6 +123,7 @@ export class ProductEditService {
   });
 
   // selectors
+  productForm = computed(() => this.form.product);
   product = computed(() => this.state().product);
   priceDictionary = computed(() => this.state().priceDictionary);
   productCodeHash = computed(() => buildProductCodeHash(this.state().product));
@@ -135,11 +135,6 @@ export class ProductEditService {
   updateProduct$ = new Subject<Product>();
   generatePriceDictionary$ = new Subject<void>();
   updatePrice$ = new Subject<{ productCode: string; price: number }>();
-
-  createAdder$ = new Subject<void>();
-  updateAdder$ = new Subject<{ index: number; adder: ProductAdder }>();
-  reorderAdder$ = new Subject<{ previousIndex: number; currentIndex: number }>();
-  removeAdder$ = new Subject<{ index: number }>();
 
   constructor() {
     // reducers
@@ -209,71 +204,6 @@ export class ProductEditService {
           },
         };
       });
-    });
-
-    this.createAdder$.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.state.update((state) => ({
-        ...state,
-        product: {
-          ...state.product,
-          adders: [
-            ...state.product.adders,
-            {
-              name: `Adder (${state.product.adders.length + 1})`,
-              defaultOptionIndex: 0,
-              allowCustomValue: false,
-              options: [
-                {
-                  displayText: 'Option 1',
-                  price: 0,
-                },
-              ],
-            },
-          ],
-        },
-      }));
-    });
-
-    this.updateAdder$.pipe(takeUntilDestroyed()).subscribe((next) => {
-      this.state.update((state) => ({
-        ...state,
-        product: {
-          ...state.product,
-          adders: state.product.adders.map((adder, index) =>
-            index === next.index ? next.adder : adder,
-          ),
-        },
-      }));
-    });
-
-    this.reorderAdder$
-      .pipe(
-        filter((next) => next.previousIndex !== next.currentIndex),
-        takeUntilDestroyed(),
-      )
-      .subscribe((next) => {
-        this.state.update((state) => {
-          const updatedAdders = [...state.product.adders];
-          moveItemInArray(updatedAdders, next.previousIndex, next.currentIndex);
-
-          return {
-            ...state,
-            product: {
-              ...state.product,
-              adders: updatedAdders,
-            },
-          };
-        });
-      });
-
-    this.removeAdder$.pipe(takeUntilDestroyed()).subscribe((next) => {
-      this.state.update((state) => ({
-        ...state,
-        product: {
-          ...state.product,
-          adders: state.product.adders.filter((_, index) => index !== next.index),
-        },
-      }));
     });
 
     // effects

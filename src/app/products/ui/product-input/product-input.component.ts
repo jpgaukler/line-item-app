@@ -21,7 +21,7 @@ export class ProductInputComponent {
         ...options,
         {
           displayText: `Option (${options.length + 1})`,
-          value: `Value (${options.length + 1})`,
+          value: `${options.length + 1}`,
         },
       ]);
   }

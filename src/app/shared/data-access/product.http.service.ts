@@ -43,8 +43,6 @@ export class ProductHttpService {
       updatedData = [...data, priceDictionary];
     }
 
-    console.log('updated', updatedData);
-
     this.localStorageService.setJson(localStorageKey, updatedData);
   }
 

@@ -37,25 +37,16 @@
         </div>
 
         <div class="flex flex-col gap-6 rounded-md p-4">
-          <div
-            class="flex flex-col gap-4"
-            cdkDropList
-            (cdkDropListDropped)="
-              productEditService.reorderAdder$.next({
-                previousIndex: $event.previousIndex,
-                currentIndex: $event.currentIndex,
-              })
-            "
-          >
+          <div class="flex flex-col gap-4" cdkDropList (cdkDropListDropped)="reorderAdder($event)">
             @for (
-              adderForm of productEditService.productForm.product.adders;
+              adderForm of productEditService.productForm().adders;
               track $index;
               let index = $index
             ) {
               <div cdkDrag>
                 <app-product-adder
                   [adderForm]="adderForm"
-                  (removeClick)="productEditService.removeAdder$.next({ index })"
+                  (removeClick)="removeAdder(index)"
                 ></app-product-adder>
               </div>
             }
@@ -63,7 +54,7 @@
           <button
             type="button"
             class="hover:bg-muted cursor-pointer rounded-md border border-dotted p-4 text-left font-medium"
-            (click)="productEditService.createAdder$.next()"
+            (click)="addAdder()"
           >
             + New Adder
           </button>

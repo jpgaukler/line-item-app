@@ -1,4 +1,4 @@
-import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, OnDestroy, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -40,5 +40,51 @@ export class ProductEditAddersPage implements OnDestroy {
 
   ngOnDestroy(): void {
     this.layoutService.clearBreadcrumbs$.next();
+  }
+
+  addAdder() {
+    this.productEditService
+      .productForm()
+      .adders()
+      .value.update((adders) => [
+        ...adders,
+        {
+          name: `Adder ${adders.length + 1}`,
+          defaultOptionIndex: 0,
+          allowCustomValue: false,
+          options: [
+            {
+              displayText: 'Option 1',
+              price: 0,
+            },
+          ],
+        },
+      ]);
+  }
+
+  reorderAdder(event: CdkDragDrop<any>) {
+    const previousIndex = event.previousIndex;
+    const currentIndex = event.currentIndex;
+
+    if (previousIndex === currentIndex) {
+      return;
+    }
+
+    const updatedAdders = [...this.productEditService.productForm().adders().value()];
+    moveItemInArray(updatedAdders, previousIndex, currentIndex);
+    this.productEditService.productForm().adders().value.set(updatedAdders);
+  }
+
+  removeAdder(index: number) {
+    const addersArray = this.productEditService.productForm().adders().value();
+
+    if (addersArray.length <= 1) {
+      return;
+    }
+
+    this.productEditService
+      .productForm()
+      .adders()
+      .value.update((adders) => adders.filter((_, i) => i !== index));
   }
 }

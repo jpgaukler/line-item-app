@@ -11,13 +11,13 @@
     @if (showDebug()) {
       <div class="bg-sidebar mt-8 border p-4">
         <h3 class="font-bold">Debug Form Value:</h3>
-        <pre>{{ productEditService.productForm.product().value() | json }}</pre>
-        <div [ngClass]="{ 'text-destructive': productEditService.productForm.product().dirty() }">
-          IsDirty: {{ productEditService.productForm.product().dirty() }}
+        <pre>{{ productEditService.productForm()().value() | json }}</pre>
+        <div [ngClass]="{ 'text-destructive': productEditService.productForm()().dirty() }">
+          IsDirty: {{ productEditService.productForm()().dirty() }}
         </div>
         <button
           class="hover:bg-input cursor-pointer rounded-md border p-2"
-          [cdkCopyToClipboard]="productEditService.productForm.product().value() | json"
+          [cdkCopyToClipboard]="productEditService.productForm() | json"
         >
           Copy
         </button>
@@ -49,7 +49,7 @@
           id="product-name-input"
           type="text"
           class="hover:bg-input focus:bg-input rounded-md p-2 text-2xl font-bold"
-          [formField]="productEditService.productForm.product.name"
+          [formField]="productEditService.productForm().name"
         />
 
         <label for="product-description-input" class="text-sm">Description</label>
@@ -57,7 +57,7 @@
           id="product-description-input"
           class="hover:bg-input focus:bg-input resize-none rounded-md border p-2 hover:resize-y"
           rows="3"
-          [formField]="productEditService.productForm.product.description"
+          [formField]="productEditService.productForm().description"
         ></textarea>
 
         <label for="product-code-input" class="text-sm">Product Code</label>
@@ -65,35 +65,19 @@
           id="product-code-input"
           class="hover:bg-input focus:bg-input rounded-md border p-2"
           placeholder="Product Code"
-          [formField]="productEditService.productForm.product.productCodeFormula"
+          [formField]="productEditService.productForm().productCodeFormula"
         />
 
-        @if (productEditService.productForm.product.productCodeFormula().invalid()) {
+        @if (productEditService.productForm().productCodeFormula().invalid()) {
           <div>
             @for (
-              error of productEditService.productForm.product.productCodeFormula().errors();
+              error of productEditService.productForm().productCodeFormula().errors();
               track error.kind
             ) {
               <p class="text-destructive">{{ error.message }}</p>
             }
           </div>
         }
-
-        <!-- @if (
-          productForm.controls.productCodeFormula.hasError('invalidFormula') &&
-          productForm.controls.productCodeFormula.touched
-        ) {
-          <div class="text-destructive">
-            Unknown field(s):
-            <span class="font-semibold">
-              {{
-                productForm.controls.productCodeFormula
-                  .getError('invalidFormula')
-                  ?.invalidFields.join(', ')
-              }}
-            </span>
-          </div>
-        } -->
       </div>
 
       <div class="flex flex-col gap-6 rounded-md p-4">
@@ -101,18 +85,20 @@
           <div class="text-2xl font-bold">Inputs</div>
         </div>
 
-        @for (
-          input of productEditService.productForm.product.inputs;
-          track $index;
-          let inputIndex = $index
-        ) {
-          <div cdkDrag>
-            <app-product-input
-              [inputForm]="input"
-              (removeClick)="removeInput(inputIndex)"
-            ></app-product-input>
-          </div>
-        }
+        <div cdkDropList (cdkDropListDropped)="reorderInput($event)" class="flex flex-col gap-4">
+          @for (
+            input of productEditService.productForm().inputs;
+            track $index;
+            let inputIndex = $index
+          ) {
+            <div cdkDrag>
+              <app-product-input
+                [inputForm]="input"
+                (removeClick)="removeInput(inputIndex)"
+              ></app-product-input>
+            </div>
+          }
+        </div>
 
         <button
           type="button"
