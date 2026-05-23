@@ -9,6 +9,7 @@ import {
   min,
   minLength,
   required,
+  validate,
 } from '@angular/forms/signals';
 import { filter, forkJoin, Subject, switchMap } from 'rxjs';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
@@ -18,7 +19,12 @@ import {
   ProductPriceDictionary,
 } from '../interfaces/product-price-dictionary.interface';
 import { Product } from '../interfaces/product.interface';
-import { buildProductCodeHash, generateProductCodes, uniqueInArray } from '../utils/product-utils';
+import {
+  buildProductCodeHash,
+  generateProductCodes,
+  uniqueInArray,
+  validateProductCodeFormula,
+} from '../utils/product-utils';
 
 interface ProductEditState {
   product: Product;
@@ -58,6 +64,24 @@ export class ProductEditService {
     required(product.name);
     required(product.description);
     required(product.productCodeFormula);
+    validate(product.productCodeFormula, (context) => {
+      const formula = context.value();
+
+      if (!formula || formula.trim() === '') {
+        return null;
+      }
+
+      const inputsList = context.valueOf(product.inputs) ?? [];
+      const inputNames = inputsList.map((input) => input.name);
+      const invalidFields = validateProductCodeFormula(formula, inputNames);
+
+      return invalidFields.length > 0
+        ? {
+            kind: 'invalidFormula',
+            message: `Unknown fields: ${invalidFields.join(', ')}`,
+          }
+        : null;
+    });
 
     // input validators
     applyEach(product.inputs, (input) => {
