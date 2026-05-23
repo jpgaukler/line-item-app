@@ -1,5 +1,6 @@
 import { ProductAdder } from './product-adder.interface';
 import { ProductInput } from './product-input.interface';
+import { ProductPriceDictionary } from './product-price-dictionary.interface';
 
 export interface Product {
   id: string;
@@ -8,6 +9,7 @@ export interface Product {
   productCodeFormula: string;
   inputs: ProductInput[];
   adders: ProductAdder[];
+  priceDictionary: ProductPriceDictionary;
 }
 
 export const MAX_PRODUCT_NAME_LENGTH = 30;

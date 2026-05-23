@@ -10,12 +10,9 @@ import {
   required,
   validate,
 } from '@angular/forms/signals';
-import { forkJoin, Subject, switchMap } from 'rxjs';
+import { Subject, switchMap } from 'rxjs';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
-import {
-  ProductCode,
-  ProductPriceDictionary,
-} from '../interfaces/product-price-dictionary.interface';
+import { ProductCode } from '../interfaces/product-price-dictionary.interface';
 import { Product } from '../interfaces/product.interface';
 import {
   buildProductCodeHash,
@@ -26,7 +23,6 @@ import {
 
 interface ProductEditState {
   product: Product;
-  priceDictionary: ProductPriceDictionary;
   loaded: boolean;
   error: string | null;
 }
@@ -44,11 +40,10 @@ export class ProductEditService {
       productCodeFormula: '',
       inputs: [],
       adders: [],
-    },
-    priceDictionary: {
-      productId: '',
-      productCodeHash: '',
-      prices: {},
+      priceDictionary: {
+        productCodeHash: '',
+        prices: {},
+      },
     },
     loaded: false,
     error: null,
@@ -120,42 +115,41 @@ export class ProductEditService {
         min(option.price, 0, { message: 'Price cannot be negative' });
       });
     });
+
+    applyEach(product.priceDictionary.prices, (price) => {
+      required(price, { message: 'Required' });
+      min(price, 0, { message: 'Price cannot be negative' });
+    });
   });
 
   // selectors
   productForm = computed(() => this.form.product);
   product = computed(() => this.state().product);
-  priceDictionary = computed(() => this.state().priceDictionary);
-  productCodeHash = computed(() => buildProductCodeHash(this.state().product));
+  priceDictionary = computed(() => this.state().product.priceDictionary);
+  isPriceDictionaryOutOfDate = computed(
+    () =>
+      buildProductCodeHash(this.state().product) !==
+      this.state().product.priceDictionary.productCodeHash,
+  );
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
 
   // sources
   loadProduct$ = new Subject<{ productId: string }>();
   generatePriceDictionary$ = new Subject<void>();
-  updatePrice$ = new Subject<{ productCode: string; price: number }>();
 
   constructor() {
     // reducers
     this.loadProduct$
       .pipe(
-        switchMap((next) =>
-          forkJoin({
-            product: this.productHttpService.getProductById(next.productId),
-            priceDictionary: this.productHttpService.getPriceDictionaryByProductId(next.productId),
-          }),
-        ),
+        switchMap((next) => this.productHttpService.getProductById(next.productId)),
         takeUntilDestroyed(),
       )
       .subscribe({
         next: (data) => {
           this.state.update((state) => ({
             ...state,
-            product: data.product,
-            priceDictionary: data.priceDictionary ?? {
-              ...state.priceDictionary,
-              productId: data.product.id,
-            },
+            product: data,
             loaded: true,
           }));
         },
@@ -168,34 +162,18 @@ export class ProductEditService {
         const prices: Record<ProductCode, number> = Object.fromEntries(
           productCodes.map((productCode) => [
             productCode,
-            state.priceDictionary?.prices[productCode] ?? 0,
+            state.product.priceDictionary?.prices[productCode] ?? 0,
           ]),
         );
 
         return {
           ...state,
-          priceDictionary: {
-            ...state.priceDictionary,
-            productId: state.product.id,
-            productCodeHash: buildProductCodeHash(this.state().product),
-            prices: prices,
-          },
-        };
-      });
-    });
-
-    this.updatePrice$.pipe(takeUntilDestroyed()).subscribe((next) => {
-      this.state.update((state) => {
-        const updatedPrices: Record<ProductCode, number> = {
-          ...state.priceDictionary.prices,
-          [next.productCode]: next.price,
-        };
-
-        return {
-          ...state,
-          priceDictionary: {
-            ...state.priceDictionary,
-            prices: updatedPrices,
+          product: {
+            ...state.product,
+            priceDictionary: {
+              productCodeHash: buildProductCodeHash(state.product),
+              prices: prices,
+            },
           },
         };
       });
@@ -207,15 +185,10 @@ export class ProductEditService {
         return;
       }
 
-      const dictionary = this.priceDictionary();
       const product = this.product();
 
       if (product) {
         this.productHttpService.saveProduct(product);
-      }
-
-      if (dictionary) {
-        this.productHttpService.savePriceDictionary(dictionary);
       }
     });
   }

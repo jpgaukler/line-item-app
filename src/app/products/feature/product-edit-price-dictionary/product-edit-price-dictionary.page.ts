@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, OnDestroy, signal } from '@angular/core';
+import { Component, effect, inject, OnDestroy, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { LayoutService } from '../../../layout/data-access/layout.service';
@@ -11,7 +11,7 @@ import { ProductEditService } from '../../data-access/product-edit.service';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, ButtonDirective],
+  imports: [CommonModule, ButtonDirective, FormField],
   templateUrl: './product-edit-price-dictionary.page.html',
   providers: [ProductEditService],
 })
@@ -22,14 +22,6 @@ export class ProductEditPriceDictionaryPage implements OnDestroy {
 
   productId = toSignal(this.activatedRoute.paramMap.pipe(map((params) => params.get('productId'))));
   showDebug = signal<boolean>(false);
-  productCodePrices = computed(() =>
-    Object.entries(this.productEditService.priceDictionary().prices)
-      .map(([productCode, price]) => ({
-        productCode,
-        price,
-      }))
-      .sort((a, b) => a.productCode.localeCompare(b.productCode)),
-  );
 
   constructor() {
     this.layoutService.updateBreadcrumbs$.next([

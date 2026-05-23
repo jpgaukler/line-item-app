@@ -19,37 +19,36 @@
     </div>
   }
 
-  <p class="text-destructive font-semibold">
-    {{ productEditService.productCodeHash() }}
-  </p>
-  <p class="text-destructive font-semibold">
-    {{ productEditService.priceDictionary().productCodeHash }}
-  </p>
-  @if (
-    productEditService.productCodeHash() !== productEditService.priceDictionary().productCodeHash
-  ) {
+  @if (productEditService.isPriceDictionaryOutOfDate()) {
     <p class="text-destructive font-semibold">Prices need to be regenerated!</p>
   }
 
   <div class="flex flex-col gap-4">
     <button appButton (click)="productEditService.generatePriceDictionary$.next()">Generate</button>
-    <p>Total Variations: {{ productCodePrices().length }}</p>
-    @for (entry of productCodePrices(); track entry.productCode) {
+    <p>Total Variations: {{ productEditService.productForm().priceDictionary.prices.length }}</p>
+    @for (priceForm of productEditService.productForm().priceDictionary.prices; track $index) {
+      @let productCode = priceForm[0];
+      @let price = priceForm[1];
+
       <div class="flex flex-row justify-between gap-2">
-        <p class="font-semibold">{{ entry.productCode }}</p>
+        <p class="font-semibold">{{ productCode }}</p>
         <input
           type="number"
           class="hover:bg-input focus:bg-input rounded-md p-2 text-right"
           placeholder="$0.00"
-          [ngModel]="entry.price"
-          (ngModelChange)="
-            productEditService.updatePrice$.next({
-              productCode: entry.productCode,
-              price: $event,
-            })
-          "
+          [formField]="price"
+          [ngClass]="{
+            'border-destructive border': price().invalid(),
+          }"
         />
       </div>
+      @if (price().invalid()) {
+        <div>
+          @for (error of price().errors(); track error.kind) {
+            <p class="text-destructive">{{ error.message }}</p>
+          }
+        </div>
+      }
       <hr />
     }
   </div>

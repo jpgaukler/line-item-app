@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { delay, map, Observable, of, switchMap, tap } from 'rxjs';
-import { ProductPriceDictionary } from '../../products/interfaces/product-price-dictionary.interface';
 import { Product } from '../../products/interfaces/product.interface';
 import { LocalStorageService } from './local-storage.service';
 
@@ -26,24 +25,6 @@ export class ProductHttpService {
     const products = this.localStorageService.getJson<Product[]>('products') || [];
     const updatedProducts = products.map((p) => (p.id === product.id ? product : p));
     this.localStorageService.setJson('products', updatedProducts);
-  }
-
-  savePriceDictionary(priceDictionary: ProductPriceDictionary): void {
-    const localStorageKey: string = 'product-code-price-dictionaries';
-
-    const data = this.localStorageService.getJson<ProductPriceDictionary[]>(localStorageKey) || [];
-
-    let updatedData: ProductPriceDictionary[] = [];
-
-    if (data.some((i) => i.productId === priceDictionary.productId)) {
-      updatedData = data.map((dictionary) =>
-        dictionary.productId === priceDictionary.productId ? priceDictionary : dictionary,
-      );
-    } else {
-      updatedData = [...data, priceDictionary];
-    }
-
-    this.localStorageService.setJson(localStorageKey, updatedData);
   }
 
   // saveProduct(product: Product): Observable<void> {
@@ -90,24 +71,11 @@ export class ProductHttpService {
     );
   }
 
-  getPriceDictionaryByProductId(productId: string): Observable<ProductPriceDictionary | null> {
-    return this.localStorageService.loadJson<ProductPriceDictionary[]>('price-dictionaries').pipe(
-      delay(500),
-      map((dictionaries) => {
-        const dictionary = dictionaries?.find((d) => d.productId === productId);
-        if (!dictionary) {
-          return null;
-        } else {
-          return dictionary;
-        }
-      }),
-    );
-  }
-
   getProductPrice(productId: string, productCode: string): Observable<number> {
-    return this.localStorageService.loadJson<ProductPriceDictionary[]>('price-dictionaries').pipe(
-      map((dictionaries) => {
-        const price = dictionaries?.find((d) => d.productId === productId)?.prices[productCode];
+    return this.localStorageService.loadJson<Product[]>('products').pipe(
+      map((products) => {
+        const product = products?.find((p) => p.id === productId);
+        const price = product?.priceDictionary.prices[productCode];
 
         if (!price) {
           throw new Error('Product price could not be determined!');

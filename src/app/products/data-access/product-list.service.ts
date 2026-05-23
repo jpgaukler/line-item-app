@@ -59,6 +59,10 @@ export class ProductListService {
             productCodeFormula: '',
             inputs: [],
             adders: [],
+            priceDictionary: {
+              productCodeHash: '',
+              prices: {},
+            },
           },
         ],
       })),
