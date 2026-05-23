@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { delay, map, Observable, of, switchMap, tap } from 'rxjs';
-import { ProductPriceDictionary } from '../../products/interfaces/product-code-price-dictionary';
+import { ProductPriceDictionary } from '../../products/interfaces/product-price-dictionary.interface';
 import { Product } from '../../products/interfaces/product.interface';
 import { LocalStorageService } from './local-storage.service';
 
