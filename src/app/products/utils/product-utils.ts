@@ -157,17 +157,17 @@ export function uniqueInArray(
   errorKind = 'uniqueValue',
   errorMessage = 'Value must be unique.',
 ) {
-  validate(itemPath, (ctx) => {
-    const currentValue = ctx.value();
+  validate(itemPath, (context) => {
+    const currentValue = context.value();
     if (!currentValue) {
       return null;
     }
 
-    const segments = ctx.pathKeys();
+    const segments = context.pathKeys();
     const propKey = segments[segments.length - 1];
 
     // Reactively extract the parent array using valueOf
-    const allItems = ctx.valueOf(arrayPath) || [];
+    const allItems = context.valueOf(arrayPath) || [];
     const matches = allItems.filter(
       (item: any) =>
         !!item?.[propKey] &&
