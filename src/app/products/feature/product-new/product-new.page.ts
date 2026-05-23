@@ -24,7 +24,7 @@ export class ProductNewPage implements OnDestroy {
   maxNameLength = MAX_PRODUCT_NAME_LENGTH;
   maxDescriptionLength = MAX_PRODUCT_DESCRIPTION_LENGTH;
 
-  newProduct = signal<NewProduct>({
+  private newProduct = signal<NewProduct>({
     name: '',
     description: '',
   });
