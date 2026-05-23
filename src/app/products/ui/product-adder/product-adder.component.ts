@@ -5,26 +5,6 @@ import { FieldTree, FormField } from '@angular/forms/signals';
 import { ProductAdder } from '../../interfaces/product-adder.interface';
 import { ProductAdderOptionComponent } from '../product-adder-option/product-adder-option.component';
 
-// function duplicateNameValidator(
-//   getCurrentIndex: () => number,
-//   getAdders: () => ProductAdder[],
-// ): ValidatorFn {
-//   return (control: AbstractControl): ValidationErrors | null => {
-//     const name = control.value?.trim();
-
-//     if (!name || !getAdders || !getCurrentIndex) return null;
-
-//     const currentIndex = getCurrentIndex();
-//     const adders = getAdders();
-
-//     return adders.some(
-//       (adder, index) => index !== currentIndex && adder.name?.toLowerCase() === name.toLowerCase(),
-//     )
-//       ? { duplicateName: true }
-//       : null;
-//   };
-// }
-
 @Component({
   selector: 'app-product-adder',
   imports: [CommonModule, ProductAdderOptionComponent, CdkDrag, CdkDropList, FormField],
@@ -44,9 +24,24 @@ export class ProductAdderComponent {
   }
 
   removeOption(index: number) {
+    const optionsArray = this.adderForm().options().value();
+
+    if (optionsArray.length <= 1) {
+      return;
+    }
+
+    // remove option
     this.adderForm()
       .options()
       .value.update((options) => options.filter((_, i) => i !== index));
+
+    // fix default if the default was removed
+    const defaultOptionIndex = this.adderForm().defaultOptionIndex().value();
+    if (defaultOptionIndex === index) {
+      this.adderForm()
+        .defaultOptionIndex()
+        .value.set(defaultOptionIndex - 1);
+    }
   }
 
   reorderOption(event: CdkDragDrop<any>) {
