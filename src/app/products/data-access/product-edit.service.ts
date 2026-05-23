@@ -188,7 +188,7 @@ export class ProductEditService {
       const product = this.product();
 
       if (product) {
-        this.productHttpService.saveProduct(product);
+        this.productHttpService.updateProduct(product);
       }
     });
   }

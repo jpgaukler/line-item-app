@@ -1,42 +1,46 @@
-@if (productListService.error()) {
-  <p class="text-destructive">Error loading products: {{ productListService.error() }}</p>
-}
-@if (!productListService.loaded()) {
-  <p>Loading...</p>
-} @else {
-  <div class="text-2xl font-bold">Create a new product</div>
-  <form [formGroup]="newProductForm" (ngSubmit)="submit()" class="mt-4 flex flex-col gap-4">
-    <input
-      id="product-name-input"
-      type="text"
-      placeholder="Product Name"
-      formControlName="name"
-      [maxlength]="maxNameLength"
-      class="rounded-md border p-2"
-      [ngClass]="{
-        'border-destructive': nameControl.invalid && nameControl.touched,
-      }"
-    />
-    @if (nameControl.invalid && nameControl.touched) {
-      <p class="text-destructive text-sm">Name is required</p>
-    }
-    <textarea
-      id="product-description-input"
-      placeholder="Description"
-      formControlName="description"
-      [maxlength]="maxDescriptionLength"
-      class="rounded-md border p-2"
-      [ngClass]="{
-        'border-destructive': descriptionControl.invalid && descriptionControl.touched,
-      }"
-    ></textarea>
-    @if (descriptionControl.invalid && descriptionControl.touched) {
-      <p class="text-destructive text-sm">Description is required</p>
-    }
-    <p class="text-sm">
-      {{ descriptionControl.value ? descriptionControl.value.length : 0 }} /
-      {{ maxDescriptionLength }}
-    </p>
-    <button appButton variant="primary" type="submit">Create product</button>
-  </form>
-}
+<div class="text-2xl font-bold">Create a new product</div>
+<form (submit)="submit($event)" class="mt-4 flex flex-col gap-4">
+  <input
+    [formField]="newProductForm.name"
+    id="product-name-input"
+    type="text"
+    placeholder="Product Name"
+    class="rounded-md border p-2"
+    [ngClass]="{
+      'border-destructive': newProductForm.name().invalid() && newProductForm.name().touched(),
+    }"
+  />
+  @if (newProductForm.name().invalid() && newProductForm.name().touched()) {
+    <div>
+      @for (error of newProductForm.name().errors(); track error.kind) {
+        <p class="text-destructive">{{ error.message }}</p>
+      }
+    </div>
+  }
+
+  <textarea
+    [formField]="newProductForm.description"
+    id="product-description-input"
+    placeholder="Description"
+    class="rounded-md border p-2"
+    [ngClass]="{
+      'border-destructive':
+        newProductForm.description().invalid() && newProductForm.description().touched(),
+    }"
+  ></textarea>
+  @if (newProductForm.description().invalid() && newProductForm.description().touched()) {
+    <div>
+      @for (error of newProductForm.description().errors(); track error.kind) {
+        <p class="text-destructive">{{ error.message }}</p>
+      }
+    </div>
+  }
+
+  <p class="text-sm">
+    {{ newProductForm.description().value() ? newProductForm.description().value().length : 0 }} /
+    {{ maxDescriptionLength }}
+  </p>
+  <button appButton variant="primary" type="submit" [disabled]="newProductForm().submitting()">
+    Create product
+  </button>
+</form>

@@ -12,5 +12,7 @@ export interface Product {
   priceDictionary: ProductPriceDictionary;
 }
 
+export type NewProduct = Pick<Product, 'name' | 'description'>;
+
 export const MAX_PRODUCT_NAME_LENGTH = 30;
 export const MAX_PRODUCT_DESCRIPTION_LENGTH = 200;

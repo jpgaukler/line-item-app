@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { delay, map, Observable, of, switchMap, tap } from 'rxjs';
-import { Product } from '../../products/interfaces/product.interface';
+import { NewProduct, Product } from '../../products/interfaces/product.interface';
 import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
@@ -10,18 +10,30 @@ import { LocalStorageService } from './local-storage.service';
 export class ProductHttpService {
   private readonly http = inject(HttpClient);
   private readonly localStorageService = inject(LocalStorageService);
-  private baseUrl = 'line-item.app';
 
-  // getProducts(): Observable<Product[]> {
-  //   const url: string = `${this.baseUrl}/api/v1/products`;
-  //   return this.http.get<Product[]>(url);
-  // }
+  createProduct(newProduct: NewProduct): void {
+    const products = this.localStorageService.getJson<Product[]>('products') || [];
+    const product: Product = {
+      id: crypto.randomUUID(),
+      name: newProduct.name,
+      description: newProduct.description,
+      productCodeFormula: '',
+      inputs: [],
+      adders: [],
+      priceDictionary: {
+        productCodeHash: '',
+        prices: {},
+      },
+    };
+
+    this.localStorageService.setJson('products', [...products, product]);
+  }
 
   saveProducts(products: Product[]): void {
     this.localStorageService.setJson('products', products);
   }
 
-  saveProduct(product: Product): void {
+  updateProduct(product: Product): void {
     const products = this.localStorageService.getJson<Product[]>('products') || [];
     const updatedProducts = products.map((p) => (p.id === product.id ? product : p));
     this.localStorageService.setJson('products', updatedProducts);

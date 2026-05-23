@@ -48,26 +48,30 @@
 
       <div class="flex flex-col gap-2 rounded-md p-4">
         <input
+          [formField]="productEditService.productForm().name"
           id="product-name-input"
+          placeholder="Product Name"
           type="text"
           class="hover:bg-input focus:bg-input rounded-md p-2 text-2xl font-bold"
-          [formField]="productEditService.productForm().name"
         />
 
         <label for="product-description-input" class="text-sm">Description</label>
         <textarea
-          id="product-description-input"
-          class="hover:bg-input focus:bg-input resize-none rounded-md border p-2 hover:resize-y"
-          rows="3"
           [formField]="productEditService.productForm().description"
+          id="product-description-input"
+          type="text"
+          placeholder="Description"
+          rows="3"
+          class="hover:bg-input focus:bg-input resize-none rounded-md border p-2 hover:resize-y"
         ></textarea>
 
         <label for="product-code-input" class="text-sm">Product Code</label>
         <input
-          id="product-code-input"
-          class="hover:bg-input focus:bg-input rounded-md border p-2"
-          placeholder="Product Code"
           [formField]="productEditService.productForm().productCodeFormula"
+          id="product-code-input"
+          type="text"
+          placeholder="Product Code"
+          class="hover:bg-input focus:bg-input rounded-md border p-2"
         />
 
         @if (productEditService.productForm().productCodeFormula().invalid()) {
@@ -83,9 +87,7 @@
       </div>
 
       <div class="flex flex-col gap-6 rounded-md p-4">
-        <div class="flex flex-row items-center justify-between">
-          <div class="text-2xl font-bold">Inputs</div>
-        </div>
+        <div class="text-2xl font-bold">Inputs</div>
 
         <div cdkDropList (cdkDropListDropped)="reorderInput($event)" class="flex flex-col gap-4">
           @for (
@@ -104,8 +106,8 @@
 
         <button
           type="button"
-          class="hover:bg-muted cursor-pointer rounded-md border border-dotted p-4 text-left font-medium"
           (click)="addInput()"
+          class="hover:bg-muted cursor-pointer rounded-md border border-dotted p-4 text-left font-medium"
         >
           + Add Input
         </button>

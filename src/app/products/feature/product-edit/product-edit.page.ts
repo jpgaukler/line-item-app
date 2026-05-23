@@ -32,9 +32,8 @@ export class ProductEditPage implements OnDestroy {
   public readonly productEditService = inject(ProductEditService);
   private readonly activatedRoute = inject(ActivatedRoute);
 
-  showDebug = signal<boolean>(false);
-
   productId = toSignal(this.activatedRoute.paramMap.pipe(map((params) => params.get('productId'))));
+  showDebug = signal<boolean>(false);
 
   constructor() {
     this.layoutService.updateBreadcrumbs$.next([
@@ -95,20 +94,6 @@ export class ProductEditPage implements OnDestroy {
       .productForm()
       .inputs()
       .value.update((inputs) => inputs.filter((_, i) => i !== index));
-  }
-
-  submit(): void {
-    // if (this.productForm.invalid) {
-    //   this.productForm.markAllAsTouched();
-    //   return;
-    // }
-    // this.productEditService.updateProduct$.next(
-    //   this.productFormService.toProduct(this.productForm),
-    // );
-  }
-
-  reset(): void {
-    // this.initializeProductForm(this.productEditService.product());
   }
 
   calculateJsonSize() {
