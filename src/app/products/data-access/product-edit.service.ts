@@ -132,7 +132,6 @@ export class ProductEditService {
 
   // sources
   loadProduct$ = new Subject<{ productId: string }>();
-  updateProduct$ = new Subject<Product>();
   generatePriceDictionary$ = new Subject<void>();
   updatePrice$ = new Subject<{ productCode: string; price: number }>();
 
@@ -162,10 +161,6 @@ export class ProductEditService {
         },
         error: (err) => this.state.update((state) => ({ ...state, error: err })),
       });
-
-    this.updateProduct$.pipe(takeUntilDestroyed()).subscribe((next) => {
-      this.state.update((state) => ({ ...state, product: next }));
-    });
 
     this.generatePriceDictionary$.pipe(takeUntilDestroyed()).subscribe(() => {
       this.state.update((state) => {

@@ -12,9 +12,11 @@
       <div class="bg-sidebar mt-8 border p-4">
         <h3 class="font-bold">Debug Form Value:</h3>
         <pre>{{ productEditService.productForm()().value() | json }}</pre>
+
         <div [ngClass]="{ 'text-destructive': productEditService.productForm()().dirty() }">
           IsDirty: {{ productEditService.productForm()().dirty() }}
         </div>
+
         <button
           class="hover:bg-input cursor-pointer rounded-md border p-2"
           [cdkCopyToClipboard]="productEditService.productForm() | json"
