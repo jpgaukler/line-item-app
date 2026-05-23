@@ -13,7 +13,10 @@ import {
 import { filter, forkJoin, Subject, switchMap } from 'rxjs';
 import { ProductHttpService } from '../../shared/data-access/product.http.service';
 import { ProductAdder } from '../interfaces/product-adder.interface';
-import { ProductCode, ProductPriceDictionary } from '../interfaces/product-code-price-dictionary';
+import {
+  ProductCode,
+  ProductPriceDictionary,
+} from '../interfaces/product-price-dictionary.interface';
 import { Product } from '../interfaces/product.interface';
 import { buildProductCodeHash, generateProductCodes, uniqueInArray } from '../utils/product-utils';
 
@@ -48,17 +51,22 @@ export class ProductEditService {
   });
 
   productForm = form(this.state, (form) => {
+    const product = form.product;
     debounce(form, 300);
-    required(form.product.name);
-    required(form.product.description);
-    required(form.product.productCodeFormula);
 
-    applyEach(form.product.inputs, (input) => {
+    // product validators
+    required(product.name);
+    required(product.description);
+    required(product.productCodeFormula);
+
+    // input validators
+    applyEach(product.inputs, (input) => {
       required(input.name, { message: 'Required' });
       minLength(input.name, 1);
       maxLength(input.name, 30);
-      uniqueInArray(input.name, form.product.inputs);
+      uniqueInArray(input.name, product.inputs);
 
+      // option validators
       applyEach(input.options, (option) => {
         required(option.displayText, { message: 'Required' });
         minLength(option.displayText, 1);
@@ -71,12 +79,14 @@ export class ProductEditService {
       });
     });
 
-    applyEach(form.product.adders, (adder) => {
+    // adder validators
+    applyEach(product.adders, (adder) => {
       required(adder.name, { message: 'Required' });
       minLength(adder.name, 1);
       maxLength(adder.name, 30);
-      uniqueInArray(adder.name, form.product.adders);
+      uniqueInArray(adder.name, product.adders);
 
+      // option validators
       applyEach(adder.options, (option) => {
         required(option.displayText, { message: 'Required' });
         minLength(option.displayText, 1);
