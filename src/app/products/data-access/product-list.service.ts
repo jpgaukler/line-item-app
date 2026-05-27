@@ -28,7 +28,6 @@ export class ProductListService {
   loaded = computed(() => this.state().loaded);
   error = computed(() => this.state().error);
 
-  addProduct$ = new Subject<{ name: string; description: string }>();
   deleteProduct$ = new Subject<{ productId: string }>();
   clearProducts$ = new Subject<void>();
 
@@ -46,27 +45,6 @@ export class ProductListService {
         })),
       error: (err) => this.state.update((state) => ({ ...state, error: err })),
     });
-
-    this.addProduct$.pipe(takeUntilDestroyed()).subscribe((next) =>
-      this.state.update((state) => ({
-        ...state,
-        products: [
-          ...state.products,
-          {
-            id: crypto.randomUUID(),
-            name: next.name,
-            description: next.description,
-            productCodeFormula: '',
-            inputs: [],
-            adders: [],
-            priceDictionary: {
-              productCodeHash: '',
-              prices: {},
-            },
-          },
-        ],
-      })),
-    );
 
     this.deleteProduct$.pipe(takeUntilDestroyed()).subscribe((next) =>
       this.state.update((state) => ({

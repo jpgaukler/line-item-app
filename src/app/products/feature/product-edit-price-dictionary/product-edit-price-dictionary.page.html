@@ -21,11 +21,14 @@
 
   @if (productEditService.isPriceDictionaryOutOfDate()) {
     <p class="text-destructive font-semibold">Prices need to be regenerated!</p>
+    <button appButton (click)="productEditService.generatePriceDictionary$.next()">Generate</button>
   }
 
   <div class="flex flex-col gap-4">
-    <button appButton (click)="productEditService.generatePriceDictionary$.next()">Generate</button>
-    <p>Total Variations: {{ productEditService.productForm().priceDictionary.prices.length }}</p>
+    <p>
+      Total Variations:
+      {{ productEditService.productCodeVariations() }}
+    </p>
     @for (priceForm of productEditService.productForm().priceDictionary.prices; track $index) {
       @let productCode = priceForm[0];
       @let price = priceForm[1];

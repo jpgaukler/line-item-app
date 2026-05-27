@@ -126,6 +126,9 @@ export class ProductEditService {
   productForm = computed(() => this.form.product);
   product = computed(() => this.state().product);
   priceDictionary = computed(() => this.state().product.priceDictionary);
+  productCodeVariations = computed(
+    () => Object.keys(this.state().product.priceDictionary.prices).length,
+  );
   isPriceDictionaryOutOfDate = computed(
     () =>
       buildProductCodeHash(this.state().product) !==
