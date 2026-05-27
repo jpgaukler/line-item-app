@@ -13,6 +13,7 @@ export interface QuoteModel {
       description: string;
       productCode: string;
       price: number;
+      quantity: number;
       inputs: {
         name: string;
         value: string;

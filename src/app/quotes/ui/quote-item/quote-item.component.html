@@ -24,7 +24,8 @@
         <button>+ Adder</button>
       </div>
       <app-quote-item-quantity
-        [(quantity)]="item().quantity"
+        [quantity]="item().quantity"
+        (quantityChange)="quantityChange($event)"
         (deleteClick)="deleteClick.emit()"
       ></app-quote-item-quantity>
     </div>

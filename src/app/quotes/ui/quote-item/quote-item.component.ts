@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, input, model, output } from '@angular/core';
 import { Product } from '../../../products/interfaces/product.interface';
 import { calculateProductCode } from '../../../products/utils/product-utils';
+import { QuoteItemAdder } from '../../interfaces/quote-item-adder.interface';
 import { QuoteItemInput } from '../../interfaces/quote-item-input.interface';
 import { QuoteItem } from '../../interfaces/quote-item.interface';
 import { DragHandleComponent } from '../drag-handle/drag-handle.component';
@@ -36,4 +37,13 @@ export class QuoteItemComponent {
       };
     });
   }
+
+  quantityChange(newQuantity: number): void {
+    this.item.update((item) => ({
+      ...item,
+      quantity: newQuantity,
+    }));
+  }
+
+  adderChange(updatedAdder: QuoteItemAdder): void {}
 }

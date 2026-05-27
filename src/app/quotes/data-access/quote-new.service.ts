@@ -92,28 +92,35 @@ export class QuoteNewService {
   itemMap = computed(() => this.state().itemMap);
   quote = computed(() => {
     const state = this.state();
-    const systems = Array.from(state.systemMap.entries(), ([systemKey, system], systemIndex) => ({
-      price: state.systemItemKeyMap
-        .get(systemKey)!
-        .reduce((total, itemKey) => total + state.itemMap.get(itemKey)!.price, 0),
-      name: `System ${systemIndex + 1}`,
-      items: state.systemItemKeyMap
-        .get(systemKey)!
-        .map((itemKey) => state.itemMap.get(itemKey)!)
-        .map((item, itemIndex) => ({
-          productId: item.productId,
-          itemNumber: `${systemIndex + 1}.${itemIndex + 1}`,
-          name: item.name,
-          description: item.description,
-          productCode: item.productCode,
-          price: item.price,
-          inputs: item.inputs.map((input) => ({
-            name: input.name,
-            value: input.value,
-            displayText: input.displayText,
-          })),
-        })),
-    }));
+
+    const systems = Array.from(state.systemMap.entries(), ([systemKey, system], systemIndex) => {
+      const systemItemKeyMap = state.systemItemKeyMap.get(systemKey)!;
+
+      return {
+        price: systemItemKeyMap.reduce((total, itemKey) => {
+          const item = state.itemMap.get(itemKey)!;
+          return total + item.price * item.quantity;
+        }, 0),
+        name: `System ${systemIndex + 1}`,
+        items: systemItemKeyMap.map((itemKey, itemIndex) => {
+          const item = state.itemMap.get(itemKey)!;
+          return {
+            productId: item.productId,
+            itemNumber: `${systemIndex + 1}.${itemIndex + 1}`,
+            name: item.name,
+            description: item.description,
+            productCode: item.productCode,
+            price: item.price,
+            quantity: item.quantity,
+            inputs: item.inputs.map((input) => ({
+              name: input.name,
+              value: input.value,
+              displayText: input.displayText,
+            })),
+          };
+        }),
+      };
+    });
 
     const quote: QuoteModel = {
       name: state.name,
