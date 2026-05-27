@@ -19,6 +19,11 @@ export interface QuoteModel {
         value: string;
         displayText: string;
       }[];
+      adders: {
+        name: string;
+        displayText: string;
+        price: number;
+      }[];
     }[];
   }[];
   price: number;

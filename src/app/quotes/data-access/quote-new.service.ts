@@ -117,6 +117,11 @@ export class QuoteNewService {
               value: input.value,
               displayText: input.displayText,
             })),
+            adders: item.adders.map((adder) => ({
+              name: adder.name,
+              displayText: adder.displayText,
+              price: adder.price,
+            })),
           };
         }),
       };
@@ -278,6 +283,7 @@ export class QuoteNewService {
             price: next.price,
             quantity: 1,
             inputs: next.defaultInputs,
+            adders: [],
           };
 
           const itemKeys: QuoteItemKey[] = state.systemItemKeyMap.get(next.systemKey)!;

@@ -1,3 +1,4 @@
+import { QuoteItemAdder } from './quote-item-adder.interface';
 import { QuoteItemInput } from './quote-item-input.interface';
 
 /** Key format for tracking the state of items on a quote. This matches the format of cryto.randomUUID() */
@@ -13,4 +14,5 @@ export interface QuoteItem {
   price: number;
   quantity: number;
   inputs: QuoteItemInput[];
+  adders: QuoteItemAdder[];
 }
