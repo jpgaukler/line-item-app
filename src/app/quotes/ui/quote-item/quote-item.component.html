@@ -19,5 +19,14 @@
         (quoteItemInputChange)="inputChange($event)"
       ></app-quote-item-input>
     }
+    <div class="mt-2 flex flex-row items-baseline justify-between gap-2">
+      <div>
+        <button>+ Adder</button>
+      </div>
+      <app-quote-item-quantity
+        [(quantity)]="item().quantity"
+        (deleteClick)="deleteClick.emit()"
+      ></app-quote-item-quantity>
+    </div>
   </div>
 </div>

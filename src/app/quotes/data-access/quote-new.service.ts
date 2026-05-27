@@ -150,6 +150,10 @@ export class QuoteNewService {
     itemKey: QuoteItemKey;
     updatedItem: QuoteItem;
   }>();
+  removeItem$ = new Subject<{
+    systemKey: QuoteSystemKey;
+    itemKey: QuoteItemKey;
+  }>();
   reorderSystem$ = new Subject<{ previousIndex: number; currentIndex: number }>();
   reorderItem$ = new Subject<{
     systemKey: QuoteSystemKey;
@@ -265,6 +269,7 @@ export class QuoteNewService {
             description: next.product.description,
             productCode: next.productCode,
             price: next.price,
+            quantity: 1,
             inputs: next.defaultInputs,
           };
 
@@ -333,5 +338,21 @@ export class QuoteNewService {
           });
         },
       );
+
+    this.removeItem$.pipe(takeUntilDestroyed()).subscribe((next) => {
+      this.state.update((state) => {
+        const itemKeys: QuoteItemKey[] = state.systemItemKeyMap.get(next.systemKey)!;
+        const updatedItemKeys: QuoteItemKey[] = itemKeys.filter((key) => key !== next.itemKey);
+
+        const updatedItemMap = new Map(state.itemMap);
+        updatedItemMap.delete(next.itemKey);
+
+        return {
+          ...state,
+          systemItemKeyMap: new Map([...state.systemItemKeyMap, [next.systemKey, updatedItemKeys]]),
+          itemMap: updatedItemMap,
+        };
+      });
+    });
   }
 }

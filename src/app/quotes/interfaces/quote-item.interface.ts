@@ -11,5 +11,6 @@ export interface QuoteItem {
   description: string;
   productCode: string;
   price: number;
+  quantity: number;
   inputs: QuoteItemInput[];
 }

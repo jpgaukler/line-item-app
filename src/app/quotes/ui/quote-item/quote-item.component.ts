@@ -1,15 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, model } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 import { Product } from '../../../products/interfaces/product.interface';
 import { calculateProductCode } from '../../../products/utils/product-utils';
 import { QuoteItemInput } from '../../interfaces/quote-item-input.interface';
 import { QuoteItem } from '../../interfaces/quote-item.interface';
 import { DragHandleComponent } from '../drag-handle/drag-handle.component';
 import { QuoteItemInputComponent } from '../quote-item-input/quote-item-input.component';
+import { QuoteItemQuantityComponent } from '../quote-item-quantity/quote-item-quantity.component';
 
 @Component({
   selector: 'app-quote-item',
-  imports: [CommonModule, DragHandleComponent, QuoteItemInputComponent],
+  imports: [CommonModule, DragHandleComponent, QuoteItemInputComponent, QuoteItemQuantityComponent],
   templateUrl: './quote-item.component.html',
 })
 export class QuoteItemComponent {
@@ -17,6 +18,7 @@ export class QuoteItemComponent {
   itemIndex = input.required<number>();
   item = model.required<QuoteItem>();
   product = model.required<Product>();
+  deleteClick = output();
 
   inputChange(updatedInput: QuoteItemInput): void {
     this.item.update((item) => {

@@ -115,6 +115,9 @@
                   (itemChange)="
                     quoteNewService.updateItem$.next({ itemKey: itemKey, updatedItem: $event })
                   "
+                  (deleteClick)="
+                    quoteNewService.removeItem$.next({ systemKey: systemKey, itemKey: itemKey })
+                  "
                 ></app-quote-item>
                 <div class="relative my-5 flex items-center">
                   <button
