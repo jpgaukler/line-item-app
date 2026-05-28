@@ -156,21 +156,22 @@ export class QuoteNewService {
   );
 
   addSystem$ = new Subject<void>();
+  reorderSystem$ = new Subject<{ previousIndex: number; currentIndex: number }>();
+  removeSystem$ = new Subject<QuoteSystemKey>();
   showAddItem$ = new Subject<QuoteSystemKey>();
   addItem$ = new Subject<{ systemKey: QuoteSystemKey; product: Product }>();
   updateItem$ = new Subject<{
     itemKey: QuoteItemKey;
     updatedItem: QuoteItem;
   }>();
-  removeItem$ = new Subject<{
-    systemKey: QuoteSystemKey;
-    itemKey: QuoteItemKey;
-  }>();
-  reorderSystem$ = new Subject<{ previousIndex: number; currentIndex: number }>();
   reorderItem$ = new Subject<{
     systemKey: QuoteSystemKey;
     previousIndex: number;
     currentIndex: number;
+  }>();
+  removeItem$ = new Subject<{
+    systemKey: QuoteSystemKey;
+    itemKey: QuoteItemKey;
   }>();
 
   constructor() {
@@ -237,6 +238,27 @@ export class QuoteNewService {
           };
         });
       });
+
+    this.removeSystem$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => {
+        const itemKeysToRemove = state.systemItemKeyMap.get(next)!;
+        const updatedItemMap = new Map(state.itemMap);
+        itemKeysToRemove.forEach((itemKey) => updatedItemMap.delete(itemKey));
+
+        const updatedSystemItemKeyMap = new Map(state.systemItemKeyMap);
+        updatedSystemItemKeyMap.delete(next);
+
+        const updatedSystemMap = new Map(state.systemMap);
+        updatedSystemMap.delete(next);
+
+        return {
+          ...state,
+          systemMap: updatedSystemMap,
+          systemItemKeyMap: updatedSystemItemKeyMap,
+          itemMap: updatedItemMap,
+        };
+      }),
+    );
 
     this.showAddItem$.pipe(takeUntilDestroyed()).subscribe((next: QuoteSystemKey) => {
       this.state.update((state) => ({

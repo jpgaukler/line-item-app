@@ -7,6 +7,7 @@ import { ProductListService } from '../../../products/data-access/product-list.s
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
 import { IconDragHandleComponent } from '../../../shared/ui/icons/icon-drag-handle.component';
 import { IconPlusComponent } from '../../../shared/ui/icons/icon-plus.component';
+import { IconXmarkComponent } from '../../../shared/ui/icons/icon-x-mark.component';
 import { QuoteNewService } from '../../data-access/quote-new.service';
 import { QuoteSystemKey } from '../../interfaces/quote-system.interface';
 import { QuoteItemComponent } from '../../ui/quote-item/quote-item.component';
@@ -21,6 +22,7 @@ import { QuoteItemComponent } from '../../ui/quote-item/quote-item.component';
     FormsModule,
     IconPlusComponent,
     IconDragHandleComponent,
+    IconXmarkComponent,
     QuoteItemComponent,
     ReactiveFormsModule,
   ],
