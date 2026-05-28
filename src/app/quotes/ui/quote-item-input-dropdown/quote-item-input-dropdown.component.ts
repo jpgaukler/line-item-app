@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ProductInputOption } from '../../../products/interfaces/product-input-option.interface';
 import { ProductInput } from '../../../products/interfaces/product-input.interface';
 import { isCustomProductInputValue } from '../../../products/utils/product-utils';
+import { IconChevronDownComponent } from '../../../shared/ui/icons/icon-chevron-down.component';
 import { QuoteItemInput } from '../../interfaces/quote-item-input.interface';
 
 @Component({
   selector: 'app-quote-item-input-dropdown',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IconChevronDownComponent],
   templateUrl: './quote-item-input-dropdown.component.html',
   host: {
     '(document:click)': 'onDocumentClick($event)',

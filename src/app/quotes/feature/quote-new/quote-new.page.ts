@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ProductListService } from '../../../products/data-access/product-list.service';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
+import { IconPlusComponent } from '../../../shared/ui/icons/icon-plus.component';
 import { QuoteNewService } from '../../data-access/quote-new.service';
 import { QuoteSystemKey } from '../../interfaces/quote-system.interface';
 import { DragHandleComponent } from '../../ui/drag-handle/drag-handle.component';
@@ -21,6 +22,7 @@ import { QuoteItemComponent } from '../../ui/quote-item/quote-item.component';
     CdkDrag,
     DragHandleComponent,
     QuoteItemComponent,
+    IconPlusComponent,
   ],
   templateUrl: './quote-new.page.html',
   providers: [ProductListService, QuoteNewService],

@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FieldTree, FormField } from '@angular/forms/signals';
+import { IconTrashComponent } from '../../../shared/ui/icons/icon-trash.component';
 import { ProductInputOption } from '../../interfaces/product-input-option.interface';
 
 @Component({
   selector: 'app-product-input-option',
-  imports: [FormsModule, CommonModule, FormField],
+  imports: [FormsModule, CommonModule, FormField, IconTrashComponent],
   templateUrl: './product-input-option.component.html',
 })
 export class ProductInputOptionComponent {

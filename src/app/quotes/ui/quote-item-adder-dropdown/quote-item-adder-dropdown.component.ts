@@ -3,11 +3,12 @@ import { Component, computed, ElementRef, inject, input, output, signal } from '
 import { FormsModule } from '@angular/forms';
 import { ProductAdderOption } from '../../../products/interfaces/product-adder-option.interface';
 import { ProductAdder } from '../../../products/interfaces/product-adder.interface';
+import { IconChevronDownComponent } from '../../../shared/ui/icons/icon-chevron-down.component';
 import { QuoteItemAdder } from '../../interfaces/quote-item-adder.interface';
 
 @Component({
   selector: 'app-quote-item-adder-dropdown',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IconChevronDownComponent],
   templateUrl: './quote-item-adder-dropdown.component.html',
   host: {
     '(document:click)': 'onDocumentClick($event)',

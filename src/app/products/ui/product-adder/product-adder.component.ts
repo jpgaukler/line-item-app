@@ -2,12 +2,20 @@ import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk
 import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
+import { IconXmarkComponent } from '../../../shared/ui/icons/icon-x-mark.component';
 import { ProductAdder } from '../../interfaces/product-adder.interface';
 import { ProductAdderOptionComponent } from '../product-adder-option/product-adder-option.component';
 
 @Component({
   selector: 'app-product-adder',
-  imports: [CommonModule, ProductAdderOptionComponent, CdkDrag, CdkDropList, FormField],
+  imports: [
+    CommonModule,
+    ProductAdderOptionComponent,
+    CdkDrag,
+    CdkDropList,
+    FormField,
+    IconXmarkComponent,
+  ],
   templateUrl: './product-adder.component.html',
 })
 export class ProductAdderComponent {
