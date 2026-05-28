@@ -11,7 +11,7 @@ export interface QuoteItem {
   name: string;
   description: string;
   productCode: string;
-  price: number;
+  basePrice: number;
   quantity: number;
   inputs: QuoteItemInput[];
   adders: QuoteItemAdder[];

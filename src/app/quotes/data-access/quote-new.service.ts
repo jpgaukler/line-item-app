@@ -94,36 +94,36 @@ export class QuoteNewService {
     const state = this.state();
 
     const systems = Array.from(state.systemMap.entries(), ([systemKey, system], systemIndex) => {
-      const systemItemKeyMap = state.systemItemKeyMap.get(systemKey)!;
+      const items = state.systemItemKeyMap.get(systemKey)!.map((itemKey, itemIndex) => {
+        const item = state.itemMap.get(itemKey)!;
+
+        return {
+          productId: item.productId,
+          itemNumber: `${systemIndex + 1}.${itemIndex + 1}`,
+          name: item.name,
+          description: item.description,
+          productCode: item.productCode,
+          basePrice: item.basePrice,
+          unitPrice:
+            item.basePrice + item.adders.reduce((adderTotal, adder) => adderTotal + adder.price, 0),
+          quantity: item.quantity,
+          inputs: item.inputs.map((input) => ({
+            name: input.name,
+            value: input.value,
+            displayText: input.displayText,
+          })),
+          adders: item.adders.map((adder) => ({
+            name: adder.name,
+            displayText: adder.displayText,
+            price: adder.price,
+          })),
+        };
+      });
 
       return {
-        price: systemItemKeyMap.reduce((total, itemKey) => {
-          const item = state.itemMap.get(itemKey)!;
-          return total + item.price * item.quantity;
-        }, 0),
         name: `System ${systemIndex + 1}`,
-        items: systemItemKeyMap.map((itemKey, itemIndex) => {
-          const item = state.itemMap.get(itemKey)!;
-          return {
-            productId: item.productId,
-            itemNumber: `${systemIndex + 1}.${itemIndex + 1}`,
-            name: item.name,
-            description: item.description,
-            productCode: item.productCode,
-            price: item.price,
-            quantity: item.quantity,
-            inputs: item.inputs.map((input) => ({
-              name: input.name,
-              value: input.value,
-              displayText: input.displayText,
-            })),
-            adders: item.adders.map((adder) => ({
-              name: adder.name,
-              displayText: adder.displayText,
-              price: adder.price,
-            })),
-          };
-        }),
+        items: items,
+        price: items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
       };
     });
 
@@ -302,7 +302,7 @@ export class QuoteNewService {
             name: next.product.name,
             description: next.product.description,
             productCode: next.productCode,
-            price: next.price,
+            basePrice: next.price,
             quantity: 1,
             inputs: next.defaultInputs,
             adders: [],
@@ -330,7 +330,7 @@ export class QuoteNewService {
           this.productHttpService
             .getProductPrice(next.updatedItem.productId, next.updatedItem.productCode)
             .pipe(
-              map((price) => ({ ...next, updatedItem: { ...next.updatedItem, price: price } })),
+              map((price) => ({ ...next, updatedItem: { ...next.updatedItem, basePrice: price } })),
               catchError((err) => {
                 // if no price match found (ie: -X product), then need to decide what to do.
                 // Maybe user should enter manual price?
