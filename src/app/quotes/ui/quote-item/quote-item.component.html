@@ -37,16 +37,23 @@
     @if (showAdders()) {
       <div class="flex gap-4">
         @for (adder of product().adders; track adder.name) {
-          <div appButton (click)="insertAdder(adder)">
+          <div appButton (click)="insertAdder(adder)" class="rounded-full!">
             {{ adder.name }}
           </div>
         }
       </div>
     }
     <div class="mt-2 flex flex-row items-baseline justify-between gap-2">
-      <div>
-        <button appButton (click)="showAdders.set(true)">+ Adder</button>
-      </div>
+      @if (showAdders()) {
+        <button
+          (click)="showAdders.set(false)"
+          class="hover:text-primary/70 cursor-pointer font-medium"
+        >
+          Cancel
+        </button>
+      } @else {
+        <button appButton (click)="showAdders.set(true)" class="rounded-full!">+ Adder</button>
+      }
       <app-quote-item-quantity
         [quantity]="item().quantity"
         (quantityChange)="quantityChange($event)"

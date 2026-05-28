@@ -29,11 +29,12 @@
     "
   >
     @for (option of productAdder().options; track option.displayText) {
-      <div (click)="optionClick(option)" class="hover:bg-input cursor-pointer p-2">
-        <div class="font-semibold">{{ option.displayText }}</div>
-        <div class="text-foreground/70 text-sm">
-          {{ productAdder().name }} = {{ option.displayText }}
-        </div>
+      <div
+        (click)="optionClick(option)"
+        class="hover:bg-input flex cursor-pointer flex-row justify-between p-2"
+      >
+        <div>{{ option.displayText }}</div>
+        <div class="text-foreground/70 text-sm">+ {{ option.price | currency }}</div>
       </div>
     }
     @if (productAdder().allowCustomValue) {
