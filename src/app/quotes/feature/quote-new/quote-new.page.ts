@@ -5,24 +5,24 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutService } from '../../../layout/data-access/layout.service';
 import { ProductListService } from '../../../products/data-access/product-list.service';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
+import { IconDragHandleComponent } from '../../../shared/ui/icons/icon-drag-handle.component';
 import { IconPlusComponent } from '../../../shared/ui/icons/icon-plus.component';
 import { QuoteNewService } from '../../data-access/quote-new.service';
 import { QuoteSystemKey } from '../../interfaces/quote-system.interface';
-import { DragHandleComponent } from '../../ui/drag-handle/drag-handle.component';
 import { QuoteItemComponent } from '../../ui/quote-item/quote-item.component';
 
 @Component({
   selector: 'app-products',
   imports: [
-    CommonModule,
     ButtonDirective,
-    ReactiveFormsModule,
-    FormsModule,
     CdkDropList,
     CdkDrag,
-    DragHandleComponent,
-    QuoteItemComponent,
+    CommonModule,
+    FormsModule,
     IconPlusComponent,
+    IconDragHandleComponent,
+    QuoteItemComponent,
+    ReactiveFormsModule,
   ],
   templateUrl: './quote-new.page.html',
   providers: [ProductListService, QuoteNewService],

@@ -11,12 +11,11 @@ import {
 import { FormsModule } from '@angular/forms';
 import { ProductInput } from '../../../products/interfaces/product-input.interface';
 import { IconCheckmarkComponent } from '../../../shared/ui/icons/icon-checkmark.component';
-import { IconMinusComponent } from '../../../shared/ui/icons/icon-minus.component';
 import { IconXmarkComponent } from '../../../shared/ui/icons/icon-x-mark.component';
 
 @Component({
   selector: 'app-quote-item-input-custom',
-  imports: [FormsModule, IconCheckmarkComponent, IconXmarkComponent, IconMinusComponent],
+  imports: [FormsModule, IconCheckmarkComponent, IconXmarkComponent],
   templateUrl: './quote-item-input-custom.component.html',
   host: {
     '(document:click)': 'onDocumentClick($event)',

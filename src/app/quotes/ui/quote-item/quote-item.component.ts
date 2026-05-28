@@ -4,10 +4,10 @@ import { ProductAdder } from '../../../products/interfaces/product-adder.interfa
 import { Product } from '../../../products/interfaces/product.interface';
 import { calculateProductCode } from '../../../products/utils/product-utils';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
+import { IconDragHandleComponent } from '../../../shared/ui/icons/icon-drag-handle.component';
 import { QuoteItemAdder } from '../../interfaces/quote-item-adder.interface';
 import { QuoteItemInput } from '../../interfaces/quote-item-input.interface';
 import { QuoteItem } from '../../interfaces/quote-item.interface';
-import { DragHandleComponent } from '../drag-handle/drag-handle.component';
 import { QuoteItemAdderComponent } from '../quote-item-adder/quote-item-adder.component';
 import { QuoteItemInputComponent } from '../quote-item-input/quote-item-input.component';
 import { QuoteItemQuantityComponent } from '../quote-item-quantity/quote-item-quantity.component';
@@ -17,7 +17,7 @@ import { QuoteItemQuantityComponent } from '../quote-item-quantity/quote-item-qu
   imports: [
     CommonModule,
     ButtonDirective,
-    DragHandleComponent,
+    IconDragHandleComponent,
     QuoteItemInputComponent,
     QuoteItemAdderComponent,
     QuoteItemQuantityComponent,
