@@ -89,7 +89,7 @@ export class ProductHttpService {
         const product = products?.find((p) => p.id === productId);
         const price = product?.priceDictionary.prices[productCode];
 
-        if (!price) {
+        if (price === null || price === undefined) {
           throw new Error('Product price could not be determined!');
         }
 
