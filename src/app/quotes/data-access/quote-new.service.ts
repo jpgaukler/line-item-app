@@ -34,7 +34,7 @@ interface QuoteNewState {
   systemMap: Map<QuoteSystemKey, QuoteSystem>;
 
   /** The system key where an item is being added, otherwise null */
-  showAddItem: QuoteSystemKey | null;
+  showAddItem: { systemKey: QuoteSystemKey; itemIndex: number } | null;
 
   /** A Map of system keys to array of item keys for the quote items in each system. */
   systemItemKeyMap: Map<QuoteSystemKey, QuoteItemKey[]>;
@@ -158,8 +158,8 @@ export class QuoteNewService {
   addSystem$ = new Subject<void>();
   reorderSystem$ = new Subject<{ previousIndex: number; currentIndex: number }>();
   removeSystem$ = new Subject<QuoteSystemKey>();
-  showAddItem$ = new Subject<QuoteSystemKey>();
-  addItem$ = new Subject<{ systemKey: QuoteSystemKey; product: Product }>();
+  showAddItem$ = new Subject<{ systemKey: QuoteSystemKey; itemIndex: number }>();
+  addItem$ = new Subject<{ systemKey: QuoteSystemKey; product: Product; itemIndex: number }>();
   updateItem$ = new Subject<{
     itemKey: QuoteItemKey;
     updatedItem: QuoteItem;
@@ -260,7 +260,7 @@ export class QuoteNewService {
       }),
     );
 
-    this.showAddItem$.pipe(takeUntilDestroyed()).subscribe((next: QuoteSystemKey) => {
+    this.showAddItem$.pipe(takeUntilDestroyed()).subscribe((next) => {
       this.state.update((state) => ({
         ...state,
         showAddItem: next,
@@ -309,7 +309,11 @@ export class QuoteNewService {
           };
 
           const itemKeys: QuoteItemKey[] = state.systemItemKeyMap.get(next.systemKey)!;
-          const updatedItemKeys: QuoteItemKey[] = [...itemKeys, newItemKey];
+          const updatedItemKeys: QuoteItemKey[] = [
+            ...itemKeys.slice(0, next.itemIndex),
+            newItemKey,
+            ...itemKeys.slice(next.itemIndex),
+          ];
 
           return {
             ...state,

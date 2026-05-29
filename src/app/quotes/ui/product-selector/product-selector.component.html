@@ -1,0 +1,20 @@
+<div class="flex flex-col gap-2">
+  <div class="flex flex-row items-baseline gap-2">
+    <span class="rounded-md border border-dashed px-3 font-semibold">
+      {{ itemNumber() }}
+    </span>
+    <span class="font-bold">Select a product</span>
+    <!-- <input
+      type="text"
+      placeholder="Search products"
+      class="hover:bg-input focus:bg-input w-full rounded-md border p-1"
+    /> -->
+  </div>
+  <div class="flex gap-4">
+    @for (product of products(); track product.id) {
+      <div appButton (click)="productClick.emit(product)" class="rounded-full!">
+        {{ product.name }}
+      </div>
+    }
+  </div>
+</div>

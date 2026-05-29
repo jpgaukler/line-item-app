@@ -10,6 +10,7 @@ import { IconPlusComponent } from '../../../shared/ui/icons/icon-plus.component'
 import { IconXmarkComponent } from '../../../shared/ui/icons/icon-x-mark.component';
 import { QuoteNewService } from '../../data-access/quote-new.service';
 import { QuoteSystemKey } from '../../interfaces/quote-system.interface';
+import { ProductSelectorComponent } from '../../ui/product-selector/product-selector.component';
 import { QuoteItemComponent } from '../../ui/quote-item/quote-item.component';
 
 @Component({
@@ -25,6 +26,7 @@ import { QuoteItemComponent } from '../../ui/quote-item/quote-item.component';
     IconXmarkComponent,
     QuoteItemComponent,
     ReactiveFormsModule,
+    ProductSelectorComponent,
   ],
   templateUrl: './quote-new.page.html',
   providers: [ProductListService, QuoteNewService],
