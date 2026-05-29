@@ -11,7 +11,7 @@
       {{ systemIndex() + 1 }}.{{ itemIndex() + 1 }}
     </span>
     <span class="font-bold">{{ item().productCode }}</span>
-    <span class="ml-auto font-bold">{{ item().basePrice | currency }}</span>
+    <span class="ml-auto pr-7">{{ item().basePrice | currency }}</span>
   </div>
   <p>{{ item().description }}</p>
   <div class="flex flex-col gap-1">
