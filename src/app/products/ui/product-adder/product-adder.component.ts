@@ -25,10 +25,13 @@ export class ProductAdderComponent {
   addOption() {
     this.adderForm()
       .options()
-      .value.update((options) => ({
+      .value.update((options) => [
         ...options,
-        options: [...options, { displayText: `Option ${options.length + 1}`, price: 0 }],
-      }));
+        {
+          displayText: `Option ${options.length + 1}`,
+          price: 0,
+        },
+      ]);
   }
 
   removeOption(index: number) {
@@ -43,9 +46,9 @@ export class ProductAdderComponent {
       .options()
       .value.update((options) => options.filter((_, i) => i !== index));
 
-    // fix default if the default was removed
+    // fix default if the default was removed or after the removed index
     const defaultOptionIndex = this.adderForm().defaultOptionIndex().value();
-    if (defaultOptionIndex === index) {
+    if (defaultOptionIndex > 0 && defaultOptionIndex >= index) {
       this.adderForm()
         .defaultOptionIndex()
         .value.set(defaultOptionIndex - 1);

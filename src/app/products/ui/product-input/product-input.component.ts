@@ -46,9 +46,9 @@ export class ProductInputComponent {
       .options()
       .value.update((options) => options.filter((_, i) => i !== index));
 
-    // fix default if the default was removed
+    // fix default if the default was removed or after the removed index
     const defaultOptionIndex = this.inputForm().defaultOptionIndex().value();
-    if (defaultOptionIndex === index) {
+    if (defaultOptionIndex > 0 && defaultOptionIndex >= index) {
       this.inputForm()
         .defaultOptionIndex()
         .value.set(defaultOptionIndex - 1);

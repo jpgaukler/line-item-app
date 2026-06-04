@@ -85,7 +85,7 @@ export class ProductEditPage implements OnDestroy {
   removeInput(index: number) {
     const inputsArray = this.productEditService.productForm().inputs().value();
 
-    if (inputsArray.length <= 1) {
+    if (inputsArray.length === 0) {
       return;
     }
 

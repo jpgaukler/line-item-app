@@ -51,7 +51,7 @@ export class ProductEditAddersPage implements OnDestroy {
         {
           name: `Adder ${adders.length + 1}`,
           defaultOptionIndex: 0,
-          allowCustomValue: false,
+          allowCustomOption: false,
           options: [
             {
               displayText: 'Option 1',
@@ -78,7 +78,7 @@ export class ProductEditAddersPage implements OnDestroy {
   removeAdder(index: number) {
     const addersArray = this.productEditService.productForm().adders().value();
 
-    if (addersArray.length <= 1) {
+    if (addersArray.length === 0) {
       return;
     }
 
