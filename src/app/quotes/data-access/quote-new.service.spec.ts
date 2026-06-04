@@ -17,7 +17,7 @@ describe('QuoteNewService', () => {
       inputs: [
         {
           name: 'Color',
-          allowCustomValue: false,
+          allowCustomOption: false,
           defaultOptionIndex: 0,
           options: [
             { displayText: 'Red', value: 'RED' },
@@ -42,7 +42,7 @@ describe('QuoteNewService', () => {
       inputs: [
         {
           name: 'Size',
-          allowCustomValue: false,
+          allowCustomOption: false,
           defaultOptionIndex: 1,
           options: [
             { displayText: 'Small', value: 'SM' },
@@ -67,7 +67,7 @@ describe('QuoteNewService', () => {
       inputs: [
         {
           name: 'Diameter',
-          allowCustomValue: false,
+          allowCustomOption: false,
           defaultOptionIndex: 0,
           options: [
             { displayText: '1 inch', value: '1' },

@@ -3,19 +3,23 @@
     "id": "df96e721-233e-4569-8761-b96ddc72e130",
     "name": "Bulk Bag Unloader",
     "description": "Square bulk bag unloader for unloading bags into a hopper.",
-    "productCodeFormula": "",
+    "productCodeFormula": "BBU",
     "inputs": [
       {
         "name": "Selection (1)",
         "defaultOptionIndex": 0,
-        "allowCustomValue": false,
+        "allowCustomOption": false,
         "options": [
           { "displayText": "Option (1)", "value": "Value (1)" },
           { "displayText": "Option (2)", "value": "Value (2)" }
         ]
       }
     ],
-    "adders": []
+    "priceDictionary": {
+      "productId": "df96e721-233e-4569-8761-b96ddc72e130",
+      "productCodeHash": "11775108626195357369",
+      "prices": { "BBU": 0 }
+    }
   },
   {
     "id": "a346890e-8d64-45d5-ae26-e5fa8352c69a",
@@ -25,8 +29,8 @@
     "inputs": [
       {
         "name": "Body Size",
-        "defaultOptionIndex": 3,
-        "allowCustomValue": true,
+        "defaultOptionIndex": 0,
+        "allowCustomOption": true,
         "options": [
           { "displayText": "18 inch square", "value": "18" },
           { "displayText": "24 inch square", "value": "24" },
@@ -38,7 +42,7 @@
       {
         "name": "Material of Construction",
         "defaultOptionIndex": 1,
-        "allowCustomValue": false,
+        "allowCustomOption": false,
         "options": [
           { "displayText": "Carbon Steel", "value": "C" },
           { "displayText": "Stainless Steel 304", "value": "S" },
@@ -48,14 +52,59 @@
       {
         "name": "Charging Adapter Size",
         "defaultOptionIndex": 0,
-        "allowCustomValue": false,
+        "allowCustomOption": false,
         "options": [
           { "displayText": "Size 1", "value": "1" },
           { "displayText": "Size 2", "value": "2" }
         ]
       }
     ],
-    "adders": []
+    "adders": [
+      {
+        "name": "Adder 1",
+        "defaultOptionIndex": 0,
+        "allowCustomOption": true,
+        "options": [
+          { "displayText": "Option 1", "price": 0 },
+          { "displayText": "Option 2", "price": 0 }
+        ]
+      }
+    ],
+    "priceDictionary": {
+      "productCodeHash": "12466855916702885175",
+      "prices": {
+        "HPD1-C18": 100,
+        "HPD2-C18": 0,
+        "HPD1-S18": 0,
+        "HPD2-S18": 0,
+        "HPD1-L18": 0,
+        "HPD2-L18": 0,
+        "HPD1-C24": 200,
+        "HPD2-C24": 1200,
+        "HPD1-S24": 800,
+        "HPD2-S24": 2,
+        "HPD1-L24": 550,
+        "HPD2-L24": 3905,
+        "HPD1-C30": 300,
+        "HPD2-C30": 1,
+        "HPD1-S30": 850,
+        "HPD2-S30": 777,
+        "HPD1-L30": 600,
+        "HPD2-L30": 356,
+        "HPD1-C36": 400,
+        "HPD2-C36": 1250,
+        "HPD1-S36": 900,
+        "HPD2-S36": 666,
+        "HPD1-L36": 650,
+        "HPD2-L36": 77,
+        "HPD1-C48": 450,
+        "HPD2-C48": 8999,
+        "HPD1-S48": 950,
+        "HPD2-S48": 276,
+        "HPD1-L48": 700,
+        "HPD2-L48": 888
+      }
+    }
   },
   {
     "id": "e8b892da-c0f9-4f97-a818-2e38b9ba69a4",
@@ -66,7 +115,7 @@
       {
         "name": "Length",
         "defaultOptionIndex": 1,
-        "allowCustomValue": false,
+        "allowCustomOption": false,
         "options": [
           { "displayText": "10 foot length", "value": "10" },
           { "displayText": "15 foot length", "value": "15" },
@@ -80,7 +129,7 @@
       {
         "name": "Size",
         "defaultOptionIndex": 0,
-        "allowCustomValue": false,
+        "allowCustomOption": false,
         "options": [
           { "displayText": "1250", "value": "1250" },
           { "displayText": "2500", "value": "2500" },
@@ -91,7 +140,7 @@
       {
         "name": "Screw Type",
         "defaultOptionIndex": 0,
-        "allowCustomValue": false,
+        "allowCustomOption": false,
         "options": [
           { "displayText": "Round", "value": "RND" },
           { "displayText": "Wide Flight", "value": "WF" },
@@ -100,7 +149,124 @@
         ]
       }
     ],
-    "adders": []
+    "priceDictionary": {
+      "productId": "e8b892da-c0f9-4f97-a818-2e38b9ba69a4",
+      "productCodeHash": "4866293924833560135",
+      "prices": {
+        "FS-RND1250-10": 0,
+        "FS-WF1250-10": 0,
+        "FS-VF1250-10": 0,
+        "FS-TP1250-10": 0,
+        "FS-RND2500-10": 0,
+        "FS-WF2500-10": 0,
+        "FS-VF2500-10": 0,
+        "FS-TP2500-10": 0,
+        "FS-RND3000-10": 0,
+        "FS-WF3000-10": 0,
+        "FS-VF3000-10": 0,
+        "FS-TP3000-10": 0,
+        "FS-RND4000-10": 0,
+        "FS-WF4000-10": 0,
+        "FS-VF4000-10": 0,
+        "FS-TP4000-10": 0,
+        "FS-RND1250-15": 0,
+        "FS-WF1250-15": 0,
+        "FS-VF1250-15": 0,
+        "FS-TP1250-15": 0,
+        "FS-RND2500-15": 0,
+        "FS-WF2500-15": 0,
+        "FS-VF2500-15": 0,
+        "FS-TP2500-15": 0,
+        "FS-RND3000-15": 0,
+        "FS-WF3000-15": 0,
+        "FS-VF3000-15": 0,
+        "FS-TP3000-15": 0,
+        "FS-RND4000-15": 0,
+        "FS-WF4000-15": 0,
+        "FS-VF4000-15": 0,
+        "FS-TP4000-15": 0,
+        "FS-RND1250-20": 0,
+        "FS-WF1250-20": 0,
+        "FS-VF1250-20": 0,
+        "FS-TP1250-20": 0,
+        "FS-RND2500-20": 0,
+        "FS-WF2500-20": 0,
+        "FS-VF2500-20": 0,
+        "FS-TP2500-20": 0,
+        "FS-RND3000-20": 0,
+        "FS-WF3000-20": 0,
+        "FS-VF3000-20": 0,
+        "FS-TP3000-20": 0,
+        "FS-RND4000-20": 0,
+        "FS-WF4000-20": 0,
+        "FS-VF4000-20": 0,
+        "FS-TP4000-20": 0,
+        "FS-RND1250-25": 0,
+        "FS-WF1250-25": 0,
+        "FS-VF1250-25": 0,
+        "FS-TP1250-25": 0,
+        "FS-RND2500-25": 0,
+        "FS-WF2500-25": 0,
+        "FS-VF2500-25": 0,
+        "FS-TP2500-25": 0,
+        "FS-RND3000-25": 0,
+        "FS-WF3000-25": 0,
+        "FS-VF3000-25": 0,
+        "FS-TP3000-25": 0,
+        "FS-RND4000-25": 0,
+        "FS-WF4000-25": 0,
+        "FS-VF4000-25": 0,
+        "FS-TP4000-25": 0,
+        "FS-RND1250-30": 0,
+        "FS-WF1250-30": 0,
+        "FS-VF1250-30": 0,
+        "FS-TP1250-30": 0,
+        "FS-RND2500-30": 0,
+        "FS-WF2500-30": 0,
+        "FS-VF2500-30": 0,
+        "FS-TP2500-30": 0,
+        "FS-RND3000-30": 0,
+        "FS-WF3000-30": 0,
+        "FS-VF3000-30": 0,
+        "FS-TP3000-30": 0,
+        "FS-RND4000-30": 0,
+        "FS-WF4000-30": 0,
+        "FS-VF4000-30": 0,
+        "FS-TP4000-30": 0,
+        "FS-RND1250-35": 0,
+        "FS-WF1250-35": 0,
+        "FS-VF1250-35": 0,
+        "FS-TP1250-35": 0,
+        "FS-RND2500-35": 0,
+        "FS-WF2500-35": 0,
+        "FS-VF2500-35": 0,
+        "FS-TP2500-35": 0,
+        "FS-RND3000-35": 0,
+        "FS-WF3000-35": 0,
+        "FS-VF3000-35": 0,
+        "FS-TP3000-35": 0,
+        "FS-RND4000-35": 0,
+        "FS-WF4000-35": 0,
+        "FS-VF4000-35": 0,
+        "FS-TP4000-35": 0,
+        "FS-RND1250-40": 0,
+        "FS-WF1250-40": 0,
+        "FS-VF1250-40": 0,
+        "FS-TP1250-40": 0,
+        "FS-RND2500-40": 0,
+        "FS-WF2500-40": 0,
+        "FS-VF2500-40": 0,
+        "FS-TP2500-40": 0,
+        "FS-RND3000-40": 0,
+        "FS-WF3000-40": 0,
+        "FS-VF3000-40": 0,
+        "FS-TP3000-40": 0,
+        "FS-RND4000-40": 0,
+        "FS-WF4000-40": 0,
+        "FS-VF4000-40": 0,
+        "FS-TP4000-40": 0
+      }
+    }
   },
   {
     "id": "f70cf6f3-e2c0-44d9-9fb1-e4d4c62c4da5",
@@ -111,14 +277,35 @@
       {
         "name": "Selection (1)",
         "defaultOptionIndex": 1,
-        "allowCustomValue": false,
+        "allowCustomOption": false,
         "options": [
           { "displayText": "Cherries", "value": "C" },
           { "displayText": "Bananas", "value": "B" },
           { "displayText": "Bluberries", "value": "BL" }
         ]
       }
+    ]
+  },
+  {
+    "id": "c8ce5e1e-9df4-4423-b68a-95d3572c8ba9",
+    "name": "Test product",
+    "description": "Test product description.",
+    "productCodeFormula": "",
+    "inputs": [
+      {
+        "name": "New Input (1)",
+        "defaultOptionIndex": 0,
+        "allowCustomOption": false,
+        "options": [{ "displayText": "Option (1)", "value": "1" }]
+      },
+      {
+        "name": "New Input (2)",
+        "defaultOptionIndex": 0,
+        "allowCustomOption": false,
+        "options": [{ "displayText": "Option (1)", "value": "1" }]
+      }
     ],
-    "adders": []
+    "adders": [],
+    "priceDictionary": { "productCodeHash": "", "prices": {} }
   }
 ]

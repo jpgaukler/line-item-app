@@ -63,7 +63,7 @@ export class ProductEditPage implements OnDestroy {
         {
           name: `New Input (${inputs.length + 1})`,
           defaultOptionIndex: 0,
-          allowCustomValue: false,
+          allowCustomOption: false,
           options: [{ displayText: 'Option (1)', value: '1' }],
         },
       ]);
