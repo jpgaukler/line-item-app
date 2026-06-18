@@ -4,9 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       target-environment:
-        description: 'The target environment (e.g., dev, staging, prod)'
-        type: string
+        description: 'Target environment'
         required: true
+        type: choice
+        options:
+          - dev
+          - uat
+          - prod
       build-version:
         description: 'Build version to deploy'
         type: string
