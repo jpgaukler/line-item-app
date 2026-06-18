@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6.4.0
         with:
-          node-version-file: 'package.json' # read node versoin from engines defined in package.json
+          node-version-file: 'package.json' # read node version from engines defined in package.json
 
       - name: Install Dependencies
         run: npm install
