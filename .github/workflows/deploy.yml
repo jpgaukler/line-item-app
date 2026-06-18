@@ -32,13 +32,33 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
+      - name: Create Build Archive
+        run: |
+          cd dist/line-item-app
+          zip -r ../../${GITHUB_SHA}.zip browser
+
+      - name: Upload Archive to S3
+        run: |
+          aws s3 cp \
+            ${GITHUB_SHA}.zip \
+            s3://${{ vars.AWS_ARTIFACT_BUCKET_NAME }}/${GITHUB_SHA}.zip
+
       - name: Deploy to S3
         run: |
           # 1. Sync all files EXCEPT index.html to avoid overwriting its headers later
-          aws s3 sync ./dist/line-item-app/browser s3://${{ vars.AWS_S3_BUCKET_NAME }} --delete --exclude "index.html"
+          aws s3 sync ./dist/line-item-app/browser \
+            s3://${{ vars.AWS_S3_BUCKET_NAME }} \
+            --delete \
+            --exclude "index.html"
 
           # 2. Specifically upload index.html with the no-cache header
-          aws s3 cp ./dist/line-item-app/browser/index.html s3://${{ vars.AWS_S3_BUCKET_NAME }}/index.html --cache-control "no-cache, no-store, must-revalidate, max-age=0" --content-type "text/html"
+          aws s3 cp ./dist/line-item-app/browser/index.html \
+            s3://${{ vars.AWS_S3_BUCKET_NAME }}/index.html \
+            --cache-control "no-cache, no-store, must-revalidate, max-age=0" \
+            --content-type "text/html"
 
       - name: Invalidate CloudFront Cache
-        run: aws cloudfront create-invalidation --distribution-id ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
