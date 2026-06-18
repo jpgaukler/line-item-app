@@ -1,0 +1,38 @@
+name: 'Deploy App Steps'
+description: 'Configures AWS, syncs build assets to S3, and invalidates CloudFront'
+
+inputs:
+  build-folder:
+    description: 'Local folder path to sync with S3 bucket'
+    required: true
+  target-bucket-name:
+    description: 'Target S3 Bucket Name'
+    required: true
+  cloudfront-distribution-id:
+    description: 'CloudFront Distribution ID'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Deploy to S3
+      shell: bash
+      run: |
+        # Sync all files EXCEPT index.html to avoid overwriting its headers later
+        aws s3 sync ${{ inputs.build-folder }} \
+          s3://${{ inputs.target-bucket-name }} \
+          --delete \
+          --exclude "index.html"
+
+        # Upload index.html with the no-cache header
+        aws s3 cp ${{ inputs.build-folder }}/index.html \
+          s3://${{ inputs.target-bucket-name }}/index.html \
+          --cache-control "no-cache, no-store, must-revalidate, max-age=0" \
+          --content-type "text/html"
+
+    - name: Invalidate CloudFront Cache
+      shell: bash
+      run: |
+        aws cloudfront create-invalidation \
+          --distribution-id ${{ inputs.cloudfront-distribution-id }} \
+          --paths "/*"
