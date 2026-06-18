@@ -1,4 +1,4 @@
-name: Build and Deploy Angular to S3
+name: Deploy to Dev
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    environment: dev
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6.0.2

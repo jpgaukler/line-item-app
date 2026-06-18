@@ -1,7 +1,7 @@
-name: Shared Job - Deploy App
+name: Promote
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       target-environment:
         description: 'The target environment (e.g., dev, staging, prod)'
@@ -13,10 +13,9 @@ on:
         required: true
 
 jobs:
-  deploy-app-shared-jo:
+  promote:
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
-
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6.1.0
@@ -34,7 +33,7 @@ jobs:
           unzip ./${{ inputs.build-version }}.zip -d ./extracted
 
       - name: Run Shared Deployment Steps
-        uses: ./.github/actions/deploy-app-steps
+        uses: ./.github/actions
         with:
           build-folder: './extracted'
           target-bucket-name: ${{ vars.AWS_S3_BUCKET_NAME }}
