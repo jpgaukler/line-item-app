@@ -21,6 +21,13 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.target-environment }}
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6.0.2
+        with:
+          sparse-checkout: |
+            .github/actions/deploy-app-steps
+          sparse-checkout-cone-mode: false
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6.1.0
         with:
