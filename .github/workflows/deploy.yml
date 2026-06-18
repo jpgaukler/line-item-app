@@ -34,10 +34,10 @@ jobs:
 
       - name: Create Build Archive
         run: |
-          cd dist/line-item-app
-          zip -r ../../${GITHUB_SHA}.zip browser
+          cd dist/line-item-app/browser
+          zip -rq ../../../${GITHUB_SHA}.zip .
 
-      - name: Upload Archive to S3
+      - name: Upload Build Archive to S3
         run: |
           aws s3 cp \
             ${GITHUB_SHA}.zip \
