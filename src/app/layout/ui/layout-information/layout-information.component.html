@@ -1,0 +1,28 @@
+@if (isOpen()) {
+  <div
+    class="fixed inset-0 z-100 flex items-center justify-center bg-black/50"
+    (click)="toggleAppInformation.emit()"
+    (window:keydown.escape)="toggleAppInformation.emit()"
+  >
+    <div
+      class="bg-card flex w-full max-w-md flex-col rounded-lg shadow-xl"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="border-b p-4">
+        <h2 class="text-lg font-semibold">Information</h2>
+      </div>
+
+      <div class="p-4">
+        <p class="text-sm">Build Version</p>
+
+        <code class="bg-input/50 mt-1 block rounded px-3 py-2 text-sm">
+          {{ buildVersion }}
+        </code>
+      </div>
+
+      <div class="flex justify-end border-t p-4">
+        <button appButton variant="primary" (click)="toggleAppInformation.emit()">Close</button>
+      </div>
+    </div>
+  </div>
+}

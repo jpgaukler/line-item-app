@@ -1,9 +1,14 @@
-<app-layout-sidebar [isOpen]="layoutService.sidebarOpen()"></app-layout-sidebar>
+<app-layout-information
+  [isOpen]="layoutService.showAppInformation()"
+  (toggleAppInformation)="layoutService.toggleAppInformation$.next()"
+></app-layout-information>
 <app-layout-topbar
   [breadcrumbs]="layoutService.breadcrumbs()"
   [sidebarOpen]="layoutService.sidebarOpen()"
   (toggleSidebarClick)="layoutService.toggleSidebar$.next()"
+  (toggleAppInformation)="layoutService.toggleAppInformation$.next()"
 ></app-layout-topbar>
+<app-layout-sidebar [isOpen]="layoutService.sidebarOpen()" />
 <main
   class="mt-topbar-height min-h-[calc(100vh-(var(--spacing-topbar-height)))] transition-[margin-left]"
   [ngClass]="{ 'ml-sidebar-width': layoutService.sidebarOpen() }"

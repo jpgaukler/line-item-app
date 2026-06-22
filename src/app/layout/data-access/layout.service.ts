@@ -8,6 +8,7 @@ type Theme = 'light' | 'dark' | 'system';
 
 interface LayoutState {
   sidebarOpen: boolean;
+  showAppInformation: boolean;
   theme: Theme;
   breadcrumbs: LayoutBreadcrumb[];
   loaded: boolean;
@@ -26,6 +27,7 @@ export class LayoutService {
   // state
   private state = signal<LayoutState>({
     sidebarOpen: false,
+    showAppInformation: false,
     theme: 'system',
     breadcrumbs: [],
     loaded: false,
@@ -34,6 +36,7 @@ export class LayoutService {
 
   // selectors
   sidebarOpen = computed(() => this.state().sidebarOpen);
+  showAppInformation = computed(() => this.state().showAppInformation);
   breadcrumbs = computed(() => this.state().breadcrumbs);
   theme = computed(() => this.state().theme);
   loaded = computed(() => this.state().loaded);
@@ -44,6 +47,7 @@ export class LayoutService {
     theme: this.localStorageService.loadString(THEME_STATE_KEY),
   });
   toggleSidebar$ = new Subject<void>();
+  toggleAppInformation$ = new Subject<void>();
   setDarkTheme$ = new Subject<void>();
   setLightTheme$ = new Subject<void>();
   setSystemTheme$ = new Subject<void>();
@@ -95,6 +99,15 @@ export class LayoutService {
         this.state.update((state) => ({
           ...state,
           sidebarOpen: !state.sidebarOpen,
+        }));
+      },
+    });
+
+    this.toggleAppInformation$.pipe(takeUntilDestroyed()).subscribe({
+      next: () => {
+        this.state.update((state) => ({
+          ...state,
+          showAppInformation: !state.showAppInformation,
         }));
       },
     });

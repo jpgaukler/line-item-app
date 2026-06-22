@@ -44,5 +44,12 @@
 
     <!-- Profile -->
     <a routerLink="/profile" class="p-4 font-bold hover:underline">Profile</a>
+
+    <button
+      class="hover:bg-input cursor-pointer rounded-md p-2"
+      (click)="toggleAppInformation.emit()"
+    >
+      Information
+    </button>
   </div>
 </header>

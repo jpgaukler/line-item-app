@@ -11,5 +11,6 @@ import { LayoutBreadcrumb } from '../../interfaces/layout-breadcrumb.interface';
 export class LayoutTopbarComponent {
   sidebarOpen = input.required<boolean>();
   breadcrumbs = input.required<LayoutBreadcrumb[]>();
+  toggleAppInformation = output();
   toggleSidebarClick = output();
 }
