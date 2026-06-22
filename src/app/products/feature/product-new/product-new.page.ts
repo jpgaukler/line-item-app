@@ -1,37 +1,40 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
+import { form, FormField, maxLength, required, submit } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { LayoutService } from '../../../layout/data-access/layout.service';
+import { ProductHttpService } from '../../../shared/data-access/product.http.service';
 import { ButtonDirective } from '../../../shared/ui/button-primary.directive';
-import { ProductListService } from '../../data-access/product-list.service';
 import {
   MAX_PRODUCT_DESCRIPTION_LENGTH,
   MAX_PRODUCT_NAME_LENGTH,
+  NewProduct,
 } from '../../interfaces/product.interface';
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, ReactiveFormsModule, ButtonDirective],
+  imports: [CommonModule, ButtonDirective, FormField],
   templateUrl: './product-new.page.html',
-  providers: [ProductListService],
 })
 export class ProductNewPage implements OnDestroy {
   private readonly router = inject(Router);
-  private readonly formBuilder = inject(FormBuilder);
   private readonly layoutService = inject(LayoutService);
-  public readonly productListService = inject(ProductListService);
+  public readonly productHttpService = inject(ProductHttpService);
 
   maxNameLength = MAX_PRODUCT_NAME_LENGTH;
   maxDescriptionLength = MAX_PRODUCT_DESCRIPTION_LENGTH;
 
-  newProductForm = this.formBuilder.group({
-    name: ['', [Validators.required, Validators.maxLength(MAX_PRODUCT_NAME_LENGTH)]],
-    description: ['', [Validators.required, Validators.maxLength(MAX_PRODUCT_DESCRIPTION_LENGTH)]],
+  private newProduct = signal<NewProduct>({
+    name: '',
+    description: '',
   });
 
-  nameControl = this.newProductForm.controls.name;
-  descriptionControl = this.newProductForm.controls.description;
+  newProductForm = form(this.newProduct, (form) => {
+    required(form.name);
+    maxLength(form.name, MAX_PRODUCT_NAME_LENGTH);
+    required(form.description);
+    maxLength(form.description, MAX_PRODUCT_DESCRIPTION_LENGTH);
+  });
 
   constructor() {
     this.layoutService.updateBreadcrumbs$.next([
@@ -45,20 +48,13 @@ export class ProductNewPage implements OnDestroy {
     this.layoutService.clearBreadcrumbs$.next();
   }
 
-  submit(): void {
-    if (this.newProductForm.invalid) {
-      this.newProductForm.markAllAsTouched();
-      return;
-    }
+  submit(event: Event) {
+    event.preventDefault();
 
-    this.productListService.addProduct$.next({
-      name: this.nameControl.value!,
-      description: this.descriptionControl.value!,
+    submit(this.newProductForm, async () => {
+      const newProduct = this.newProduct();
+      this.productHttpService.createProduct(newProduct);
+      this.router.navigate(['/products']);
     });
-
-    // this is navigating away too fast, so the product isnt saving because the
-    // service is getting destroyed before the effect runs.
-    // need to find a better way to handle this
-    // this.router.navigate(['/products']);
   }
 }

@@ -5,6 +5,6 @@ export const environment: Environment = {
   auth0: {
     domain: 'login.dev.line-item.app',
     clientId: 'N8B3KhcpMYABAjSjwZ3jBbqDXE8ZD5gG',
-    audience: 'https://line-item.app',
+    apiAudience: 'https://line-item.app/api',
   },
 };

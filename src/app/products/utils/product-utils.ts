@@ -141,3 +141,39 @@ export function buildProductCodeHash(product: Product): string {
 
   return fnv1a(fingerprint, { size: 64 }).toString();
 }
+
+import { SchemaPath, validate } from '@angular/forms/signals';
+
+/**
+ * Ensures that a string field value is unique across all items in a sibling array path.
+ * @param itemPath The path to the specific item string field being validated (e.g., adder.name)
+ * @param arrayPath The path to the parent collection array (e.g., form.product.adders)
+ * @param errorKind The error identifier key
+ * @param errorMessage The message bound to the validation state
+ */
+export function uniqueInArray(
+  itemPath: SchemaPath<string>,
+  arrayPath: SchemaPath<any[]>,
+  errorKind = 'uniqueValue',
+  errorMessage = 'Value must be unique.',
+) {
+  validate(itemPath, (context) => {
+    const currentValue = context.value();
+    if (!currentValue) {
+      return null;
+    }
+
+    const segments = context.pathKeys();
+    const propKey = segments[segments.length - 1];
+
+    // Reactively extract the parent array using valueOf
+    const allItems = context.valueOf(arrayPath) || [];
+    const matches = allItems.filter(
+      (item: any) =>
+        !!item?.[propKey] &&
+        item?.[propKey].trim().toLowerCase() === currentValue.trim().toLowerCase(),
+    );
+
+    return matches.length > 1 ? { kind: errorKind, message: errorMessage } : null;
+  });
+}

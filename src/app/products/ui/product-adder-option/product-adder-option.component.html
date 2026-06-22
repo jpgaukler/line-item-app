@@ -1,0 +1,61 @@
+<div class="ml-2 flex flex-row items-center gap-2">
+  <button
+    type="button"
+    class="group flex h-6 w-6 cursor-pointer items-center justify-center rounded-full"
+    (click)="setDefaultClick.emit()"
+  >
+    <div
+      class="bg-input h-3 w-3 rounded-full"
+      [ngClass]="{
+        'bg-primary': isDefaultOption(),
+        'group-hover:bg-primary': !isDefaultOption(),
+      }"
+    ></div>
+  </button>
+
+  <div class="flex flex-1 flex-col">
+    <input
+      type="text"
+      [formField]="optionForm().displayText"
+      placeholder="Option"
+      class="hover:bg-input focus:bg-input flex-1 rounded-md border p-2"
+      [ngClass]="{
+        'border-destructive': optionForm().displayText().invalid(),
+      }"
+    />
+    @if (optionForm().displayText().invalid()) {
+      <div>
+        @for (error of optionForm().displayText().errors(); track error.kind) {
+          <p class="text-destructive">{{ error.message }}</p>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="flex flex-col">
+    <input
+      type="number"
+      [formField]="optionForm().price"
+      placeholder="Price"
+      class="hover:bg-input focus:bg-input rounded-md border p-2"
+      [ngClass]="{
+        'border-destructive': optionForm().price().invalid(),
+      }"
+    />
+    @if (optionForm().price().invalid()) {
+      <div>
+        @for (error of optionForm().price().errors(); track error.kind) {
+          <p class="text-destructive">{{ error.message }}</p>
+        }
+      </div>
+    }
+  </div>
+
+  <button
+    type="button"
+    class="hover:bg-muted cursor-pointer rounded-full p-2"
+    (click)="removeClick.emit()"
+  >
+    <svg app-icon-trash class="size-4"></svg>
+  </button>
+</div>

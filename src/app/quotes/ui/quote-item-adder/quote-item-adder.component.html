@@ -1,0 +1,16 @@
+@if (showCustom()) {
+  <app-quote-item-adder-custom
+    [productAdder]="productAdder()"
+    [(customPrice)]="customPrice"
+    [(customDisplayText)]="customDisplayText"
+    (saveClick)="saveCustomClick()"
+    (cancelClick)="cancelCustomClick()"
+  ></app-quote-item-adder-custom>
+} @else {
+  <app-quote-item-adder-dropdown
+    [quoteItemAdder]="quoteItemAdder()"
+    [productAdder]="productAdder()"
+    (selectedOptionChange)="selectedOptionChange($event)"
+    (showCustomClick)="showCustomClick()"
+  ></app-quote-item-adder-dropdown>
+}

@@ -1,0 +1,21 @@
+<div class="inline-flex items-center justify-between rounded-full border px-3 py-2">
+  <button
+    class="hover:text-foreground/80 flex cursor-pointer items-center justify-center"
+    (click)="decrement()"
+  >
+    @if (quantity() === 1) {
+      <svg app-icon-trash class="size-4"></svg>
+    } @else {
+      <svg app-icon-minus class="size-4"></svg>
+    }
+  </button>
+
+  <span class="px-4 text-sm">{{ quantity() }}</span>
+
+  <button
+    class="hover:text-foreground/80 flex cursor-pointer items-center justify-center"
+    (click)="increment()"
+  >
+    <svg app-icon-plus class="size-4"></svg>
+  </button>
+</div>

@@ -1,4 +1,3 @@
-import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { describe, expect, it } from 'vitest';
@@ -18,7 +17,7 @@ describe('QuoteNewService', () => {
       inputs: [
         {
           name: 'Color',
-          allowCustomValue: false,
+          allowCustomOption: false,
           defaultOptionIndex: 0,
           options: [
             { displayText: 'Red', value: 'RED' },
@@ -26,6 +25,14 @@ describe('QuoteNewService', () => {
           ],
         },
       ],
+      priceDictionary: {
+        productCodeHash: '123',
+        prices: {
+          'SKU-RED': 100,
+          'SKU-BLUE': 150,
+        },
+      },
+      adders: [],
     },
     {
       id: 'product-2',
@@ -35,7 +42,7 @@ describe('QuoteNewService', () => {
       inputs: [
         {
           name: 'Size',
-          allowCustomValue: false,
+          allowCustomOption: false,
           defaultOptionIndex: 1,
           options: [
             { displayText: 'Small', value: 'SM' },
@@ -43,6 +50,14 @@ describe('QuoteNewService', () => {
           ],
         },
       ],
+      priceDictionary: {
+        productCodeHash: '123',
+        prices: {
+          'SKU-SM': 100,
+          'SKU-LRG': 150,
+        },
+      },
+      adders: [],
     },
     {
       id: 'product-3',
@@ -52,7 +67,7 @@ describe('QuoteNewService', () => {
       inputs: [
         {
           name: 'Diameter',
-          allowCustomValue: false,
+          allowCustomOption: false,
           defaultOptionIndex: 0,
           options: [
             { displayText: '1 inch', value: '1' },
@@ -60,13 +75,20 @@ describe('QuoteNewService', () => {
           ],
         },
       ],
+      priceDictionary: {
+        productCodeHash: '123',
+        prices: {
+          'SKU-1': 100,
+          'SKU-2': 150,
+        },
+      },
+      adders: [],
     },
   ];
 
   beforeAll(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideZonelessChangeDetection(),
         QuoteNewService,
         {
           provide: ProductHttpService,
@@ -106,24 +128,25 @@ describe('QuoteNewService', () => {
     expect(item1.description, 'item has product description').toBe(product.description);
     expect(item1.productCode, 'item has default product code').toBe('SKU-RED');
     expect(item1.price, 'item price is greater than 0').toBeGreaterThan(0);
+    expect(item1.quantity, 'item quantity is 1').toBe(1);
   });
 
-  it('should update the item description', () => {
+  it('should update the item quantity', () => {
     const systemKey = service.systemMap().keys().next().value as QuoteSystemKey;
     const itemKey = service.systemItemKeyMap().get(systemKey)![0];
     const currentItem = service.itemMap().get(itemKey)!;
-    const newDescription = 'New item description';
+    const newQuantity = currentItem.quantity + 1;
 
     service.updateItem$.next({
       itemKey,
       updatedItem: {
         ...currentItem,
-        description: newDescription,
+        quantity: newQuantity,
       },
     });
 
     const updatedItem = service.quote().systems[0].items[0];
-    expect(updatedItem.description, 'item description is updated').toBe(newDescription);
+    expect(updatedItem.quantity, 'item quantity is updated').toBe(newQuantity);
   });
 
   it('should add a second item', () => {

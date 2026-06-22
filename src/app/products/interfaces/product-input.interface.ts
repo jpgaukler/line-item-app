@@ -2,7 +2,7 @@ import { ProductInputOption } from './product-input-option.interface';
 
 export interface ProductInput {
   name: string;
-  allowCustomValue: boolean;
+  allowCustomOption: boolean;
   defaultOptionIndex: number;
   options: ProductInputOption[];
 }

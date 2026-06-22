@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, input, model, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProductInputOption } from '../../../products/interfaces/product-input-option.interface';
@@ -9,12 +8,7 @@ import { QuoteItemInputDropdownComponent } from '../quote-item-input-dropdown/qu
 
 @Component({
   selector: 'app-quote-item-input',
-  imports: [
-    CommonModule,
-    FormsModule,
-    QuoteItemInputCustomComponent,
-    QuoteItemInputDropdownComponent,
-  ],
+  imports: [FormsModule, QuoteItemInputCustomComponent, QuoteItemInputDropdownComponent],
   templateUrl: './quote-item-input.component.html',
 })
 export class QuoteItemInputComponent {

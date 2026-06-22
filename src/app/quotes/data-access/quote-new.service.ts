@@ -34,7 +34,7 @@ interface QuoteNewState {
   systemMap: Map<QuoteSystemKey, QuoteSystem>;
 
   /** The system key where an item is being added, otherwise null */
-  showAddItem: QuoteSystemKey | null;
+  showAddItem: { systemKey: QuoteSystemKey; itemIndex: number } | null;
 
   /** A Map of system keys to array of item keys for the quote items in each system. */
   systemItemKeyMap: Map<QuoteSystemKey, QuoteItemKey[]>;
@@ -92,28 +92,40 @@ export class QuoteNewService {
   itemMap = computed(() => this.state().itemMap);
   quote = computed(() => {
     const state = this.state();
-    const systems = Array.from(state.systemMap.entries(), ([systemKey, system], systemIndex) => ({
-      price: state.systemItemKeyMap
-        .get(systemKey)!
-        .reduce((total, itemKey) => total + state.itemMap.get(itemKey)!.price, 0),
-      name: `System ${systemIndex + 1}`,
-      items: state.systemItemKeyMap
-        .get(systemKey)!
-        .map((itemKey) => state.itemMap.get(itemKey)!)
-        .map((item, itemIndex) => ({
+
+    const systems = Array.from(state.systemMap.entries(), ([systemKey, system], systemIndex) => {
+      const items = state.systemItemKeyMap.get(systemKey)!.map((itemKey, itemIndex) => {
+        const item = state.itemMap.get(itemKey)!;
+
+        return {
           productId: item.productId,
           itemNumber: `${systemIndex + 1}.${itemIndex + 1}`,
           name: item.name,
           description: item.description,
           productCode: item.productCode,
-          price: item.price,
+          basePrice: item.basePrice,
+          unitPrice:
+            item.basePrice + item.adders.reduce((adderTotal, adder) => adderTotal + adder.price, 0),
+          quantity: item.quantity,
           inputs: item.inputs.map((input) => ({
             name: input.name,
             value: input.value,
             displayText: input.displayText,
           })),
-        })),
-    }));
+          adders: item.adders.map((adder) => ({
+            name: adder.name,
+            displayText: adder.displayText,
+            price: adder.price,
+          })),
+        };
+      });
+
+      return {
+        name: `System ${systemIndex + 1}`,
+        items: items,
+        price: items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
+      };
+    });
 
     const quote: QuoteModel = {
       name: state.name,
@@ -144,17 +156,22 @@ export class QuoteNewService {
   );
 
   addSystem$ = new Subject<void>();
-  showAddItem$ = new Subject<QuoteSystemKey>();
-  addItem$ = new Subject<{ systemKey: QuoteSystemKey; product: Product }>();
+  reorderSystem$ = new Subject<{ previousIndex: number; currentIndex: number }>();
+  removeSystem$ = new Subject<QuoteSystemKey>();
+  showAddItem$ = new Subject<{ systemKey: QuoteSystemKey; itemIndex: number }>();
+  addItem$ = new Subject<{ systemKey: QuoteSystemKey; product: Product; itemIndex: number }>();
   updateItem$ = new Subject<{
     itemKey: QuoteItemKey;
     updatedItem: QuoteItem;
   }>();
-  reorderSystem$ = new Subject<{ previousIndex: number; currentIndex: number }>();
   reorderItem$ = new Subject<{
     systemKey: QuoteSystemKey;
     previousIndex: number;
     currentIndex: number;
+  }>();
+  removeItem$ = new Subject<{
+    systemKey: QuoteSystemKey;
+    itemKey: QuoteItemKey;
   }>();
 
   constructor() {
@@ -222,7 +239,28 @@ export class QuoteNewService {
         });
       });
 
-    this.showAddItem$.pipe(takeUntilDestroyed()).subscribe((next: QuoteSystemKey) => {
+    this.removeSystem$.pipe(takeUntilDestroyed()).subscribe((next) =>
+      this.state.update((state) => {
+        const itemKeysToRemove = state.systemItemKeyMap.get(next)!;
+        const updatedItemMap = new Map(state.itemMap);
+        itemKeysToRemove.forEach((itemKey) => updatedItemMap.delete(itemKey));
+
+        const updatedSystemItemKeyMap = new Map(state.systemItemKeyMap);
+        updatedSystemItemKeyMap.delete(next);
+
+        const updatedSystemMap = new Map(state.systemMap);
+        updatedSystemMap.delete(next);
+
+        return {
+          ...state,
+          systemMap: updatedSystemMap,
+          systemItemKeyMap: updatedSystemItemKeyMap,
+          itemMap: updatedItemMap,
+        };
+      }),
+    );
+
+    this.showAddItem$.pipe(takeUntilDestroyed()).subscribe((next) => {
       this.state.update((state) => ({
         ...state,
         showAddItem: next,
@@ -264,12 +302,18 @@ export class QuoteNewService {
             name: next.product.name,
             description: next.product.description,
             productCode: next.productCode,
-            price: next.price,
+            basePrice: next.price,
+            quantity: 1,
             inputs: next.defaultInputs,
+            adders: [],
           };
 
           const itemKeys: QuoteItemKey[] = state.systemItemKeyMap.get(next.systemKey)!;
-          const updatedItemKeys: QuoteItemKey[] = [...itemKeys, newItemKey];
+          const updatedItemKeys: QuoteItemKey[] = [
+            ...itemKeys.slice(0, next.itemIndex),
+            newItemKey,
+            ...itemKeys.slice(next.itemIndex),
+          ];
 
           return {
             ...state,
@@ -290,7 +334,7 @@ export class QuoteNewService {
           this.productHttpService
             .getProductPrice(next.updatedItem.productId, next.updatedItem.productCode)
             .pipe(
-              map((price) => ({ ...next, updatedItem: { ...next.updatedItem, price: price } })),
+              map((price) => ({ ...next, updatedItem: { ...next.updatedItem, basePrice: price } })),
               catchError((err) => {
                 // if no price match found (ie: -X product), then need to decide what to do.
                 // Maybe user should enter manual price?
@@ -333,5 +377,21 @@ export class QuoteNewService {
           });
         },
       );
+
+    this.removeItem$.pipe(takeUntilDestroyed()).subscribe((next) => {
+      this.state.update((state) => {
+        const itemKeys: QuoteItemKey[] = state.systemItemKeyMap.get(next.systemKey)!;
+        const updatedItemKeys: QuoteItemKey[] = itemKeys.filter((key) => key !== next.itemKey);
+
+        const updatedItemMap = new Map(state.itemMap);
+        updatedItemMap.delete(next.itemKey);
+
+        return {
+          ...state,
+          systemItemKeyMap: new Map([...state.systemItemKeyMap, [next.systemKey, updatedItemKeys]]),
+          itemMap: updatedItemMap,
+        };
+      });
+    });
   }
 }

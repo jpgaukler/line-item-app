@@ -1,0 +1,65 @@
+@if (productEditService.error()) {
+  <p class="text-destructive">Error: {{ productEditService.error() }}</p>
+}
+
+@if (!productEditService.loaded()) {
+  <p>Loading...</p>
+} @else {
+  <button appButton type="button" (click)="showDebug.set(!showDebug())">Toggle Debug</button>
+  @if (showDebug()) {
+    <div class="bg-sidebar mt-8 border p-4">
+      <h3 class="font-bold">Debug Form Value:</h3>
+      <pre>{{ productEditService.product().adders | json }}</pre>
+    </div>
+  }
+  <div class="flex flex-col gap-4">
+    <!-- Product Info Display -->
+    <div class="bg-sidebar flex flex-col gap-2 rounded-md p-4">
+      <h2 class="text-lg font-bold">{{ productEditService.product().name }}</h2>
+      <p class="text-muted-foreground text-sm">{{ productEditService.product().description }}</p>
+      <p class="text-sm">Product ID: {{ productEditService.product().id }}</p>
+    </div>
+
+    <!-- Adders Section (Placeholder) -->
+    <div class="flex flex-col gap-2 rounded-md border p-4">
+      <h3 class="font-bold">Adders</h3>
+
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-row justify-between gap-4">
+          <div class="flex flex-row gap-2">
+            <!-- <button appButton variant="primary" type="submit" [disabled]="!productForm.dirty">
+              Save Changes
+            </button>
+            <button appButton type="button" (click)="reset()" [disabled]="!productForm.dirty">
+              Discard Changes
+            </button> -->
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-6 rounded-md p-4">
+          <div class="flex flex-col gap-4" cdkDropList (cdkDropListDropped)="reorderAdder($event)">
+            @for (
+              adderForm of productEditService.productForm().adders;
+              track $index;
+              let index = $index
+            ) {
+              <div cdkDrag>
+                <app-product-adder
+                  [adderForm]="adderForm"
+                  (removeClick)="removeAdder(index)"
+                ></app-product-adder>
+              </div>
+            }
+          </div>
+          <button
+            type="button"
+            class="hover:bg-muted cursor-pointer rounded-md border border-dotted p-4 text-left font-medium"
+            (click)="addAdder()"
+          >
+            + New Adder
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

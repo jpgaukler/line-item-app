@@ -3,6 +3,6 @@ export interface Environment {
   auth0: {
     domain: string;
     clientId: string;
-    audience: string;
+    apiAudience: string;
   };
 }

@@ -1,0 +1,56 @@
+<div class="flex flex-col gap-2 rounded-md border p-4">
+  <div class="flex flex-row justify-between gap-4">
+    <input
+      type="text"
+      class="hover:bg-input focus:bg-input rounded-md text-lg font-bold"
+      [formField]="inputForm().name"
+      [ngClass]="{
+        'border-destructive border': inputForm().name().invalid(),
+      }"
+    />
+
+    @if (inputForm().name().invalid()) {
+      <div>
+        @for (error of inputForm().name().errors(); track error.kind) {
+          <p class="text-destructive">{{ error.message }}</p>
+        }
+      </div>
+    }
+
+    <button
+      type="button"
+      class="hover:bg-muted cursor-pointer rounded-full p-2"
+      (click)="removeClick.emit()"
+    >
+      <svg app-icon-x-mark class="size-4"></svg>
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-4" cdkDropList (cdkDropListDropped)="reorderOption($event)">
+    @for (optionForm of inputForm().options; track $index; let index = $index) {
+      <div cdkDrag>
+        <app-product-input-option
+          [optionForm]="optionForm"
+          [isDefaultOption]="index === inputForm().defaultOptionIndex().value()"
+          (setDefaultClick)="inputForm().defaultOptionIndex().value.set(index)"
+          (removeClick)="removeOption(index)"
+        ></app-product-input-option>
+      </div>
+    }
+  </div>
+
+  <div class="mx-2 mt-2 flex flex-row justify-between">
+    <button
+      type="button"
+      class="text-primary hover:text-primary/80 cursor-pointer font-medium"
+      (click)="addOption()"
+    >
+      Add Option
+    </button>
+
+    <label>
+      <input type="checkbox" [formField]="inputForm().allowCustomOption" />
+      Allow custom values
+    </label>
+  </div>
+</div>

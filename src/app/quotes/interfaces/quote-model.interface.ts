@@ -12,11 +12,18 @@ export interface QuoteModel {
       name: string;
       description: string;
       productCode: string;
-      price: number;
+      basePrice: number;
+      unitPrice: number;
+      quantity: number;
       inputs: {
         name: string;
         value: string;
         displayText: string;
+      }[];
+      adders: {
+        name: string;
+        displayText: string;
+        price: number;
       }[];
     }[];
   }[];

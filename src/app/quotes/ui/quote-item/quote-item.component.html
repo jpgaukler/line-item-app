@@ -1,13 +1,17 @@
 <div class="flex flex-col gap-2">
   <div class="relative flex flex-row items-center gap-2">
     <div class="group absolute -translate-x-full">
-      <app-drag-handle class="invisible group-hover:visible"></app-drag-handle>
+      <svg
+        app-icon-drag-handle
+        cdkDragHandle
+        class="invisible size-6 cursor-move group-hover:visible"
+      ></svg>
     </div>
     <span class="bg-accent rounded-md px-3 font-semibold">
       {{ systemIndex() + 1 }}.{{ itemIndex() + 1 }}
     </span>
     <span class="font-bold">{{ item().productCode }}</span>
-    <span class="ml-auto font-bold">{{ item().price | currency }}</span>
+    <span class="ml-auto pr-7">{{ item().basePrice | currency }}</span>
   </div>
   <p>{{ item().description }}</p>
   <div class="flex flex-col gap-1">
@@ -19,5 +23,42 @@
         (quoteItemInputChange)="inputChange($event)"
       ></app-quote-item-input>
     }
+    @if (item().adders.length > 0) {
+      @for (adder of item().adders; track $index; let adderIndex = $index) {
+        @let itemAdder = item().adders[adderIndex];
+        @let productAdder = product().adders.find((a) => a.name === itemAdder.name)!;
+        <app-quote-item-adder
+          [productAdder]="productAdder"
+          [quoteItemAdder]="itemAdder"
+          (quoteItemAdderChange)="adderChange(adderIndex, $event)"
+        ></app-quote-item-adder>
+      }
+    }
+    @if (showAdders()) {
+      <div class="flex gap-4">
+        @for (adder of product().adders; track adder.name) {
+          <div appButton (click)="insertAdder(adder)" class="rounded-full!">
+            {{ adder.name }}
+          </div>
+        }
+      </div>
+    }
+    <div class="mt-2 flex flex-row items-baseline justify-between gap-2">
+      @if (showAdders()) {
+        <button
+          (click)="showAdders.set(false)"
+          class="hover:text-primary/70 cursor-pointer font-medium"
+        >
+          Cancel
+        </button>
+      } @else {
+        <button appButton (click)="showAdders.set(true)" class="rounded-full!">+ Adder</button>
+      }
+      <app-quote-item-quantity
+        [quantity]="item().quantity"
+        (quantityChange)="quantityChange($event)"
+        (deleteClick)="deleteClick.emit()"
+      ></app-quote-item-quantity>
+    </div>
   </div>
 </div>
