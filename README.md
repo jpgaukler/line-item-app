@@ -1,4 +1,4 @@
-# Line-Item
+# Line Item App
 
 Line-Item is a web app for configuring products and generating priced sales quotes. Users define
 products with configurable inputs (options, dropdowns, custom values) and price adders, then
